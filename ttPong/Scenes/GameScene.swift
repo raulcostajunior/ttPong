@@ -18,6 +18,10 @@ class GameScene: SKScene {
     override init(size: CGSize) {
         super.init(size: size)
         backgroundColor = SKColor(red: 0.0, green: 0.0, blue:0.0, alpha: 1.0)
+        
+        let disc = DiscSprite(for: size)
+        disc.position = CGPoint(x: 100.0, y: 100.0)
+        self.addChild(disc)
     }
 
 }
