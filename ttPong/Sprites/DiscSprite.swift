@@ -21,14 +21,32 @@ class DiscSprite: SKSpriteNode {
         UIGraphicsBeginImageContext(CGSize(width: intDiameter,
                                            height: intDiameter))
         let ctxt: CGContext! = UIGraphicsGetCurrentContext()
-        ctxt.setFillColor(red: 255.0, green: 234.0, blue: 0.0, alpha: 1.0)
-        ctxt.setStrokeColor(red: 255.0, green: 234.0, blue: 0.0, alpha: 1.0)
+        // The disc body.
+        ctxt.setFillColor(red: 1.0, green: 234.0/255.0, blue: 0.0,
+                          alpha: 1.0)
         ctxt.addEllipse(in: CGRect(x: 0.0, y: 0.0,
                                    width: Double(diameter),
                                    height:Double(diameter)))
-        ctxt.drawPath(using: .fillStroke)
+        ctxt.drawPath(using: .fill)
+        // The border arcs - provide feedback on rotation.
+        ctxt.setStrokeColor(red: 1.0, green: 106.0/255.0,
+                            blue: 0.0, alpha: 1.0)
+        let radius = CGFloat(diameter/2.0)
+        let center = CGPoint(x: radius, y: radius)
+        ctxt.setLineWidth(4.0)
+        ctxt.addArc(center: center, radius: radius - 4.0,
+                    startAngle: 0.0, endAngle: 1.0472, clockwise: false)
+        ctxt.drawPath(using: .stroke)
+        ctxt.addArc(center: center, radius: radius - 4.0,
+                    startAngle: 2.0944, endAngle: 3.14159, clockwise: false)
+        ctxt.drawPath(using: .stroke)
+        ctxt.addArc(center: center, radius: radius - 4.0,
+                    startAngle: 4.1887, endAngle: 5.23599, clockwise: false)
+        ctxt.drawPath(using: .stroke)
+
         let textureImg: UIImage! = UIGraphicsGetImageFromCurrentImageContext()
         let texture = SKTexture(image: textureImg)
+        UIGraphicsEndImageContext()
         
         super.init(texture: texture, color: UIColor.clear, size: texture.size())
     }
