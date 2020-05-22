@@ -14,41 +14,81 @@ class DiscSprite: SKSpriteNode {
         super.init(coder: aDecoder)
     }
     
-    // Creates the disc sprite from a dynamically generated image of the disc.
+    private var _active = false
+    
+    private var _activeTexture: SKTexture!
+    private var _inactiveTexture: SKTexture!
+    
+    /**
+     The disc is active when at least one of the pads is active.
+     
+     When the disc is active it is fully opaque, otherwise it is
+     partially transparent.
+     
+     The disc depends on an external stimulus to be active or inactive.
+     */
+    var isActive: Bool {
+        get {
+            _active
+        }
+        set {
+            _active = newValue
+            if _active {
+                texture = _activeTexture
+            } else {
+                texture = _inactiveTexture
+            }
+        }
+    }
+    
     init(for sceneSize:CGSize) {
         let diameter = Double(sceneSize.height/12.0)
         let intDiameter = Int(round(diameter))
-        UIGraphicsBeginImageContext(CGSize(width: intDiameter,
-                                           height: intDiameter))
+       
+        super.init(texture: nil, color: UIColor.clear,
+                   size: CGSize(width: intDiameter, height: intDiameter))
+        
+        _inactiveTexture = initTexture(diameter: intDiameter, active: false)
+        _activeTexture = initTexture(diameter: intDiameter, active: true)
+        
+        texture = _inactiveTexture
+    }
+    
+    private func initTexture(diameter: Int, active: Bool) -> SKTexture? {
+        UIGraphicsBeginImageContext(CGSize(width: diameter,
+                                           height: diameter))
+        let discAlpha = CGFloat(active ? 1.0 : 0.5)
+        
         let ctxt: CGContext! = UIGraphicsGetCurrentContext()
         // The disc body.
         ctxt.setFillColor(red: 1.0, green: 234.0/255.0, blue: 0.0,
-                          alpha: 1.0)
+                          alpha: discAlpha)
         ctxt.addEllipse(in: CGRect(x: 0.0, y: 0.0,
                                    width: Double(diameter),
                                    height:Double(diameter)))
         ctxt.drawPath(using: .fill)
-        // The border arcs - provide feedback on rotation.
-        ctxt.setStrokeColor(red: 1.0, green: 106.0/255.0,
-                            blue: 0.0, alpha: 1.0)
-        let radius = CGFloat(diameter/2.0)
-        let center = CGPoint(x: radius, y: radius)
-        ctxt.setLineWidth(4.0)
-        ctxt.addArc(center: center, radius: radius - 4.0,
-                    startAngle: 0.0, endAngle: 1.0472, clockwise: false)
-        ctxt.drawPath(using: .stroke)
-        ctxt.addArc(center: center, radius: radius - 4.0,
-                    startAngle: 2.0944, endAngle: 3.14159, clockwise: false)
-        ctxt.drawPath(using: .stroke)
-        ctxt.addArc(center: center, radius: radius - 4.0,
-                    startAngle: 4.1887, endAngle: 5.23599, clockwise: false)
-        ctxt.drawPath(using: .stroke)
+        // The border arcs - provide feedback on rotation - only when active.
+        if active {
+            ctxt.setStrokeColor(red: 1.0, green: 106.0/255.0,
+                                blue: 0.0, alpha: discAlpha)
+            let radius = CGFloat(Double(diameter)/2.0)
+            let center = CGPoint(x: radius, y: radius)
+            ctxt.setLineWidth(4.0)
+            ctxt.addArc(center: center, radius: radius - 4.0,
+                        startAngle: 0.0, endAngle: 1.0472, clockwise: false)
+            ctxt.drawPath(using: .stroke)
+            ctxt.addArc(center: center, radius: radius - 4.0,
+                        startAngle: 2.0944, endAngle: 3.14159, clockwise: false)
+            ctxt.drawPath(using: .stroke)
+            ctxt.addArc(center: center, radius: radius - 4.0,
+                        startAngle: 4.1887, endAngle: 5.23599, clockwise: false)
+            ctxt.drawPath(using: .stroke)
+        }
 
         let textureImg: UIImage! = UIGraphicsGetImageFromCurrentImageContext()
-        let texture = SKTexture(image: textureImg)
         UIGraphicsEndImageContext()
         
-        super.init(texture: texture, color: UIColor.clear, size: texture.size())
+        return SKTexture(image: textureImg)
     }
     
 
