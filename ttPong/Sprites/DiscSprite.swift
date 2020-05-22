@@ -33,11 +33,7 @@ class DiscSprite: SKSpriteNode {
         }
         set {
             _active = newValue
-            if _active {
-                texture = _activeTexture
-            } else {
-                texture = _inactiveTexture
-            }
+            texture = _active ? _activeTexture : _inactiveTexture
         }
     }
     
