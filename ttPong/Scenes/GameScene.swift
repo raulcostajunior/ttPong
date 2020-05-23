@@ -9,6 +9,7 @@
 import SpriteKit
 import GameplayKit
 
+
 class GameScene: SKScene {
     
     static let PAD_INSET = CGFloat(12.0)
@@ -41,6 +42,10 @@ class GameScene: SKScene {
         self.addChild(rightPad)       
     }
     
+    override func update(_ currentTime: TimeInterval) {
+        // TODO: display top menu if state is WaitingForStart or Paused
+         
+    }
     override func didEvaluateActions() {
         disc.isActive = leftPad.isActive || rightPad.isActive
     }

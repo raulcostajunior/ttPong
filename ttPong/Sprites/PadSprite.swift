@@ -9,6 +9,10 @@
 import SpriteKit
 
 class PadSprite: SKSpriteNode {
+    
+    // Width set to the minimum recommended width for touch interactive
+    // elements.
+    static let WIDTH = 44
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -29,14 +33,13 @@ class PadSprite: SKSpriteNode {
     
     init(for sceneSize:CGSize) {
         let height = Int(round(sceneSize.height/3.6))
-        let width = Int(round(sceneSize.width*2.5 / 40.0))
-        
+            
         super.init(texture: nil, color: UIColor.clear,
-                   size: CGSize(width: width, height: height))
+                   size: CGSize(width: PadSprite.WIDTH, height: height))
 
-        _inactiveTexture = initTexture(width: width, height: height,
+        _inactiveTexture = initTexture(width: PadSprite.WIDTH, height: height,
                                        active: false)
-        _activeTexture = initTexture(width: width, height: height,
+        _activeTexture = initTexture(width: PadSprite.WIDTH, height: height,
                                      active: true)
         
         texture = _inactiveTexture

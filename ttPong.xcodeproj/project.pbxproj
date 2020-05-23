@@ -18,6 +18,7 @@
 		CBBF951E244CA6F700789DE2 /* DiscSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBBF951D244CA6F700789DE2 /* DiscSprite.swift */; };
 		CBBF9520244CA77A00789DE2 /* BeamGenSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBBF951F244CA77A00789DE2 /* BeamGenSprite.swift */; };
 		CBBF9523244CA84900789DE2 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBBF9522244CA84900789DE2 /* GameScene.swift */; };
+		CBDFE8EA24797F74003EE801 /* GameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDFE8E924797F74003EE801 /* GameData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		CBBF951D244CA6F700789DE2 /* DiscSprite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscSprite.swift; sourceTree = "<group>"; };
 		CBBF951F244CA77A00789DE2 /* BeamGenSprite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeamGenSprite.swift; sourceTree = "<group>"; };
 		CBBF9522244CA84900789DE2 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		CBDFE8E924797F74003EE801 /* GameData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +111,7 @@
 				CBBF951A244CA5EB00789DE2 /* Sprites */,
 				CBBF94DA244AE65000789DE2 /* AppDelegate.swift */,
 				CBBF94E2244AE65000789DE2 /* GameViewController.swift */,
+				CBDFE8E924797F74003EE801 /* GameData.swift */,
 				CBBF94E4244AE65000789DE2 /* Main.storyboard */,
 				CBBF94E7244AE65100789DE2 /* Assets.xcassets */,
 				CBBF94E9244AE65100789DE2 /* LaunchScreen.storyboard */,
@@ -284,6 +287,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CBDFE8EA24797F74003EE801 /* GameData.swift in Sources */,
 				CBBF9523244CA84900789DE2 /* GameScene.swift in Sources */,
 				CBBF9520244CA77A00789DE2 /* BeamGenSprite.swift in Sources */,
 				CBBF94E3244AE65000789DE2 /* GameViewController.swift in Sources */,
