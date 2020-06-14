@@ -1,5 +1,5 @@
 //
-//  GameScene.swift
+//  CourtScene.swift
 //  ttPong
 //
 //  Created by Raul Costa Junior on 18.04.20.
@@ -10,7 +10,7 @@ import SpriteKit
 import GameplayKit
 
 
-class GameScene: SKScene {
+class CourtScene: SKScene {
     
     static let PAD_INSET = CGFloat(12.0)
 
@@ -31,13 +31,13 @@ class GameScene: SKScene {
         self.addChild(disc)
 
         leftPad = PadSprite(for: size)
-        let lHPos = leftPad.size.width/2.0 + GameScene.PAD_INSET
+        let lHPos = leftPad.size.width/2.0 + CourtScene.PAD_INSET
         let vPos = size.height/2.0
         leftPad.position = CGPoint(x: lHPos, y: vPos)
         self.addChild(leftPad)
 
         rightPad = PadSprite(for: size)
-        let rHPos = size.width - rightPad.size.width/2.0 - GameScene.PAD_INSET
+        let rHPos = size.width - rightPad.size.width/2.0 - CourtScene.PAD_INSET
         rightPad.position = CGPoint(x: rHPos, y: vPos)
         self.addChild(rightPad)       
     }

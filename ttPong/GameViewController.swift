@@ -19,13 +19,11 @@ class GameViewController: UIViewController {
         }
         guard let view = self.view as! SKView? else { return }
         view.ignoresSiblingOrder = true
-        view.showsFPS = true
-        view.showsNodeCount = true
-        view.showsPhysics = true
-        view.showsDrawCount = true
-        let scene = GameScene(size:view.bounds.size)
-        scene.scaleMode = .aspectFill
-        view.presentScene(scene)
+//        view.showsFPS = true
+//        view.showsNodeCount = true
+//        view.showsPhysics = true
+//        view.showsDrawCount = true
+        GameManager.shared.presentGame(on:view)
     }
 
     override var shouldAutorotate: Bool {
