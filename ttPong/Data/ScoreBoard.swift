@@ -23,16 +23,6 @@ struct ScoreBoard {
     var score:Int { return _score }
     var highScore:Int { return _highScore }
     
-    var scoreLabel: String {
-        let fmtScore = String(format:"%04d", _score)
-        return "SCORE  \(fmtScore)"
-    }
-    
-    var highScoreLabel: String {
-        let fmtScore = String(format:"%04d", _highScore)
-        return "RECORD  \(fmtScore)"
-    }
-    
     init(highScore: Int) {
         _score = 0
         _highScore = highScore

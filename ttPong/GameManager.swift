@@ -25,6 +25,7 @@ class GameManager {
     
     private let _dataStore = DataStore()
     private var _scoreBoard: ScoreBoard
+    private var _availableDiscs = 3
     
     var options: Options
     
@@ -40,6 +41,18 @@ class GameManager {
     deinit {
         _dataStore.saveOptions(self.options)
         _dataStore.saveScoreBoard(self.scoreBoard)
+    }
+    
+    var availableDiscs: Int {
+        return _availableDiscs;
+    }
+    
+    func pickUpDisc() -> Bool {
+        guard _availableDiscs > 0 else {
+            return false
+        }
+        _availableDiscs -= 1
+        return true
     }
     
     private var _currentScene: SKScene?

@@ -23,8 +23,8 @@ class CourtScene: SKScene {
     private var rightPad: PadSprite!
     
     private var scoreDisp: SKLabelNode!
-    private var highScoreDisp: SKLabelNode!
-    
+    private var discsDisp: SKLabelNode!
+      
     override init(size: CGSize) {
         super.init(size: size)
         backgroundColor = SKColor(red: 0.0, green: 0.0, blue:0.0, alpha: 1.0)
@@ -45,20 +45,20 @@ class CourtScene: SKScene {
         self.addChild(rightPad)
         
         scoreDisp = SKLabelNode(fontNamed: "Phosphate")
-        scoreDisp.fontSize = 20
+        scoreDisp.fontSize = 18
         scoreDisp.position = CGPoint(x: rightPad.position.x - 50.0,
                                      y: size.height - CourtScene.PAD_INSET)
         scoreDisp.horizontalAlignmentMode = .right
         scoreDisp.verticalAlignmentMode = .top
         self.addChild(scoreDisp)
         
-        highScoreDisp = SKLabelNode(fontNamed: "Phosphate")
-        highScoreDisp.fontSize = 20
-        highScoreDisp.position = CGPoint(x: rightPad.position.x - 50.0,
-                                         y: CourtScene.PAD_INSET)
-        highScoreDisp.horizontalAlignmentMode = .right
-        highScoreDisp.verticalAlignmentMode = .bottom
-        self.addChild(highScoreDisp)
+        discsDisp = SKLabelNode(fontNamed: "Phosphate")
+        discsDisp.fontSize = 18
+        discsDisp.position = CGPoint(x: size.width/4,
+                                     y: size.height - CourtScene.PAD_INSET)
+        discsDisp.horizontalAlignmentMode = .center
+        discsDisp.verticalAlignmentMode = .top
+        self.addChild(discsDisp)
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -68,13 +68,32 @@ class CourtScene: SKScene {
     override func didEvaluateActions() {
         disc.isActive = leftPad.isActive || rightPad.isActive
         
-        scoreDisp.text = GameManager.shared.scoreBoard.scoreLabel
+        scoreDisp.text = scoreBoardText()
         scoreDisp.fontColor =
             (disc.isActive ? UIColor.white : UIColor.systemGray)
         
-        highScoreDisp.text = GameManager.shared.scoreBoard.highScoreLabel
-        highScoreDisp.fontColor =
+        discsDisp.text = discsText()
+        discsDisp.fontColor =
             (disc.isActive ? UIColor.white : UIColor.systemGray)
+    }
+    
+    private func scoreBoardText() -> String {
+        let fmtScore = String(format:"%04d",
+                              GameManager.shared.scoreBoard.score)
+        let fmtHighScore = String(format:"%04d",
+                                  GameManager.shared.scoreBoard.highScore)
+        return "SCORE - \(fmtScore)      HIGH - \(fmtHighScore)"
+    }
+    
+    private func discsText() -> String {
+        let adsks = GameManager.shared.availableDiscs
+        var txt = ""
+        switch adsks {
+        case 0: txt = "LAST DISC"
+        case 1: txt = "1 X DISC"
+        default: txt = "\(adsks) X DISCS"
+        }
+        return txt
     }
 
 }
