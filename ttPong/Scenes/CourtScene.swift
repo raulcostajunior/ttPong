@@ -90,8 +90,8 @@ class CourtScene: SKScene {
         var txt = ""
         switch adsks {
         case 0: txt = "LAST DISC"
-        case 1: txt = "1 X DISC"
-        default: txt = "\(adsks) X DISCS"
+        case 1: txt = "DISC - 1"
+        default: txt = "DISCS - \(adsks)"
         }
         return txt
     }
