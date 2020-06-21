@@ -26,7 +26,7 @@ class DataStore {
     
     func loadScoreBoard() -> ScoreBoard {
         // TODO: add real body
-        return ScoreBoard();
+        return ScoreBoard(highScore: 0);
     }
     
     func saveScoreBoard(_ sb: ScoreBoard) {

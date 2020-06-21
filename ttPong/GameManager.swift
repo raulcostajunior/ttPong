@@ -23,26 +23,23 @@ class GameManager {
     
     static let shared = GameManager()
     
-    private let dataStore = DataStore()
+    private let _dataStore = DataStore()
+    private var _scoreBoard: ScoreBoard
     
     var options: Options
     
-    var scoreBoard: ScoreBoard
-    
-    // TODO: add ScoreBoard instance. ScoreBoard should be a new class,
-    //       accessible from here and expose a Save method. The rest of the
-    //       game should access the ScoreBoard through GameData. ScoreBoard
-    //       may be a temporary class - it may not survive a future GameCenter
-    //       integration.
+    var scoreBoard: ScoreBoard {
+        return _scoreBoard
+    }
     
     private init() {
-        self.options = dataStore.loadOptions()
-        self.scoreBoard = dataStore.loadScoreBoard()
+        self.options = _dataStore.loadOptions()
+        _scoreBoard = _dataStore.loadScoreBoard()
     }
     
     deinit {
-        dataStore.saveOptions(self.options)
-        dataStore.saveScoreBoard(self.scoreBoard)
+        _dataStore.saveOptions(self.options)
+        _dataStore.saveScoreBoard(self.scoreBoard)
     }
     
     private var _currentScene: SKScene?
@@ -67,5 +64,4 @@ class GameManager {
         }
     }
     
-
 }
