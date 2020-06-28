@@ -45,7 +45,7 @@ class CourtScene: SKScene {
         self.addChild(rightPad)
         
         scoreDisp = SKLabelNode(fontNamed: "Phosphate")
-        scoreDisp.fontSize = 18
+        scoreDisp.fontSize = 16
         scoreDisp.position = CGPoint(x: rightPad.position.x - 50.0,
                                      y: size.height - CourtScene.PAD_INSET)
         scoreDisp.horizontalAlignmentMode = .right
@@ -53,7 +53,7 @@ class CourtScene: SKScene {
         self.addChild(scoreDisp)
         
         discsDisp = SKLabelNode(fontNamed: "Phosphate")
-        discsDisp.fontSize = 18
+        discsDisp.fontSize = 16
         discsDisp.position = CGPoint(x: size.width/4,
                                      y: size.height - CourtScene.PAD_INSET)
         discsDisp.horizontalAlignmentMode = .center
@@ -78,9 +78,9 @@ class CourtScene: SKScene {
     }
     
     private func scoreBoardText() -> String {
-        let fmtScore = String(format:"%04d",
+        let fmtScore = String(format:"%03d",
                               GameManager.shared.scoreBoard.score)
-        let fmtHighScore = String(format:"%04d",
+        let fmtHighScore = String(format:"%03d",
                                   GameManager.shared.scoreBoard.highScore)
         return "SCORE - \(fmtScore)      HIGH - \(fmtHighScore)"
     }

@@ -23,6 +23,22 @@ class PadSprite: SKSpriteNode {
     private var _activeTexture: SKTexture!
     private var _inactiveTexture: SKTexture!
 
+    // Reference to the container scene used internally to refer to the
+    // container scene's coordinate system. Computed once in the lifetime
+    // of the pad sprite - safe as long the same pad sprite is not reused
+    // across multiple scenes.
+    private weak var _sceneNode: SKNode?
+    private var sceneNode: SKNode? {
+        if let sn = _sceneNode {
+            return sn
+        }
+        var pn = self.parent
+        while let sn = pn, !(sn is SKScene) {
+            pn = self.parent
+        }
+        return pn
+    }
+
     /**
      A pad is active while it is touched.
      
@@ -70,6 +86,11 @@ class PadSprite: SKSpriteNode {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         _active = true
         texture = _activeTexture
+        // Forced unwrap of sceneNode at this point is safe - the sprite must
+        // be a node in some scene to receive touch events.
+        self.position =
+            CGPoint(x: self.position.x,
+                    y: touches[touches.startIndex].location(in:self.sceneNode!).y)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -78,13 +99,11 @@ class PadSprite: SKSpriteNode {
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        // TODO: Limit the pad vertical position so it doesn't go beyond the
-        //       screen viewport.
-        for touch in touches {
-            self.position =
-                CGPoint(x: self.position.x,
-                        y: self.position.y + touch.location(in: self).y)
-        }
+        // Forced unwrap of sceneNode at this point is safe - the sprite must
+        // be a node in some scene to receive touch events.
+        self.position =
+            CGPoint(x: self.position.x,
+                    y: touches[touches.startIndex].location(in: self.sceneNode!).y)
     }
 
 }
