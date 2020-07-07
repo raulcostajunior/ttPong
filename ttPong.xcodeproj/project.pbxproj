@@ -14,6 +14,8 @@
 		CB3F8779249636E100DBE5C4 /* NewRecordScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3F8778249636E100DBE5C4 /* NewRecordScene.swift */; };
 		CB3F877B249636F500DBE5C4 /* ScoreBoardScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3F877A249636F500DBE5C4 /* ScoreBoardScene.swift */; };
 		CB3F877D2496378800DBE5C4 /* HelpScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3F877C2496378800DBE5C4 /* HelpScene.swift */; };
+		CBB8F97324B382DB00761E6B /* SoundOptionSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBB8F97224B382DB00761E6B /* SoundOptionSprite.swift */; };
+		CBB8F97524B3830A00761E6B /* HelpSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBB8F97424B3830A00761E6B /* HelpSprite.swift */; };
 		CBBF94DB244AE65000789DE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBBF94DA244AE65000789DE2 /* AppDelegate.swift */; };
 		CBBF94E3244AE65000789DE2 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBBF94E2244AE65000789DE2 /* GameViewController.swift */; };
 		CBBF94E6244AE65000789DE2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CBBF94E4244AE65000789DE2 /* Main.storyboard */; };
@@ -53,6 +55,8 @@
 		CB3F8778249636E100DBE5C4 /* NewRecordScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRecordScene.swift; sourceTree = "<group>"; };
 		CB3F877A249636F500DBE5C4 /* ScoreBoardScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreBoardScene.swift; sourceTree = "<group>"; };
 		CB3F877C2496378800DBE5C4 /* HelpScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpScene.swift; sourceTree = "<group>"; };
+		CBB8F97224B382DB00761E6B /* SoundOptionSprite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundOptionSprite.swift; sourceTree = "<group>"; };
+		CBB8F97424B3830A00761E6B /* HelpSprite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpSprite.swift; sourceTree = "<group>"; };
 		CBBF94D7244AE65000789DE2 /* ttPong.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ttPong.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBBF94DA244AE65000789DE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CBBF94E2244AE65000789DE2 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
@@ -178,6 +182,8 @@
 				CBBF951F244CA77A00789DE2 /* BeamGenSprite.swift */,
 				CBBF951D244CA6F700789DE2 /* DiscSprite.swift */,
 				CBBF951B244CA63200789DE2 /* PadSprite.swift */,
+				CBB8F97224B382DB00761E6B /* SoundOptionSprite.swift */,
+				CBB8F97424B3830A00761E6B /* HelpSprite.swift */,
 			);
 			path = Sprites;
 			sourceTree = "<group>";
@@ -332,12 +338,14 @@
 				CB3F877D2496378800DBE5C4 /* HelpScene.swift in Sources */,
 				CB3F877524962D4200DBE5C4 /* ScoreBoard.swift in Sources */,
 				CBBF9520244CA77A00789DE2 /* BeamGenSprite.swift in Sources */,
+				CBB8F97324B382DB00761E6B /* SoundOptionSprite.swift in Sources */,
 				CBBF94E3244AE65000789DE2 /* GameViewController.swift in Sources */,
 				CBBF94DB244AE65000789DE2 /* AppDelegate.swift in Sources */,
 				CB3F8779249636E100DBE5C4 /* NewRecordScene.swift in Sources */,
 				CBBF951E244CA6F700789DE2 /* DiscSprite.swift in Sources */,
 				CB3F877B249636F500DBE5C4 /* ScoreBoardScene.swift in Sources */,
 				CBBF951C244CA63200789DE2 /* PadSprite.swift in Sources */,
+				CBB8F97524B3830A00761E6B /* HelpSprite.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
