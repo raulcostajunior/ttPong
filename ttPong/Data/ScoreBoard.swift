@@ -22,6 +22,9 @@ struct ScoreBoard {
     
     var score:Int { return _score }
     var highScore:Int { return _highScore }
+    var isNewRecord:Bool {
+        return _score >= _highScore
+    }
     
     init(highScore: Int) {
         _score = 0

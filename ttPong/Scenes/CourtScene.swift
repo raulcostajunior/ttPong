@@ -37,7 +37,8 @@ class CourtScene: SKScene {
     
     private var _scoreDisp: SKLabelNode!
     private var _discsDisp: SKLabelNode!
-    private var _msgDisp: SKLabelNode!
+    private var _msgDisp1: SKLabelNode!
+    private var _msgDisp2: SKLabelNode!
     
     private var _state = CourtState.WaitToStartGame
       
@@ -89,49 +90,77 @@ class CourtScene: SKScene {
         _discsDisp.verticalAlignmentMode = .top
         self.addChild(_discsDisp)
         
-        _msgDisp = SKLabelNode(fontNamed: "Phosphate")
-        _msgDisp.fontSize = 19
-        _msgDisp.fontColor = UIColor.yellow
-        _msgDisp.position = CGPoint(x: size.width/2,
-                                   y: size.height/2)
-        _msgDisp.horizontalAlignmentMode = .center
-        _msgDisp.verticalAlignmentMode = .center
-        self.addChild(_msgDisp)
+        _msgDisp1 = SKLabelNode(fontNamed: "Phosphate")
+        _msgDisp1.fontSize = 19
+        _msgDisp1.fontColor = UIColor.yellow
+        _msgDisp1.position = CGPoint(x: size.width/2,
+                                     y: size.height/2 + _msgDisp1.fontSize)
+        _msgDisp1.horizontalAlignmentMode = .center
+        _msgDisp1.verticalAlignmentMode = .center
+        self.addChild(_msgDisp1)
+        
+        _msgDisp2 = SKLabelNode(fontNamed: "Phosphate")
+        _msgDisp2.fontSize = 19
+        _msgDisp2.fontColor = UIColor.yellow
+        _msgDisp2.position = CGPoint(x: size.width/2,
+                                     y: size.height/2 - 8)
+        _msgDisp2.horizontalAlignmentMode = .center
+        _msgDisp2.verticalAlignmentMode = .center
+        self.addChild(_msgDisp2)
         
     }
     
-    override func update(_ currentTime: TimeInterval) {
-        // TODO: display top menu if state is WaitingForStart or Paused
+    private func updateSceneState() {
         switch _state {
-        case .WaitToStartGame, .GameFinished,
-             .GameFinishedNewRecord, .GamePaused,
-             .GameAborted:
+        case .WaitToStartGame:
             _disc.isHidden = true
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
-            _msgDisp.isHidden = false
+            _msgDisp1.isHidden = false
             _soundOption.isHidden = false
+            _gameInfo.isHidden = false
+            if _leftPad.isActive && _rightPad.isActive {
+                // Both pads are being touched - start game
+                _state = .StartingGame
+            }
+        case .GameFinished, .GameFinishedNewRecord,
+             .GamePaused, .GameAborted:
+            _disc.isHidden = true
+            _discsDisp.isHidden = true
+            _scoreDisp.isHidden = true
+            _msgDisp1.isHidden = false
+            _soundOption.isHidden = false
+            _gameInfo.isHidden = false
         case .GameOngoing:
             _disc.isHidden = false
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
-            _msgDisp.isHidden = true
+            _msgDisp1.isHidden = true
             _soundOption.isHidden = true
+            _gameInfo.isHidden = true
         case .StartingGame:
             // TODO: Display the starting particle effect
+            // TODO: Define a random disc appearing position and velocity vector
             _disc.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
-            _msgDisp.isHidden = false
+            _msgDisp1.isHidden = false
             _soundOption.isHidden = true
+            _gameInfo.isHidden = true
+            if !_leftPad.isActive || !_rightPad.isActive {
+                // Releasing any pad while game is starting aborts the
+                // starting of the game
+                _state = .WaitToStartGame
+            }
         }
     }
     
     override func didEvaluateActions() {
+        updateSceneState()
         _disc.isActive = _leftPad.isActive || _rightPad.isActive
         _scoreDisp.text = scoreBoardText()
         _discsDisp.text = discsText()
-        _msgDisp.text = msgText()
+        setMsgs()
     }
     
     private func scoreBoardText() -> String {
@@ -153,24 +182,35 @@ class CourtScene: SKScene {
         return txt
     }
     
-    private func msgText() -> String {
+    private func setMsgs() {
         switch _state {
         case .WaitToStartGame:
-            return "Touch and hold both pads to start a new game."
+            _msgDisp1.text = "To start a new match,"
+            _msgDisp2.text = "touch and hold both pads."
         case .GameFinishedNewRecord:
-            return "Well done! You've set a new record!"
+            _msgDisp1.text = "Well done!"
+            _msgDisp2.text = "You've set a new record!"
         case .GamePaused:
-            return "Touch one or both pads to resume the game.\nTouch anywhere with 3 fingers to abort."
+            _msgDisp1.text = "To resume, touch one or both pads."
+            _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
         case .GameAborted:
-            return "Game aborted."
+            _msgDisp1.text = "Game aborted."
+            if GameManager.shared.scoreBoard.isNewRecord {
+                _msgDisp2.text = "Congrats, you've set a new record!"
+            } else {
+                _msgDisp2.text = "Hope you come back soon!"
+            }
         case .StartingGame:
-            return "Game starting - Get Ready!\nRelease both pads to pause the match."
+            _msgDisp1.text = "Get ready to play!"
+            _msgDisp2.text = "To pause the match, release both pads."
         case .GameOngoing:
-            return ""
+            _msgDisp1.text = ""
+            _msgDisp2.text = ""
         case .GameFinished:
             // TODO: think about better finished message - maybe congratulate
             //       if score is above a given threshold; display playing time.
-            return "Thanks for playing!\nTouch anywhere to start a new game."
+            _msgDisp1.text = "Thanks for playing!"
+            _msgDisp2.text = "Touch anywhere to start a new game."
         }
     }
 
