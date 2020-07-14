@@ -19,7 +19,6 @@ class CourtScene: SKScene {
         case GamePaused
         case GameFinished
         case GameFinishedNewRecord
-        case GameAborted
     }
     
     static let PAD_INSET = CGFloat(12.0)
@@ -39,6 +38,7 @@ class CourtScene: SKScene {
     private var _discsDisp: SKLabelNode!
     private var _msgDisp1: SKLabelNode!
     private var _msgDisp2: SKLabelNode!
+    private var _msgPaused: SKLabelNode!
     
     private var _discAppearance: SKEmitterNode!
     
@@ -110,6 +110,16 @@ class CourtScene: SKScene {
         _msgDisp2.verticalAlignmentMode = .center
         self.addChild(_msgDisp2)
         
+        _msgPaused = SKLabelNode(fontNamed: "Phosphate")
+        _msgPaused.fontSize = 19
+        _msgPaused.fontColor = UIColor.white
+        _msgPaused.position = CGPoint(x: _rightPad.position.x - 50.0,
+                                      y: sndOptVPos)
+        _msgPaused.horizontalAlignmentMode = .right
+        _msgPaused.verticalAlignmentMode = .center
+        _msgPaused.text = "Game Paused"
+        self.addChild(_msgPaused)
+        
         let discAppearancePath =
             Bundle.main.path(forResource: "DiscAppearance",
                              ofType: "sks")
@@ -121,6 +131,10 @@ class CourtScene: SKScene {
         self.addChild(_discAppearance)
     }
     
+    internal func gotoInitialState() {
+        _state = .WaitToStartGame
+    }
+    
     private func updateSceneState() {
         switch _state {
         case .WaitToStartGame:
@@ -128,8 +142,21 @@ class CourtScene: SKScene {
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
+            _msgDisp2.isHidden = false
+            _msgPaused.isHidden = true
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
+            let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET
+            let vPos = size.height/2.0
+            _leftPad.position = CGPoint(x: lHPos, y: vPos)
+            let rHPos = self.size.width - CourtScene.PAD_INSET - _rightPad.size.width/2.0
+            _rightPad.position = CGPoint(x: rHPos, y: vPos)
+            _leftPad.isHidden = false
+            _rightPad.isHidden = false
+            _msgDisp1.removeAction(forKey: "fadeOut")
+            _msgDisp2.removeAction(forKey: "fadeOut")
+            _msgDisp1.alpha = 1.0
+            _msgDisp2.alpha = 1.0
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start game
                 _state = .StartingGame
@@ -138,22 +165,22 @@ class CourtScene: SKScene {
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
                 launchDisc()
             }
-        case .GameFinished, .GameFinishedNewRecord,
-             .GamePaused, .GameAborted:
+        case .StartingGame:
             _disc.isHidden = true
-            _discsDisp.isHidden = true
-            _scoreDisp.isHidden = true
+            _discsDisp.isHidden = false
+            _scoreDisp.isHidden = false
             _msgDisp1.isHidden = false
-            _soundOption.isHidden = false
-            _gameInfo.isHidden = false
-            if _leftPad.isActive || _rightPad.isActive {
-                _state = .GameOngoing
-            }
+            _msgDisp2.isHidden = false
+            _msgPaused.isHidden = true
+            _soundOption.isHidden = true
+            _gameInfo.isHidden = true
         case .GameOngoing:
             _disc.isHidden = false
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = true
+            _msgDisp2.isHidden = true
+            _msgPaused.isHidden = true
             _soundOption.isHidden = true
             _gameInfo.isHidden = true
             _msgDisp1.removeAction(forKey: "fadeOut")
@@ -161,19 +188,44 @@ class CourtScene: SKScene {
             _msgDisp1.alpha = 1.0
             _msgDisp2.alpha = 1.0
             if !_leftPad.isActive && !_rightPad.isActive {
-                 // Releasing both pads while match is ongoing, pauses it
-                 _state = .GamePaused
-             }
-        case .StartingGame:
-            // TODO: Display the starting particle effect
-            // TODO: Define a random disc appearing position and velocity vector
-            _disc.isHidden = true
-            _discsDisp.isHidden = false
-            _scoreDisp.isHidden = false
+                // Releasing both pads while match is ongoing, pauses it
+                _state = .GamePaused
+            }
+        case .GamePaused:
+            _disc.isHidden = false
+            _discsDisp.isHidden = true
+            _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
-            _soundOption.isHidden = true
-            _gameInfo.isHidden = true
-         }
+            _msgDisp2.isHidden = false
+            _msgPaused.isHidden = false
+            _soundOption.isHidden = false
+            _gameInfo.isHidden = false
+            if _leftPad.isActive || _rightPad.isActive {
+                _state = .GameOngoing
+            }
+        case .GameFinished, .GameFinishedNewRecord:
+            // TODO: Give NewRecord case its own handler - has to navigate to
+            //       new record entry string.
+            _disc.isHidden = true
+            _discsDisp.isHidden = true
+            _scoreDisp.isHidden = true
+            _msgDisp1.isHidden = false
+            _msgDisp2.isHidden = false
+            _msgPaused.isHidden = true
+            _soundOption.isHidden = false
+            _gameInfo.isHidden = false
+        }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if touches.count == 3 && _state == .GamePaused {
+            // User chose to abort game
+            self.alpha = 0.0
+            let fadeInScene = SKAction.fadeIn(withDuration: 3.0)
+            self.run(fadeInScene)
+            _state = .WaitToStartGame
+            GameManager.shared.startNewGame()
+        }
     }
     
     override func didEvaluateActions() {
@@ -187,7 +239,7 @@ class CourtScene: SKScene {
     private func launchDisc() {
         let fromLeft = Bool.random()
         var offsetFromMiddle =
-            CGFloat.random(in: 20.0...(self.size.width/2.0-(_leftPad.size.width+5.0)))
+            CGFloat.random(in: 40.0...(self.size.width/2.0-(_leftPad.size.width+35.0)))
         if fromLeft {
             offsetFromMiddle = -offsetFromMiddle
         }
@@ -247,13 +299,6 @@ class CourtScene: SKScene {
         case .GamePaused:
             _msgDisp1.text = "To resume, touch one or both pads."
             _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
-        case .GameAborted:
-            _msgDisp1.text = "Game aborted."
-            if GameManager.shared.scoreBoard.isNewRecord {
-                _msgDisp2.text = "Congrats, you've set a new record!"
-            } else {
-                _msgDisp2.text = "Hope you come back soon!"
-            }
         case .StartingGame:
             _msgDisp1.text = "Get ready to play!"
             _msgDisp2.text = "To pause the match, release both pads."

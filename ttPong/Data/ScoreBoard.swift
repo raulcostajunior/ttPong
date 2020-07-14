@@ -19,12 +19,11 @@ struct ScoreBoard {
     
     private var _score = 0
     private var _highScore = 0
+    private var _isNewRecord = false
     
     var score:Int { return _score }
     var highScore:Int { return _highScore }
-    var isNewRecord:Bool {
-        return _score >= _highScore
-    }
+    var isNewRecord:Bool { return _isNewRecord }
     
     init(highScore: Int) {
         _score = 0
@@ -35,7 +34,12 @@ struct ScoreBoard {
         _score += increment
         if _score > _highScore {
             _highScore = _score
+            _isNewRecord = true
         }
+    }
+    
+    mutating func resetScore() {
+        _score = 0
     }
     
 }

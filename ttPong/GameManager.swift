@@ -23,9 +23,11 @@ class GameManager {
     
     static let shared = GameManager()
     
+    private static let TOTAL_DISCS = 3
+    
     private let _dataStore = DataStore()
     private var _scoreBoard: ScoreBoard
-    private var _availableDiscs = 3
+    private var _availableDiscs = GameManager.TOTAL_DISCS
     
     var options: Options
     
@@ -59,15 +61,33 @@ class GameManager {
     
     func presentGame(on view: SKView) {
         guard _currentScene == nil else {
+            print("Error: there should be not current scene when calling 'presentGame'.")
+            print("       'presentGame' should be called only at the begin of the game lifecycle.")
             return;
         }
         _currentScene = CourtScene(size:view.bounds.size)
         _currentScene?.scaleMode = .aspectFill
         view.presentScene(_currentScene)
+        startNewGame()
     }
     
-    // TODO: Add another scene transition methods
-    func registerNewRecord() {
+    internal func startNewGame() {
+        guard let currentScene = _currentScene,
+                  currentScene is CourtScene else {
+                    print("Error: the current scene is expected to be of type 'CourtScene'")
+                    return
+        }
+        _availableDiscs = GameManager.TOTAL_DISCS;
+        _scoreBoard.resetScore()
+    }
+    
+
+    func navigateToNewRecord() {
+        guard let currentScene = _currentScene,
+                  currentScene is CourtScene else {
+                    print("Error: the current scene is expected to be of type 'CourtScene'")
+                    return
+        }
         let newRecordScene = NewRecordScene()
         if let currentScene = _currentScene {
             let trans = SKTransition.fade(withDuration:1.5)
@@ -77,4 +97,23 @@ class GameManager {
         }
     }
     
+    func navigateToInstructions() {
+        guard let currentScene = _currentScene,
+                  currentScene is CourtScene else {
+                    print("Error: the current scene is expected to be of type 'CourtScene'")
+                    return
+        }
+        // TODO: Save the current court for later restoring.
+    }
+    
+    func goBackToCourt() {
+        guard let currentScene = _currentScene,
+                  !(currentScene is CourtScene) else {
+                    print("Error: the current scene cannot be of type 'CourtScene'")
+                    return
+        }
+        // TODO: Restore the court scene if there's a court scene to be restored.
+        //       Otherwise, creates a fresh CourtScene
+    }
+
 }
