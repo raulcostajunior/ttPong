@@ -63,23 +63,26 @@ class DiscSprite: SKSpriteNode {
                                    width: Double(diameter),
                                    height:Double(diameter)))
         ctxt.drawPath(using: .fill)
+        // TODO: Uncomment drawing of border arcs as soon as disc torque simulation
+        //       is in place.
+        
         // The border arcs - provide feedback on rotation - only when active.
-        if active {
-            ctxt.setStrokeColor(red: 1.0, green: 106.0/255.0,
-                                blue: 0.0, alpha: discAlpha)
-            let radius = CGFloat(Double(diameter)/2.0)
-            let center = CGPoint(x: radius, y: radius)
-            ctxt.setLineWidth(4.0)
-            ctxt.addArc(center: center, radius: radius - 4.0,
-                        startAngle: 0.0, endAngle: 1.0472, clockwise: false)
-            ctxt.drawPath(using: .stroke)
-            ctxt.addArc(center: center, radius: radius - 4.0,
-                        startAngle: 2.0944, endAngle: 3.14159, clockwise: false)
-            ctxt.drawPath(using: .stroke)
-            ctxt.addArc(center: center, radius: radius - 4.0,
-                        startAngle: 4.1887, endAngle: 5.23599, clockwise: false)
-            ctxt.drawPath(using: .stroke)
-        }
+//        if active {
+//            ctxt.setStrokeColor(red: 1.0, green: 106.0/255.0,
+//                                blue: 0.0, alpha: discAlpha)
+//            let radius = CGFloat(Double(diameter)/2.0)
+//            let center = CGPoint(x: radius, y: radius)
+//            ctxt.setLineWidth(4.0)
+//            ctxt.addArc(center: center, radius: radius - 4.0,
+//                        startAngle: 0.0, endAngle: 1.0472, clockwise: false)
+//            ctxt.drawPath(using: .stroke)
+//            ctxt.addArc(center: center, radius: radius - 4.0,
+//                        startAngle: 2.0944, endAngle: 3.14159, clockwise: false)
+//            ctxt.drawPath(using: .stroke)
+//            ctxt.addArc(center: center, radius: radius - 4.0,
+//                        startAngle: 4.1887, endAngle: 5.23599, clockwise: false)
+//            ctxt.drawPath(using: .stroke)
+//        }
 
         let textureImg: UIImage! = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()

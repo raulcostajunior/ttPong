@@ -28,7 +28,7 @@ class CourtScene: SKScene {
         super.init(coder: aDecoder)
     }
     
-    private var _disc: DiscSprite!
+    private var _disc: Disc!
     private var _leftPad: PadSprite!
     private var _rightPad: PadSprite!
     private var _soundOption: SoundOptionSprite!
@@ -48,9 +48,9 @@ class CourtScene: SKScene {
         super.init(size: size)
         backgroundColor = SKColor(red: 0.0, green: 0.0, blue:0.0, alpha: 1.0)
         
-        _disc = DiscSprite(for: size)
-        _disc.position = CGPoint(x: size.width/2.0, y: 100.0)
-        self.addChild(_disc)
+        _disc = Disc(with: DiscSprite(for: size))
+        _disc.sprite.position = CGPoint(x: size.width/2.0, y: 100.0)
+        self.addChild(_disc.sprite)
 
         _leftPad = PadSprite(for: size)
         let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET
@@ -129,6 +129,10 @@ class CourtScene: SKScene {
         _discAppearance.isHidden = true
         _discAppearance.alpha = 0.0
         self.addChild(_discAppearance)
+        
+        // Physics related initializations
+        // Court has no gravity affecting it
+        self.physicsWorld.gravity = CGVector(dx:0.0, dy:0.0)
     }
     
     internal func gotoInitialState() {
@@ -138,7 +142,7 @@ class CourtScene: SKScene {
     private func updateSceneState() {
         switch _state {
         case .WaitToStartGame:
-            _disc.isHidden = true
+            _disc.sprite.isHidden = true
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
@@ -160,13 +164,13 @@ class CourtScene: SKScene {
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start game
                 _state = .StartingGame
-                let fadeOutMsg = SKAction.fadeOut(withDuration: 2.5)
+                let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
                 launchDisc()
             }
         case .StartingGame:
-            _disc.isHidden = true
+            _disc.sprite.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = false
@@ -175,7 +179,7 @@ class CourtScene: SKScene {
             _soundOption.isHidden = true
             _gameInfo.isHidden = true
         case .GameOngoing:
-            _disc.isHidden = false
+            _disc.sprite.isHidden = false
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = true
@@ -190,9 +194,10 @@ class CourtScene: SKScene {
             if !_leftPad.isActive && !_rightPad.isActive {
                 // Releasing both pads while match is ongoing, pauses it
                 _state = .GamePaused
+                _disc.pauseDisc()
             }
         case .GamePaused:
-            _disc.isHidden = false
+            _disc.sprite.isHidden = false
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
@@ -202,11 +207,12 @@ class CourtScene: SKScene {
             _gameInfo.isHidden = false
             if _leftPad.isActive || _rightPad.isActive {
                 _state = .GameOngoing
+                _disc.resumeDisc()
             }
         case .GameFinished, .GameFinishedNewRecord:
             // TODO: Give NewRecord case its own handler - has to navigate to
             //       new record entry string.
-            _disc.isHidden = true
+            _disc.sprite.isHidden = true
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
@@ -221,7 +227,7 @@ class CourtScene: SKScene {
         if touches.count == 3 && _state == .GamePaused {
             // User chose to abort game
             self.alpha = 0.0
-            let fadeInScene = SKAction.fadeIn(withDuration: 3.0)
+            let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
             self.run(fadeInScene)
             _state = .WaitToStartGame
             GameManager.shared.startNewGame()
@@ -230,43 +236,48 @@ class CourtScene: SKScene {
     
     override func didEvaluateActions() {
         updateSceneState()
-        _disc.isActive = _leftPad.isActive || _rightPad.isActive
+        _disc.sprite.isActive = _leftPad.isActive || _rightPad.isActive
         _scoreDisp.text = scoreBoardText()
         _discsDisp.text = discsText()
         setMsgs()
     }
     
     private func launchDisc() {
-        let fromLeft = Bool.random()
-        var offsetFromMiddle =
-            CGFloat.random(in: 40.0...(self.size.width/2.0-(_leftPad.size.width+35.0)))
-        if fromLeft {
-            offsetFromMiddle = -offsetFromMiddle
+        let fromRight = Bool.random()
+        let leftLimit = _leftPad.size.width + 40.0
+        let rightLimit = self.size.width/2 - 40.0
+        var xOffset =
+            CGFloat.random(in: leftLimit...rightLimit)
+        if fromRight {
+            // When the disk is comming from right, the x offset is relative to
+            // the middle of the court, not to its left border.
+            xOffset += self.size.width/2.0
         }
-        let initialPos = CGPoint(x: self.size.width/2.0 + offsetFromMiddle,
-                                 y: CGFloat.random(in: 10.0...self.size.height - 20.0))
-        
-        // TODO: initial speed X as positive or negative depending on initial
-        //       position. Should be a reasonable constant absolute value.
-        var initialSpeedX = 2.0
-        // TODO: initial speed Y with slight variation to allow different
-        //       trajectory slopes.
-        var initialSpeedY = 4.0
-        
+        let initialPos =
+            CGPoint(x: xOffset,
+                    y: CGFloat.random(
+                        in: CourtScene.PAD_INSET...size.height - CourtScene.PAD_INSET))
         _discAppearance.position = initialPos
         _discAppearance.isHidden = false
-        let fadeInDisc = SKAction.fadeIn(withDuration: 1.0)
+        let fadeInDisc = SKAction.fadeIn(withDuration: 1.5)
         _discAppearance.run(fadeInDisc)
         
-        let _ = Timer.scheduledTimer(
-                      withTimeInterval: 2.0,
-                      repeats: false,
-                      block: { timer in
-                          self._discAppearance.alpha = 0.0
-                          self._discAppearance.isHidden = true
-                          self._state = CourtState.GameOngoing
-                          // TODO: start the disc physics
-                })
+        Timer.scheduledTimer(
+            withTimeInterval: 1.5,
+            repeats: false,
+            block: { timer in
+                self._discAppearance.alpha = 0.0
+                self._discAppearance.isHidden = true
+                self._state = CourtState.GameOngoing
+                var xVelocity = CGFloat(500.0)
+                if fromRight {
+                    xVelocity = -xVelocity
+                }
+                let yVelocity = CGFloat.random(in:-500.0...500.0)
+                self._disc.sprite.position = initialPos
+                self._disc.velocity =
+                    CGVector(dx: xVelocity, dy: yVelocity)
+        })
     }
     
     private func scoreBoardText() -> String {
