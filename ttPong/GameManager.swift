@@ -71,7 +71,7 @@ class GameManager {
         startNewGame()
     }
     
-    internal func startNewGame() {
+    func startNewGame() {
         guard let currentScene = _currentScene,
                   currentScene is CourtScene else {
                     print("Error: the current scene is expected to be of type 'CourtScene'")
