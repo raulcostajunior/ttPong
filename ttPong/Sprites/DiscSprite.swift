@@ -48,6 +48,11 @@ class DiscSprite: SKSpriteNode {
         _activeTexture = initTexture(diameter: intDiameter, active: true)
         
         texture = _inactiveTexture
+        
+        physicsBody = SKPhysicsBody(circleOfRadius: size.width/2.0)
+        physicsBody!.isDynamic = true
+        physicsBody!.linearDamping = 0.0
+        physicsBody!.velocity = CGVector(dx: 0.0, dy: 0.0)
     }
     
     private func initTexture(diameter: Int, active: Bool) -> SKTexture? {
@@ -90,5 +95,42 @@ class DiscSprite: SKSpriteNode {
         return SKTexture(image: textureImg)
     }
     
-
+    func pause() {
+        guard !_paused else {
+            print("pause called for a disc that is already paused!")
+            return
+        }
+        _paused = true
+        _resumeVelocity = physicsBody!.velocity
+        physicsBody!.velocity = CGVector(dx: 0.0, dy: 0.0)
+    }
+    
+    func resume() {
+        guard _paused else {
+            print("resume called for a disc that is not paused!")
+            return
+        }
+        assert(_resumeVelocity != nil,
+               "A paused disc must have a defined _resumeVelocity!")
+        physicsBody!.velocity = _resumeVelocity!
+        _paused = false
+    }
+    
+    var velocity: CGVector {
+        get {
+            return physicsBody!.velocity
+        }
+        
+        set {
+            guard !_paused else {
+                print("Disc velocity cannot be set while disc is paused!")
+                return
+            }
+            physicsBody!.velocity = newValue
+        }
+    }
+    
+    private var _paused = false
+    private var _resumeVelocity: CGVector?
+    
 }

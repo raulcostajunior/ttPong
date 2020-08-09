@@ -28,7 +28,7 @@ class CourtScene: SKScene {
         super.init(coder: aDecoder)
     }
     
-    private var _disc: Disc!
+    private var _disc: DiscSprite!
     private var _leftPad: PadSprite!
     private var _rightPad: PadSprite!
     private var _soundOption: SoundOptionSprite!
@@ -48,9 +48,9 @@ class CourtScene: SKScene {
         super.init(size: size)
         backgroundColor = SKColor(red: 0.0, green: 0.0, blue:0.0, alpha: 1.0)
         
-        _disc = Disc(with: DiscSprite(for: size))
-        _disc.sprite.position = CGPoint(x: size.width/2.0, y: 100.0)
-        self.addChild(_disc.sprite)
+        _disc = DiscSprite(for: size)
+        _disc.position = CGPoint(x: size.width/2.0, y: 100.0)
+        self.addChild(_disc)
 
         _leftPad = PadSprite(for: size)
         let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET
@@ -142,7 +142,7 @@ class CourtScene: SKScene {
     private func updateSceneState() {
         switch _state {
         case .WaitToStartGame:
-            _disc.sprite.isHidden = true
+            _disc.isHidden = true
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
@@ -170,7 +170,7 @@ class CourtScene: SKScene {
                 launchDisc()
             }
         case .StartingGame:
-            _disc.sprite.isHidden = true
+            _disc.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = false
@@ -179,7 +179,7 @@ class CourtScene: SKScene {
             _soundOption.isHidden = true
             _gameInfo.isHidden = true
         case .GameOngoing:
-            _disc.sprite.isHidden = false
+            _disc.isHidden = false
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = true
@@ -194,10 +194,10 @@ class CourtScene: SKScene {
             if !_leftPad.isActive && !_rightPad.isActive {
                 // Releasing both pads while match is ongoing, pauses it
                 _state = .GamePaused
-                _disc.pauseDisc()
+                _disc.pause()
             }
         case .GamePaused:
-            _disc.sprite.isHidden = false
+            _disc.isHidden = false
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
@@ -207,12 +207,12 @@ class CourtScene: SKScene {
             _gameInfo.isHidden = false
             if _leftPad.isActive || _rightPad.isActive {
                 _state = .GameOngoing
-                _disc.resumeDisc()
+                _disc.resume()
             }
         case .GameFinished, .GameFinishedNewRecord:
             // TODO: Give NewRecord case its own handler - has to navigate to
             //       new record entry string.
-            _disc.sprite.isHidden = true
+            _disc.isHidden = true
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
@@ -236,7 +236,7 @@ class CourtScene: SKScene {
     
     override func didEvaluateActions() {
         updateSceneState()
-        _disc.sprite.isActive = _leftPad.isActive || _rightPad.isActive
+        _disc.isActive = _leftPad.isActive || _rightPad.isActive
         _scoreDisp.text = scoreBoardText()
         _discsDisp.text = discsText()
         setMsgs()
@@ -274,7 +274,7 @@ class CourtScene: SKScene {
                     xVelocity = -xVelocity
                 }
                 let yVelocity = CGFloat.random(in:-500.0...500.0)
-                self._disc.sprite.position = initialPos
+                self._disc.position = initialPos
                 self._disc.velocity =
                     CGVector(dx: xVelocity, dy: yVelocity)
         })
