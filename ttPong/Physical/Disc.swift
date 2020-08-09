@@ -28,6 +28,11 @@ class Disc {
     }
     
     func pauseDisc() {
+        guard !_paused else {
+            print("pauseDisc called for a disc that is already paused!")
+            return
+        }
+        _paused = true
         _resumeVelocity = _sprite.physicsBody!.velocity
         _sprite.physicsBody!.velocity = CGVector(dx: 0.0, dy: 0.0)
     }
@@ -37,11 +42,10 @@ class Disc {
             print("resumeDisc called with no corresponding previous pauseDisc!")
             return
         }
-        
         assert(_resumeVelocity != nil,
                "A disc that has already been paused must have a defined _resumeVelocity")
-
         _sprite.physicsBody!.velocity = _resumeVelocity!
+        _paused = false
     }
     
     var velocity: CGVector {
