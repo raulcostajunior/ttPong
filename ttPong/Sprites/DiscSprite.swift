@@ -8,6 +8,7 @@
 
 import SpriteKit
 
+
 class DiscSprite: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) {
@@ -51,7 +52,9 @@ class DiscSprite: SKSpriteNode {
         
         physicsBody = SKPhysicsBody(circleOfRadius: size.width/2.0)
         physicsBody!.isDynamic = true
-        physicsBody!.linearDamping = 0.0
+        physicsBody!.linearDamping = 0.0   // No friction force actuating
+        physicsBody!.restitution = 1.0     // No speed loss on collision
+        physicsBody!.angularDamping = 0.0  // No automatic rotation handling
         physicsBody!.velocity = CGVector(dx: 0.0, dy: 0.0)
     }
     
@@ -72,22 +75,22 @@ class DiscSprite: SKSpriteNode {
         //       is in place.
         
         // The border arcs - provide feedback on rotation - only when active.
-//        if active {
-//            ctxt.setStrokeColor(red: 1.0, green: 106.0/255.0,
-//                                blue: 0.0, alpha: discAlpha)
-//            let radius = CGFloat(Double(diameter)/2.0)
-//            let center = CGPoint(x: radius, y: radius)
-//            ctxt.setLineWidth(4.0)
-//            ctxt.addArc(center: center, radius: radius - 4.0,
-//                        startAngle: 0.0, endAngle: 1.0472, clockwise: false)
-//            ctxt.drawPath(using: .stroke)
-//            ctxt.addArc(center: center, radius: radius - 4.0,
-//                        startAngle: 2.0944, endAngle: 3.14159, clockwise: false)
-//            ctxt.drawPath(using: .stroke)
-//            ctxt.addArc(center: center, radius: radius - 4.0,
-//                        startAngle: 4.1887, endAngle: 5.23599, clockwise: false)
-//            ctxt.drawPath(using: .stroke)
-//        }
+        if active {
+            ctxt.setStrokeColor(red: 1.0, green: 106.0/255.0,
+                                blue: 0.0, alpha: discAlpha)
+            let radius = CGFloat(Double(diameter)/2.0)
+            let center = CGPoint(x: radius, y: radius)
+            ctxt.setLineWidth(4.0)
+            ctxt.addArc(center: center, radius: radius - 4.0,
+                        startAngle: 0.0, endAngle: 1.0472, clockwise: false)
+            ctxt.drawPath(using: .stroke)
+            ctxt.addArc(center: center, radius: radius - 4.0,
+                        startAngle: 2.0944, endAngle: 3.14159, clockwise: false)
+            ctxt.drawPath(using: .stroke)
+            ctxt.addArc(center: center, radius: radius - 4.0,
+                        startAngle: 4.1887, endAngle: 5.23599, clockwise: false)
+            ctxt.drawPath(using: .stroke)
+        }
 
         let textureImg: UIImage! = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -122,10 +125,6 @@ class DiscSprite: SKSpriteNode {
         }
         
         set {
-            guard !_paused else {
-                print("Disc velocity cannot be set while disc is paused!")
-                return
-            }
             physicsBody!.velocity = newValue
         }
     }

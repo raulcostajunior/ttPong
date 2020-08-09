@@ -131,8 +131,12 @@ class CourtScene: SKScene {
         self.addChild(_discAppearance)
         
         // Physics related initializations
-        // Court has no gravity affecting it
+        // Court has no gravity affecting it.
         self.physicsWorld.gravity = CGVector(dx:0.0, dy:0.0)
+        // TODO: add the edge limits only to the top and bottom
+        // Limits the court with an edge that bounces the disc elastically
+        self.physicsBody = SKPhysicsBody(edgeLoopFrom: self.frame)
+        self.physicsBody!.restitution = 1.0
     }
     
     internal func gotoInitialState() {
@@ -240,8 +244,28 @@ class CourtScene: SKScene {
         _scoreDisp.text = scoreBoardText()
         _discsDisp.text = discsText()
         setMsgs()
+        
+        // TODO: add the game loss detection code in here
+        //       loss happens when the disc is completely out of the frame
+        
+        // TODO: add the successful disc hit logic to didEndContact handler
+        
+        // TODO: move the minimal speed logic to the didEndContact
+        //       handler when the disc and the pad are envolved.
+        if (_state == .GameOngoing) {
+            // Guarantees the mininal disc horizontal and vertical speeds
+            // (avoid edge cases where the game would be too boring).
+            if let phys = _disc.physicsBody {
+                if abs(phys.velocity.dx) < 500.0 {
+                    phys.velocity.dx = (phys.velocity.dx < 0 ? -500.0 : 500.0)
+                }
+                if abs(phys.velocity.dy) < 20.0 {
+                    phys.velocity.dy = (phys.velocity.dy < 0 ? -20.0 : 20.0)
+                }
+            }
+        }
     }
-    
+       
     private func launchDisc() {
         let fromRight = Bool.random()
         let leftLimit = _leftPad.size.width + 40.0
@@ -269,11 +293,11 @@ class CourtScene: SKScene {
                 self._discAppearance.alpha = 0.0
                 self._discAppearance.isHidden = true
                 self._state = CourtState.GameOngoing
-                var xVelocity = CGFloat(500.0)
+                var xVelocity = CGFloat(550.0)
                 if fromRight {
                     xVelocity = -xVelocity
                 }
-                let yVelocity = CGFloat.random(in:-500.0...500.0)
+                let yVelocity = CGFloat.random(in:-550.0...550.0)
                 self._disc.position = initialPos
                 self._disc.velocity =
                     CGVector(dx: xVelocity, dy: yVelocity)

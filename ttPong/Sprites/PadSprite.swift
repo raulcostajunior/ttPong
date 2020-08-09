@@ -61,6 +61,10 @@ class PadSprite: SKSpriteNode {
         texture = _inactiveTexture
         
         isUserInteractionEnabled = true
+        
+        physicsBody = SKPhysicsBody(rectangleOf: self.size)
+        physicsBody!.isDynamic = false
+        physicsBody!.restitution = 1.0
     }
 
     private func initTexture(width: Int, height: Int,
