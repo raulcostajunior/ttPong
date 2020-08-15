@@ -13,12 +13,13 @@ import GameplayKit
 class CourtScene: SKScene {
     
     enum CourtState {
-        case WaitToStartGame
-        case StartingGame
+        case WaitToStartMatch
+        case LaunchingDisk
         case GameOngoing
+        case WaitToStartNewRally
         case GamePaused
-        case GameFinished
-        case GameFinishedNewRecord
+        case MatchFinished
+        case MatchFinishedNewRecord
     }
     
     static let PAD_INSET = CGFloat(12.0)
@@ -42,7 +43,7 @@ class CourtScene: SKScene {
     
     private var _discAppearance: SKEmitterNode!
     
-    private var _state = CourtState.WaitToStartGame
+    private var _state = CourtState.WaitToStartMatch
       
     override init(size: CGSize) {
         super.init(size: size)
@@ -133,19 +134,19 @@ class CourtScene: SKScene {
         // Physics related initializations
         // Court has no gravity affecting it.
         self.physicsWorld.gravity = CGVector(dx:0.0, dy:0.0)
-        // TODO: add the edge limits only to the top and bottom
-        // Limits the court with an edge that bounces the disc elastically
+        // Limits the court with the scenes edges.
         self.physicsBody = SKPhysicsBody(edgeLoopFrom: self.frame)
-        self.physicsBody!.restitution = 1.0
+        self.physicsBody?.restitution = 1.0
     }
     
     internal func gotoInitialState() {
-        _state = .WaitToStartGame
+        _state = .WaitToStartMatch
+        GameManager.shared.startNewGame()
     }
     
     private func updateSceneState() {
         switch _state {
-        case .WaitToStartGame:
+        case .WaitToStartMatch:
             _disc.isHidden = true
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
@@ -167,13 +168,13 @@ class CourtScene: SKScene {
             _msgDisp2.alpha = 1.0
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start game
-                _state = .StartingGame
+                _state = .LaunchingDisk
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
                 launchDisc()
             }
-        case .StartingGame:
+        case .LaunchingDisk:
             _disc.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
@@ -182,6 +183,23 @@ class CourtScene: SKScene {
             _msgPaused.isHidden = true
             _soundOption.isHidden = true
             _gameInfo.isHidden = true
+        case .WaitToStartNewRally:
+            _disc.isHidden = true
+            _discsDisp.isHidden = false
+            _scoreDisp.isHidden = false
+            _msgDisp1.isHidden = false
+            _msgDisp2.isHidden = false
+            _msgPaused.isHidden = true
+            _soundOption.isHidden = true
+            _gameInfo.isHidden = true
+            if _leftPad.isActive && _rightPad.isActive {
+                // Both pads are being touched - start new rally
+                _state = .LaunchingDisk
+                let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
+                _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
+                _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
+                launchDisc()
+            }
         case .GameOngoing:
             _disc.isHidden = false
             _discsDisp.isHidden = false
@@ -213,7 +231,7 @@ class CourtScene: SKScene {
                 _state = .GameOngoing
                 _disc.resume()
             }
-        case .GameFinished, .GameFinishedNewRecord:
+        case .MatchFinished, .MatchFinishedNewRecord:
             // TODO: Give NewRecord case its own handler - has to navigate to
             //       new record entry string.
             _disc.isHidden = true
@@ -224,6 +242,7 @@ class CourtScene: SKScene {
             _msgPaused.isHidden = true
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
+            gotoInitialState()
         }
     }
     
@@ -233,39 +252,52 @@ class CourtScene: SKScene {
             self.alpha = 0.0
             let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
             self.run(fadeInScene)
-            _state = .WaitToStartGame
+            _state = .WaitToStartMatch
             GameManager.shared.startNewGame()
         }
     }
     
-    override func didEvaluateActions() {
+    override func update(_ currentTime: TimeInterval) {
         updateSceneState()
         _disc.isActive = _leftPad.isActive || _rightPad.isActive
-        _scoreDisp.text = scoreBoardText()
-        _discsDisp.text = discsText()
-        setMsgs()
-        
-        // TODO: add the game loss detection code in here
-        //       loss happens when the disc is completely out of the frame
-        
-        // TODO: add the successful disc hit logic to didEndContact handler
-        
-        // TODO: move the minimal speed logic to the didEndContact
-        //       handler when the disc and the pad are envolved.
-        if (_state == .GameOngoing) {
-            // Guarantees the mininal disc horizontal and vertical speeds
-            // (avoid edge cases where the game would be too boring).
-            if let phys = _disc.physicsBody {
-                if abs(phys.velocity.dx) < 500.0 {
-                    phys.velocity.dx = (phys.velocity.dx < 0 ? -500.0 : 500.0)
-                }
-                if abs(phys.velocity.dy) < 20.0 {
-                    phys.velocity.dy = (phys.velocity.dy < 0 ? -20.0 : 20.0)
+    }
+    
+    override func didEvaluateActions() {
+        if _state == .GameOngoing {
+            let leftLimit = _leftPad.position.x - _leftPad.size.width/2
+            let rightLimit = _rightPad.position.x + _disc.size.width/2
+            if _disc.position.x - _disc.size.width/2 < leftLimit || _disc.position.x + _disc.size.width/2 > rightLimit {
+                // Disc is completely to the left or to the right of the scene - player lost rally.
+                if GameManager.shared.pickUpDisc() {
+                     _state = .WaitToStartNewRally
+                } else {
+                    // Lost rally for the last disc
+                    _state = GameManager.shared.scoreBoard.isNewRecord ? .MatchFinishedNewRecord : .MatchFinished
                 }
             }
         }
     }
-       
+    
+    override func didSimulatePhysics() {
+        _scoreDisp.text = scoreBoardText()
+        _discsDisp.text = discsText()
+        setMsgs()
+        
+        if (_state == .GameOngoing) {
+            // Guarantees the mininal disc horizontal and vertical speeds
+            // (avoid edge cases where the game would be too boring).
+            // The ratio between the minimum Vx/Vy is the minimal disc slope.
+            if let phys = _disc.physicsBody {
+                if abs(phys.velocity.dx) < 501.0 {
+                    phys.velocity.dx = (phys.velocity.dx < 0 ? -501.0 : 501.0)
+                }
+                if abs(phys.velocity.dy) < 80.0 {
+                    phys.velocity.dy = (phys.velocity.dy < 0 ? -83.0 : 83.0)
+                }
+            }
+        }
+    }
+    
     private func launchDisc() {
         let fromRight = Bool.random()
         let leftLimit = _leftPad.size.width + 40.0
@@ -280,7 +312,7 @@ class CourtScene: SKScene {
         let initialPos =
             CGPoint(x: xOffset,
                     y: CGFloat.random(
-                        in: CourtScene.PAD_INSET...size.height - CourtScene.PAD_INSET))
+                        in: _disc.size.height*2...size.height - _disc.size.height*2))
         _discAppearance.position = initialPos
         _discAppearance.isHidden = false
         let fadeInDisc = SKAction.fadeIn(withDuration: 1.5)
@@ -293,7 +325,7 @@ class CourtScene: SKScene {
                 self._discAppearance.alpha = 0.0
                 self._discAppearance.isHidden = true
                 self._state = CourtState.GameOngoing
-                var xVelocity = CGFloat(550.0)
+                var xVelocity = CGFloat(501.0)
                 if fromRight {
                     xVelocity = -xVelocity
                 }
@@ -325,22 +357,25 @@ class CourtScene: SKScene {
     
     private func setMsgs() {
         switch _state {
-        case .WaitToStartGame:
+        case .WaitToStartMatch:
             _msgDisp1.text = "To start a new match,"
             _msgDisp2.text = "touch and hold both pads."
-        case .GameFinishedNewRecord:
+        case .MatchFinishedNewRecord:
             _msgDisp1.text = "Well done!"
             _msgDisp2.text = "You've set a new record!"
         case .GamePaused:
             _msgDisp1.text = "To resume, touch one or both pads."
             _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
-        case .StartingGame:
+        case .LaunchingDisk:
             _msgDisp1.text = "Get ready to play!"
-            _msgDisp2.text = "To pause the match, release both pads."
+            _msgDisp2.text = "To pause the game, release both pads."
+        case .WaitToStartNewRally:
+            _msgDisp1.text = "Hold both pads to launch a new disc."
+            _msgDisp2.text = "To abort, touch anywhere with 3 fingers"
         case .GameOngoing:
             _msgDisp1.text = ""
             _msgDisp2.text = ""
-        case .GameFinished:
+        case .MatchFinished:
             // TODO: think about better finished message - maybe congratulate
             //       if score is above a given threshold; display playing time.
             _msgDisp1.text = "Thanks for playing!"
