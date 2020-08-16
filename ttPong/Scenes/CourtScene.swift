@@ -276,7 +276,7 @@ class CourtScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         updateSceneState()
-        _disc.isActive = _leftPad.isActive || _rightPad.isActive
+        _disc.isActive = _leftPad.isActive && _rightPad.isActive
 
         if (_state == .GameOngoing) {
             // Guarantees the mininal disc horizontal and vertical speeds
