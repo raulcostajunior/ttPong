@@ -50,10 +50,13 @@ class GameManager {
     }
     
     func pickUpDisc() -> Bool {
-        guard _availableDiscs > 0 else {
+        print("@pickUpDisc -> _availableDiscs = \(availableDiscs)")
+        guard _availableDiscs > 1 else {
+            print("@pickUpDisc -> will return false")
             return false
         }
         _availableDiscs -= 1
+        print("@pickUpDisc -> decremented _availableDiscs (now \(_availableDiscs)). Will return true")
         return true
     }
     
@@ -79,6 +82,7 @@ class GameManager {
         }
         _availableDiscs = GameManager.TOTAL_DISCS;
         _scoreBoard.resetScore()
+        print("@startNewGame -> _availableDiscs = \(_availableDiscs)")
     }
     
 
