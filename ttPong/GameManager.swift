@@ -23,7 +23,7 @@ class GameManager {
     
     static let shared = GameManager()
     
-    private static let TOTAL_DISCS = 3
+    private static let TOTAL_DISCS = 4
     
     private let _dataStore = DataStore()
     private var _scoreBoard: ScoreBoard
@@ -50,13 +50,11 @@ class GameManager {
     }
     
     func pickUpDisc() {
-        print("@pickUpDisc -> _availableDiscs = \(availableDiscs)")
         guard _availableDiscs > 0 else {
             print("@pickUpDisc -> will return false")
             return
         }
         _availableDiscs -= 1
-        print("@pickUpDisc -> decremented _availableDiscs (now \(_availableDiscs)). Will return true")
     }
     
     private var _currentScene: SKScene?
@@ -81,7 +79,6 @@ class GameManager {
         }
         _availableDiscs = GameManager.TOTAL_DISCS;
         _scoreBoard.resetScore()
-        print("@startNewGame -> _availableDiscs = \(_availableDiscs)")
     }
     
 

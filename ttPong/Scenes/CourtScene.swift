@@ -37,7 +37,7 @@ class CourtScene: SKScene {
     private var _gameInfo: HelpSprite!
     
     private var _scoreDisp: SKLabelNode!
-    private var _spareDiscsDisp: SKLabelNode!
+    private var _discsDisp: SKLabelNode!
     private var _msgDisp1: SKLabelNode!
     private var _msgDisp2: SKLabelNode!
     private var _msgPaused: SKLabelNode!
@@ -91,13 +91,13 @@ class CourtScene: SKScene {
         _scoreDisp.verticalAlignmentMode = .top
         self.addChild(_scoreDisp)
         
-        _spareDiscsDisp = SKLabelNode(fontNamed: "Phosphate")
-        _spareDiscsDisp.fontSize = 16
-        _spareDiscsDisp.position = CGPoint(x: size.width/4,
+        _discsDisp = SKLabelNode(fontNamed: "Phosphate")
+        _discsDisp.fontSize = 16
+        _discsDisp.position = CGPoint(x: size.width/4,
                                      y: size.height - CourtScene.PAD_INSET)
-        _spareDiscsDisp.horizontalAlignmentMode = .center
-        _spareDiscsDisp.verticalAlignmentMode = .top
-        self.addChild(_spareDiscsDisp)
+        _discsDisp.horizontalAlignmentMode = .center
+        _discsDisp.verticalAlignmentMode = .top
+        self.addChild(_discsDisp)
         
         _msgDisp1 = SKLabelNode(fontNamed: "Phosphate")
         _msgDisp1.fontSize = 19
@@ -165,7 +165,7 @@ class CourtScene: SKScene {
         switch _state {
         case .WaitToStartMatch:
             _disc.isHidden = true
-            _spareDiscsDisp.isHidden = true
+            _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
@@ -179,18 +179,30 @@ class CourtScene: SKScene {
             _msgDisp2.alpha = 1.0
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start game
-                assert(GameManager.shared.availableDiscs > 0,
-                       "Internal state machine problem: .WaitToStartMatch with no disc available!")
                 _state = .LaunchingDisk
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
-                GameManager.shared.pickUpDisc()
                 launchDisc()
             }
-        case .LaunchingDisk, .LostDisc:    // Transient states - display timed message while
-            _disc.isHidden = true          // something is going on.
-            _spareDiscsDisp.isHidden = false
+        case .LaunchingDisk:
+            // Transient state - display timed message while
+            // some actions are executed.
+            _disc.isHidden = true
+            _discsDisp.isHidden = false
+            _scoreDisp.isHidden = false
+            _msgDisp1.isHidden = false
+            _msgDisp2.isHidden = false
+            _msgPaused.isHidden = true
+            _soundOption.isHidden = true
+            _gameInfo.isHidden = true
+        case .LostDisc:
+            // Transient state - display timed message while
+            // some actions are executed.
+            _disc.isHidden = true
+            // Hides the number of discs available as this could lead
+            // to confusion. This number is shown in the message.
+            _discsDisp.isHidden = true
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
@@ -199,7 +211,7 @@ class CourtScene: SKScene {
             _gameInfo.isHidden = true
         case .WaitToStartNewRally:
             _disc.isHidden = true
-            _spareDiscsDisp.isHidden = false
+            _discsDisp.isHidden = true
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
@@ -208,19 +220,17 @@ class CourtScene: SKScene {
             _gameInfo.isHidden = true
             resetPadsPositions()
             if _leftPad.isActive && _rightPad.isActive {
-                // Both pads are being touched - start new rally
-                assert(GameManager.shared.availableDiscs > 0,
-                       "Internal state machine problem: .WaitToStartRally with no disc available!")
+                // Both pads are being touched - start new rally.
+                GameManager.shared.pickUpDisc()
                 _state = .LaunchingDisk
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
-                GameManager.shared.pickUpDisc()
                 launchDisc()
             }
         case .GameOngoing:
             _disc.isHidden = false
-            _spareDiscsDisp.isHidden = false
+            _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = true
             _msgDisp2.isHidden = true
@@ -238,7 +248,7 @@ class CourtScene: SKScene {
             }
         case .GamePaused:
             _disc.isHidden = false
-            _spareDiscsDisp.isHidden = true
+            _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
@@ -253,7 +263,7 @@ class CourtScene: SKScene {
             // TODO: Give NewRecord case its own handler - has to navigate to
             //       new record entry string.
             _disc.isHidden = true
-            _spareDiscsDisp.isHidden = true
+            _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
@@ -265,7 +275,8 @@ class CourtScene: SKScene {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if touches.count == 3 && (_state == .GamePaused  || _state == .LostDisc) {
+        if touches.count == 3 &&
+            (_state == .GamePaused  || _state == .LostDisc || _state == .WaitToStartNewRally) {
             // User chose to abort game
             self.alpha = 0.0
             let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
@@ -305,8 +316,9 @@ class CourtScene: SKScene {
                 let fadeInMsg = SKAction.fadeIn(withDuration: 0.5)
                 _msgDisp1.run(fadeInMsg)
                 _msgDisp2.run(fadeInMsg)
-                if GameManager.shared.availableDiscs > 0 {
-                    // There's at least one disc left - start new rally
+                if GameManager.shared.availableDiscs > 1 {
+                    // There's at least one disc left; let user start
+                    // a new rally
                     Timer.scheduledTimer(withTimeInterval: 3.0,
                                          repeats: false,
                                          block: { timer in
@@ -322,12 +334,10 @@ class CourtScene: SKScene {
                         // TODO: Add game finished sound effect
                         nextState = .MatchFinished
                     }
-                    print("@didEvaluateActions -> nextState = \(nextState!)")
                     Timer.scheduledTimer(withTimeInterval: 3.0,
                                          repeats: false,
                                          block: { timer in
                                             self._state = nextState
-                                            print("@didEvaluateActions (timer pulse) -> transition to nextState = \(nextState!)")
                     })
                 }
             }
@@ -336,7 +346,7 @@ class CourtScene: SKScene {
     
     override func didSimulatePhysics() {
         _scoreDisp.text = scoreBoardText()
-        _spareDiscsDisp.text = spareDiscsText()
+        _discsDisp.text = discsText()
         setMsgs()
     }
     
@@ -386,13 +396,12 @@ class CourtScene: SKScene {
         return "SCORE - \(fmtScore)      HIGH - \(fmtHighScore)"
     }
     
-    private func spareDiscsText() -> String {
+    private func discsText() -> String {
         let adsks = GameManager.shared.availableDiscs
         var txt = ""
         switch adsks {
-        case 0: txt = "LAST DISC"
-        case 1: txt = "SPARE DISC - 1"
-        default: txt = "SPARE DISCS - \(adsks)"
+        case 1: txt = "LAST DISC"
+        default: txt = "DISCS - \(adsks)"
         }
         return txt
     }
@@ -412,9 +421,17 @@ class CourtScene: SKScene {
             _msgDisp1.text = "Get ready to play!"
             _msgDisp2.text = "To pause the game, release one or both pads."
         case .LostDisc:
-            if GameManager.shared.availableDiscs > 0 {
+            // availDiscs includes the one that has just been lost.
+            let availDiscs = GameManager.shared.availableDiscs
+            if availDiscs > 1 {
+                var discTxt: String!
+                if availDiscs >= 3 {
+                    discTxt = ", you have \(availDiscs - 1) discs left!"
+                } else if availDiscs == 2 {
+                    discTxt = ", make the most of your last disc!"
+                }
                 // There's at least one rally left ...
-                _msgDisp1.text = "Get ready for new rally!"
+                _msgDisp1.text = "Get ready\(discTxt!)"
                 _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
             } else if GameManager.shared.scoreBoard.isNewRecord {
                 _msgDisp1.text = "Well done!!!"
