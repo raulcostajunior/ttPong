@@ -49,15 +49,14 @@ class GameManager {
         return _availableDiscs;
     }
     
-    func pickUpDisc() -> Bool {
+    func pickUpDisc() {
         print("@pickUpDisc -> _availableDiscs = \(availableDiscs)")
-        guard _availableDiscs > 1 else {
+        guard _availableDiscs > 0 else {
             print("@pickUpDisc -> will return false")
-            return false
+            return
         }
         _availableDiscs -= 1
         print("@pickUpDisc -> decremented _availableDiscs (now \(_availableDiscs)). Will return true")
-        return true
     }
     
     private var _currentScene: SKScene?

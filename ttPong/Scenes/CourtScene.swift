@@ -37,12 +37,17 @@ class CourtScene: SKScene {
     private var _gameInfo: HelpSprite!
     
     private var _scoreDisp: SKLabelNode!
-    private var _discsDisp: SKLabelNode!
+    private var _spareDiscsDisp: SKLabelNode!
     private var _msgDisp1: SKLabelNode!
     private var _msgDisp2: SKLabelNode!
     private var _msgPaused: SKLabelNode!
     
     private var _discAppearance: SKEmitterNode!
+    
+    // A disc whose x position is outside the limits below is
+    // considered lost.
+    private var _leftLimit: CGFloat!
+    private var _rightLimit: CGFloat!
     
     private var _state: CourtState = .WaitToStartMatch
       
@@ -86,13 +91,13 @@ class CourtScene: SKScene {
         _scoreDisp.verticalAlignmentMode = .top
         self.addChild(_scoreDisp)
         
-        _discsDisp = SKLabelNode(fontNamed: "Phosphate")
-        _discsDisp.fontSize = 16
-        _discsDisp.position = CGPoint(x: size.width/4,
+        _spareDiscsDisp = SKLabelNode(fontNamed: "Phosphate")
+        _spareDiscsDisp.fontSize = 16
+        _spareDiscsDisp.position = CGPoint(x: size.width/4,
                                      y: size.height - CourtScene.PAD_INSET)
-        _discsDisp.horizontalAlignmentMode = .center
-        _discsDisp.verticalAlignmentMode = .top
-        self.addChild(_discsDisp)
+        _spareDiscsDisp.horizontalAlignmentMode = .center
+        _spareDiscsDisp.verticalAlignmentMode = .top
+        self.addChild(_spareDiscsDisp)
         
         _msgDisp1 = SKLabelNode(fontNamed: "Phosphate")
         _msgDisp1.fontSize = 19
@@ -139,6 +144,8 @@ class CourtScene: SKScene {
         self.physicsBody = SKPhysicsBody(edgeLoopFrom: self.frame)
         self.physicsBody?.restitution = 1.0
         
+        _leftLimit = _leftPad.position.x - _leftPad.size.width/2
+        _rightLimit = _rightPad.position.x + _disc.size.width/2
     }
     
     func gotoInitialState() {
@@ -146,39 +153,44 @@ class CourtScene: SKScene {
         GameManager.shared.startNewGame()
     }
     
+    private func resetPadsPositions() {
+        let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET
+        let vPos = size.height/2.0
+        _leftPad.position = CGPoint(x: lHPos, y: vPos)
+        let rHPos = self.size.width - CourtScene.PAD_INSET - _rightPad.size.width/2.0
+        _rightPad.position = CGPoint(x: rHPos, y: vPos)
+    }
+    
     private func updateSceneState() {
         switch _state {
         case .WaitToStartMatch:
             _disc.isHidden = true
-            _discsDisp.isHidden = true
+            _spareDiscsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
-            let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET
-            let vPos = size.height/2.0
-            _leftPad.position = CGPoint(x: lHPos, y: vPos)
-            let rHPos = self.size.width - CourtScene.PAD_INSET - _rightPad.size.width/2.0
-            _rightPad.position = CGPoint(x: rHPos, y: vPos)
-            _leftPad.isHidden = false
-            _rightPad.isHidden = false
+            resetPadsPositions()
             _msgDisp1.removeAction(forKey: "fadeOut")
             _msgDisp2.removeAction(forKey: "fadeOut")
             _msgDisp1.alpha = 1.0
             _msgDisp2.alpha = 1.0
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start game
+                assert(GameManager.shared.availableDiscs > 0,
+                       "Internal state machine problem: .WaitToStartMatch with no disc available!")
                 _state = .LaunchingDisk
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
+                GameManager.shared.pickUpDisc()
                 launchDisc()
             }
         case .LaunchingDisk, .LostDisc:    // Transient states - display timed message while
             _disc.isHidden = true          // something is going on.
-            _discsDisp.isHidden = false
+            _spareDiscsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
@@ -187,24 +199,28 @@ class CourtScene: SKScene {
             _gameInfo.isHidden = true
         case .WaitToStartNewRally:
             _disc.isHidden = true
-            _discsDisp.isHidden = false
+            _spareDiscsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
             _soundOption.isHidden = true
             _gameInfo.isHidden = true
+            resetPadsPositions()
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start new rally
+                assert(GameManager.shared.availableDiscs > 0,
+                       "Internal state machine problem: .WaitToStartRally with no disc available!")
                 _state = .LaunchingDisk
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
+                GameManager.shared.pickUpDisc()
                 launchDisc()
             }
         case .GameOngoing:
             _disc.isHidden = false
-            _discsDisp.isHidden = false
+            _spareDiscsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = true
             _msgDisp2.isHidden = true
@@ -215,21 +231,21 @@ class CourtScene: SKScene {
             _msgDisp2.removeAction(forKey: "fadeOut")
             _msgDisp1.alpha = 1.0
             _msgDisp2.alpha = 1.0
-            if !_leftPad.isActive && !_rightPad.isActive {
+            if !_leftPad.isActive || !_rightPad.isActive {
                 // Releasing both pads while match is ongoing, pauses it
                 _state = .GamePaused
                 _disc.pause()
             }
         case .GamePaused:
             _disc.isHidden = false
-            _discsDisp.isHidden = true
+            _spareDiscsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = false
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
-            if _leftPad.isActive || _rightPad.isActive {
+            if _leftPad.isActive && _rightPad.isActive {
                 _state = .GameOngoing
                 _disc.resume()
             }
@@ -237,7 +253,7 @@ class CourtScene: SKScene {
             // TODO: Give NewRecord case its own handler - has to navigate to
             //       new record entry string.
             _disc.isHidden = true
-            _discsDisp.isHidden = true
+            _spareDiscsDisp.isHidden = true
             _scoreDisp.isHidden = true
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
@@ -249,7 +265,7 @@ class CourtScene: SKScene {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if touches.count == 3 && _state == .GamePaused {
+        if touches.count == 3 && (_state == .GamePaused  || _state == .LostDisc) {
             // User chose to abort game
             self.alpha = 0.0
             let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
@@ -280,10 +296,7 @@ class CourtScene: SKScene {
     override func didEvaluateActions() {
         if _state == .GameOngoing {
             // Detects and processes disc loss
-            // TODO: make leftLimit and rightLimit instance constants and initialize them at the scene initialization
-            let leftLimit = _leftPad.position.x - _leftPad.size.width/2
-            let rightLimit = _rightPad.position.x + _disc.size.width/2
-            if _disc.position.x - _disc.size.width/2 < leftLimit || _disc.position.x + _disc.size.width/2 > rightLimit {
+            if _disc.position.x - _disc.size.width/2 < _leftLimit || _disc.position.x + _disc.size.width/2 > _rightLimit {
                 // Disc is completely to the left or to the right of the scene - player lost rally.
                 // TODO: Add disc lost sound effect!
                 _state = .LostDisc
@@ -292,7 +305,7 @@ class CourtScene: SKScene {
                 let fadeInMsg = SKAction.fadeIn(withDuration: 0.5)
                 _msgDisp1.run(fadeInMsg)
                 _msgDisp2.run(fadeInMsg)
-                if GameManager.shared.pickUpDisc() {
+                if GameManager.shared.availableDiscs > 0 {
                     // There's at least one disc left - start new rally
                     Timer.scheduledTimer(withTimeInterval: 3.0,
                                          repeats: false,
@@ -323,7 +336,7 @@ class CourtScene: SKScene {
     
     override func didSimulatePhysics() {
         _scoreDisp.text = scoreBoardText()
-        _discsDisp.text = discsText()
+        _spareDiscsDisp.text = spareDiscsText()
         setMsgs()
     }
     
@@ -373,12 +386,13 @@ class CourtScene: SKScene {
         return "SCORE - \(fmtScore)      HIGH - \(fmtHighScore)"
     }
     
-    private func discsText() -> String {
+    private func spareDiscsText() -> String {
         let adsks = GameManager.shared.availableDiscs
         var txt = ""
         switch adsks {
-        case 1: txt = "LAST DISC"
-        default: txt = "DISCS - \(adsks)"
+        case 0: txt = "LAST DISC"
+        case 1: txt = "SPARE DISC - 1"
+        default: txt = "SPARE DISCS - \(adsks)"
         }
         return txt
     }
@@ -392,17 +406,15 @@ class CourtScene: SKScene {
             _msgDisp1.text = "Well done!"
             _msgDisp2.text = "You've set a new record!"
         case .GamePaused:
-            _msgDisp1.text = "To resume, touch one or both pads."
+            _msgDisp1.text = "To resume, touch both pads."
             _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
         case .LaunchingDisk:
             _msgDisp1.text = "Get ready to play!"
-            _msgDisp2.text = "To pause the game, release both pads."
+            _msgDisp2.text = "To pause the game, release one or both pads."
         case .LostDisc:
-            let availDiscs = GameManager.shared.availableDiscs
-            if availDiscs > 0 {
+            if GameManager.shared.availableDiscs > 0 {
                 // There's at least one rally left ...
-                let discTxt = availDiscs == 1 ? "disc" : "discs"
-                _msgDisp1.text = "Get ready, you have \(availDiscs) \(discTxt) left"
+                _msgDisp1.text = "Get ready for new rally!"
                 _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
             } else if GameManager.shared.scoreBoard.isNewRecord {
                 _msgDisp1.text = "Well done!!!"
