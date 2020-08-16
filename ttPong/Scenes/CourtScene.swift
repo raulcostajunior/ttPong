@@ -241,7 +241,7 @@ class CourtScene: SKScene {
             _msgDisp2.removeAction(forKey: "fadeOut")
             _msgDisp1.alpha = 1.0
             _msgDisp2.alpha = 1.0
-            if !_leftPad.isActive || !_rightPad.isActive {
+            if !_leftPad.isActive && !_rightPad.isActive {
                 // Releasing both pads while match is ongoing, pauses it
                 _state = .GamePaused
                 _disc.pause()
@@ -255,7 +255,7 @@ class CourtScene: SKScene {
             _msgPaused.isHidden = false
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
-            if _leftPad.isActive && _rightPad.isActive {
+            if _leftPad.isActive || _rightPad.isActive {
                 _state = .GameOngoing
                 _disc.resume()
             }
@@ -287,7 +287,7 @@ class CourtScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         updateSceneState()
-        _disc.isActive = _leftPad.isActive && _rightPad.isActive
+        _disc.isActive = _leftPad.isActive || _rightPad.isActive
 
         if (_state == .GameOngoing) {
             // Guarantees the mininal disc horizontal and vertical speeds
@@ -415,11 +415,11 @@ class CourtScene: SKScene {
             _msgDisp1.text = "Well done!"
             _msgDisp2.text = "You've set a new record!"
         case .GamePaused:
-            _msgDisp1.text = "To resume, touch both pads."
+            _msgDisp1.text = "To resume, touch one or both pads."
             _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
         case .LaunchingDisk:
             _msgDisp1.text = "Get ready to play!"
-            _msgDisp2.text = "To pause the game, release one or both pads."
+            _msgDisp2.text = "To pause the game, release both pads."
         case .LostDisc:
             // availDiscs includes the one that has just been lost.
             let availDiscs = GameManager.shared.availableDiscs
