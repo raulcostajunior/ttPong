@@ -17,6 +17,7 @@ class CourtScene: SKScene {
         case LaunchingDisk
         case GameOngoing
         case LostDisc
+        case LostLastDisc
         case WaitToStartNewRally
         case GamePaused
         case MatchFinished
@@ -196,7 +197,7 @@ class CourtScene: SKScene {
             _msgPaused.isHidden = true
             _soundOption.isHidden = true
             _gameInfo.isHidden = true
-        case .LostDisc:
+        case .LostDisc, .LostLastDisc:
             // Transient state - display timed message while
             // some actions are executed.
             _disc.isHidden = true
@@ -211,7 +212,7 @@ class CourtScene: SKScene {
             _gameInfo.isHidden = true
         case .WaitToStartNewRally:
             _disc.isHidden = true
-            _discsDisp.isHidden = true
+            _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
@@ -221,7 +222,6 @@ class CourtScene: SKScene {
             resetPadsPositions()
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start new rally.
-                GameManager.shared.pickUpDisc()
                 _state = .LaunchingDisk
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
@@ -310,8 +310,7 @@ class CourtScene: SKScene {
             if _disc.position.x - _disc.size.width/2 < _leftLimit || _disc.position.x + _disc.size.width/2 > _rightLimit {
                 // Disc is completely to the left or to the right of the scene - player lost rally.
                 // TODO: Add disc lost sound effect!
-                _state = .LostDisc
-                _msgDisp1.alpha = 0.0
+                 _msgDisp1.alpha = 0.0
                 _msgDisp2.alpha = 0.0
                 let fadeInMsg = SKAction.fadeIn(withDuration: 0.5)
                 _msgDisp1.run(fadeInMsg)
@@ -319,6 +318,8 @@ class CourtScene: SKScene {
                 if GameManager.shared.availableDiscs > 1 {
                     // There's at least one disc left; let user start
                     // a new rally
+                    _state = .LostDisc
+                    GameManager.shared.pickUpDisc()
                     Timer.scheduledTimer(withTimeInterval: 3.0,
                                          repeats: false,
                                          block: { timer in
@@ -326,6 +327,7 @@ class CourtScene: SKScene {
                     })
                 } else {
                     // Lost rally for the last disc
+                    _state = .LostLastDisc
                     var nextState: CourtState!
                     if GameManager.shared.scoreBoard.isNewRecord {
                         // TODO: Add congratulation sound effect
@@ -422,18 +424,18 @@ class CourtScene: SKScene {
             _msgDisp2.text = "To pause the game, release both pads."
         case .LostDisc:
             // availDiscs includes the one that has just been lost.
+            var discTxt: String!
             let availDiscs = GameManager.shared.availableDiscs
-            if availDiscs > 1 {
-                var discTxt: String!
-                if availDiscs >= 3 {
-                    discTxt = ", you have \(availDiscs - 1) discs left!"
-                } else if availDiscs == 2 {
-                    discTxt = ", make the most of your last disc!"
-                }
-                // There's at least one rally left ...
-                _msgDisp1.text = "Get ready\(discTxt!)"
-                _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
-            } else if GameManager.shared.scoreBoard.isNewRecord {
+            if availDiscs >= 2 {
+                discTxt = ", you have \(availDiscs) discs left!"
+            } else if availDiscs == 1 {
+                discTxt = ", make the most of your last disc!"
+            }
+            // There's at least one rally left ...
+            _msgDisp1.text = "Get ready\(discTxt!)"
+            _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
+        case .LostLastDisc:
+            if GameManager.shared.scoreBoard.isNewRecord {
                 _msgDisp1.text = "Well done!!!"
                 _msgDisp2.text = "You just set a new record!"
             } else {
