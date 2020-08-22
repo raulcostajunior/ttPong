@@ -15,30 +15,28 @@ import Foundation
  alias - just like old school arcade machines.
  */
     
-struct ScoreBoard {
+class ScoreBoard {
     
     private var _score = 0
     private var _highScore = 0
-    private var _isNewRecord = false
     
     var score:Int { return _score }
     var highScore:Int { return _highScore }
-    var isNewRecord:Bool { return _isNewRecord }
+    var isNewRecord:Bool { return _score >= _highScore }
     
     init(highScore: Int) {
         _score = 0
         _highScore = highScore
     }
     
-    mutating func increaseScore(by increment:Int) {
+    func increaseScore(by increment:Int) {
         _score += increment
         if _score > _highScore {
             _highScore = _score
-            _isNewRecord = true
         }
     }
     
-    mutating func resetScore() {
+    func resetScore() {
         _score = 0
     }
     

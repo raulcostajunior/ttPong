@@ -10,7 +10,7 @@ import SpriteKit
 import GameplayKit
 
 
-class CourtScene: SKScene {
+class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     enum CourtState {
         case WaitToStartMatch
@@ -50,6 +50,11 @@ class CourtScene: SKScene {
     private var _leftLimit: CGFloat!
     private var _rightLimit: CGFloat!
     
+    // A disc whose x position is within the limits below is
+    // considered in court.
+    private var _leftLimitIn: CGFloat!
+    private var _rightLimitIn: CGFloat!
+    
     private var _state: CourtState = .WaitToStartMatch
       
     override init(size: CGSize) {
@@ -57,16 +62,19 @@ class CourtScene: SKScene {
         backgroundColor = SKColor(red: 0.0, green: 0.0, blue:0.0, alpha: 1.0)
         
         _disc = DiscSprite(for: size)
+        _disc.name = "Disc"
         _disc.position = CGPoint(x: size.width/2.0, y: 100.0)
         self.addChild(_disc)
 
         _leftPad = PadSprite(for: size)
+        _leftPad.name = "LeftPad"
         let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET
         let vPos = size.height/2.0
         _leftPad.position = CGPoint(x: lHPos, y: vPos)
         self.addChild(_leftPad)
 
         _rightPad = PadSprite(for: size)
+        _rightPad.name = "RightPad"
         let rHPos = self.size.width - CourtScene.PAD_INSET - _rightPad.size.width/2.0
         _rightPad.position = CGPoint(x: rHPos, y: vPos)
         self.addChild(_rightPad)
@@ -85,7 +93,7 @@ class CourtScene: SKScene {
         self.addChild(_gameInfo)
         
         _scoreDisp = SKLabelNode(fontNamed: "Phosphate")
-        _scoreDisp.fontSize = 16
+        _scoreDisp.fontSize = 19
         _scoreDisp.position = CGPoint(x: _rightPad.position.x - 50.0,
                                      y: size.height - CourtScene.PAD_INSET)
         _scoreDisp.horizontalAlignmentMode = .right
@@ -93,9 +101,9 @@ class CourtScene: SKScene {
         self.addChild(_scoreDisp)
         
         _discsDisp = SKLabelNode(fontNamed: "Phosphate")
-        _discsDisp.fontSize = 16
+        _discsDisp.fontSize = 19
         _discsDisp.position = CGPoint(x: size.width/4,
-                                     y: size.height - CourtScene.PAD_INSET)
+                                      y: size.height - CourtScene.PAD_INSET)
         _discsDisp.horizontalAlignmentMode = .center
         _discsDisp.verticalAlignmentMode = .top
         self.addChild(_discsDisp)
@@ -144,22 +152,67 @@ class CourtScene: SKScene {
         // Limits the court with the scenes edges.
         self.physicsBody = SKPhysicsBody(edgeLoopFrom: self.frame)
         self.physicsBody?.restitution = 1.0
+        self.physicsWorld.contactDelegate = self
+        // Pads and discs collide with each other
+        _disc.physicsBody!.contactTestBitMask = PadSprite.CollisionCateg
+        _leftPad.physicsBody!.contactTestBitMask = DiscSprite.CollisionCateg
+        _rightPad.physicsBody!.contactTestBitMask = DiscSprite.CollisionCateg
         
-        _leftLimit = _leftPad.position.x - _leftPad.size.width/2
+        _leftLimit = _leftPad.position.x - _disc.size.width/2
         _rightLimit = _rightPad.position.x + _disc.size.width/2
+        _leftLimitIn = _leftPad.position.x + _leftPad.size.width/2
+        _rightLimitIn = _rightPad.position.x - _rightPad.size.width/2
     }
+    
+    // MARK: - SKPhysicsContactDelegate
+    
+    func didBegin(_ contact:SKPhysicsContact) {
+        guard _state == .GameOngoing && _disc.position.x > _leftLimitIn &&
+            _disc.position.x < _rightLimitIn
+            else {
+            // We're only interested in collisions while game is ongoing
+            // and the disc in court
+            return
+        }
+        let contactMask =
+            contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
+        if contactMask == DiscSprite.CollisionCateg | PadSprite.CollisionCateg {
+            // TODO: play sound effect for disc hitting a pad.
+        }
+    }
+    
+    func didEnd(_ contact: SKPhysicsContact) {
+        guard _state == .GameOngoing && _disc.position.x > _leftLimitIn &&
+            _disc.position.x < _rightLimit
+            else {
+            // We're only interested in collisions while game is ongoing
+            // and the disc in court
+            return
+        }
+        let contactMask =
+            contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
+        if contactMask == DiscSprite.CollisionCateg | PadSprite.CollisionCateg {
+            // If a few milliseconds after hitting the pad the disc had it
+            // horizontal velocity component reverted, it is still in game.
+            let hitLeftPad = (_disc.position.x < self.size.width/2)
+            Timer.scheduledTimer(
+                withTimeInterval: 0.15,
+                repeats: false,
+                block: { timer in
+                    if (hitLeftPad && self._disc.velocity.dx > 0.0) ||
+                        (!hitLeftPad && self._disc.velocity.dx < 0.0) {
+                        GameManager.shared.scoreBoard.increaseScore(by: 1)
+                    }
+                }
+            )
+        }
+    }
+    
+    // MARK: - Scene State handling
     
     func gotoInitialState() {
         _state = .WaitToStartMatch
         GameManager.shared.startNewGame()
-    }
-    
-    private func resetPadsPositions() {
-        let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET
-        let vPos = size.height/2.0
-        _leftPad.position = CGPoint(x: lHPos, y: vPos)
-        let rHPos = self.size.width - CourtScene.PAD_INSET - _rightPad.size.width/2.0
-        _rightPad.position = CGPoint(x: rHPos, y: vPos)
     }
     
     private func updateSceneState() {
@@ -274,6 +327,8 @@ class CourtScene: SKScene {
         }
     }
     
+    // MARK: - SKScene overrides
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if touches.count == 3 &&
             (_state == .GamePaused  || _state == .LostDisc || _state == .WaitToStartNewRally) {
@@ -352,6 +407,16 @@ class CourtScene: SKScene {
         setMsgs()
     }
     
+    // MARK: - Private helper methods
+    
+    private func resetPadsPositions() {
+        let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET
+        let vPos = size.height/2.0
+        _leftPad.position = CGPoint(x: lHPos, y: vPos)
+        let rHPos = self.size.width - CourtScene.PAD_INSET - _rightPad.size.width/2.0
+        _rightPad.position = CGPoint(x: rHPos, y: vPos)
+    }
+    
     private func launchDisc() {
         let fromRight = Bool.random()
         let leftLimit = _leftPad.size.width + 40.0
@@ -423,7 +488,6 @@ class CourtScene: SKScene {
             _msgDisp1.text = "Get ready to play!"
             _msgDisp2.text = "To pause the game, release both pads."
         case .LostDisc:
-            // availDiscs includes the one that has just been lost.
             var discTxt: String!
             let availDiscs = GameManager.shared.availableDiscs
             if availDiscs >= 2 {

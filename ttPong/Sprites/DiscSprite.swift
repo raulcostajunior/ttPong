@@ -38,6 +38,8 @@ class DiscSprite: SKSpriteNode {
         }
     }
     
+    static let CollisionCateg: UInt32 = 0x1 << 2
+    
     init(for sceneSize:CGSize) {
         let diameter = Double(sceneSize.height/12.0)
         let intDiameter = Int(round(diameter))
@@ -56,6 +58,7 @@ class DiscSprite: SKSpriteNode {
         physicsBody!.restitution = 1.0     // No speed loss on collision
         physicsBody!.angularDamping = 0.0  // No automatic rotation handling
         physicsBody!.velocity = CGVector(dx: 0.0, dy: 0.0)
+        physicsBody!.categoryBitMask = DiscSprite.CollisionCateg
     }
     
     private func initTexture(diameter: Int, active: Bool) -> SKTexture? {

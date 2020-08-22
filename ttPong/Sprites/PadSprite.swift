@@ -47,6 +47,11 @@ class PadSprite: SKSpriteNode {
      */
     var isActive: Bool { _active }
     
+    /**
+     The collision category common to all pads.
+     */
+    static let CollisionCateg: UInt32 = 0x1 << 1
+    
     init(for sceneSize:CGSize) {
         let height = Int(round(sceneSize.height/3.6))
             
@@ -65,6 +70,7 @@ class PadSprite: SKSpriteNode {
         physicsBody = SKPhysicsBody(rectangleOf: self.size)
         physicsBody!.isDynamic = false
         physicsBody!.restitution = 1.0
+        physicsBody!.categoryBitMask = PadSprite.CollisionCateg
     }
 
     private func initTexture(width: Int, height: Int,
