@@ -61,8 +61,6 @@ class GameManager {
     
     func presentGame(on view: SKView) {
         guard _currentScene == nil else {
-            print("Error: there should be not current scene when calling 'presentGame'.")
-            print("       'presentGame' should be called only at the begin of the game lifecycle.")
             return;
         }
         _currentScene = CourtScene(size:view.bounds.size)
