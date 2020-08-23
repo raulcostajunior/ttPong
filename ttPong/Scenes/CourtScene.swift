@@ -27,10 +27,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     static let PAD_INSET = CGFloat(12.0)
     static let ICON_H_SPACING = CGFloat(36.0)
 
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
     private var _disc: DiscSprite!
     private var _leftPad: PadSprite!
     private var _rightPad: PadSprite!
@@ -55,7 +51,18 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private var _leftLimitIn: CGFloat!
     private var _rightLimitIn: CGFloat!
     
+    // Minimum values for components of velocity vector - proportional
+    // to screen size
+    private var _minDxSpeed: CGFloat!
+    private var _minDySpeed: CGFloat!
+    
     private var _state: CourtState = .WaitToStartMatch
+    
+    // MARK: - Initializers
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
       
     override init(size: CGSize) {
         super.init(size: size)
@@ -157,6 +164,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _disc.physicsBody!.contactTestBitMask = PadSprite.CollisionCateg
         _leftPad.physicsBody!.contactTestBitMask = DiscSprite.CollisionCateg
         _rightPad.physicsBody!.contactTestBitMask = DiscSprite.CollisionCateg
+        // Minimum velocity components proportional to scene size
+        // Ratios defined from experimentation on an iPhone 5c (568x320 screen)
+        _minDxSpeed = size.width * 0.92
+        _minDySpeed = size.height * 0.25
         
         _leftLimit = _leftPad.position.x - _disc.size.width/2
         _rightLimit = _rightPad.position.x + _disc.size.width/2
@@ -349,11 +360,13 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // (avoid edge cases where the game would be too boring).
             // The ratio between the minimum Vx/Vy is the minimal disc slope.
             if let phys = _disc.physicsBody {
-                if abs(phys.velocity.dx) < 501.0 {
-                    phys.velocity.dx = (phys.velocity.dx < 0 ? -501.0 : 501.0)
+                if abs(phys.velocity.dx) < _minDxSpeed {
+                    phys.velocity.dx =
+                        (phys.velocity.dx < 0 ? -_minDxSpeed : _minDxSpeed)
                 }
-                if abs(phys.velocity.dy) < 80.0 {
-                    phys.velocity.dy = (phys.velocity.dy < 0 ? -83.0 : 83.0)
+                if abs(phys.velocity.dy) < _minDySpeed {
+                    phys.velocity.dy =
+                        (phys.velocity.dy < 0 ? -_minDySpeed : _minDySpeed)
                 }
             }
         }
@@ -444,7 +457,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 self._discAppearance.alpha = 0.0
                 self._discAppearance.isHidden = true
                 self._state = CourtState.GameOngoing
-                var xVelocity = CGFloat(501.0)
+                var xVelocity = self._minDxSpeed!
                 if fromRight {
                     xVelocity = -xVelocity
                 }
