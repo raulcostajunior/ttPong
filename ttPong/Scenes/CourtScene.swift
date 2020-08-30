@@ -353,9 +353,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     override func update(_ currentTime: TimeInterval) {
         updateSceneState()
-        _disc.isActive = _leftPad.isActive || _rightPad.isActive
 
-        if (_state == .GameOngoing) {
+        if _disc.isActive {
             // Guarantees the mininal disc horizontal and vertical speeds
             // (avoid edge cases where the game would be too boring).
             // The ratio between the minimum Vx/Vy is the minimal disc slope.
@@ -432,17 +431,17 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     private func launchDisc() {
         let fromRight = Bool.random()
-        let leftLimit = _leftPad.size.width + 40.0
-        let rightLimit = self.size.width/2 - 40.0
-        var xOffset =
+        let leftLimit = _leftPad.size.width/2.0 + _leftPad.position.x + 20.0
+        let rightLimit = self.size.width / 4.0
+        var xStart =
             CGFloat.random(in: leftLimit...rightLimit)
         if fromRight {
-            // When the disk is comming from right, the x offset is relative to
-            // the middle of the court, not to its left border.
-            xOffset += self.size.width/2.0
+            // When the disk is comming from right, the x is relative to
+            // the scene right boundary.
+            xStart = self.size.width - xStart
         }
         let initialPos =
-            CGPoint(x: xOffset,
+            CGPoint(x: xStart,
                     y: CGFloat.random(
                         in: _disc.size.height*2...size.height - _disc.size.height*2))
         _discAppearance.position = initialPos
@@ -461,7 +460,18 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 if fromRight {
                     xVelocity = -xVelocity
                 }
-                let yVelocity = CGFloat.random(in:-550.0...550.0)
+                var yVelocity = CGFloat.random(in:-550.0...550.0)
+                // For the first launch, limit the angle to 30 degrees.
+                // This means dy has to have a maximum value of
+                // dx/sqrt(3) because arctan(1/sqrt(3)) = Pi/6 rad(30 degrees).
+                if GameManager.shared.availableDiscs == GameManager.shared.totalDiscs {
+                    let tan_30_inv: CGFloat = 1.0 / sqrt(30.0)
+                    let yVelocityAbsLimit = abs(xVelocity) * tan_30_inv
+                    if abs(yVelocity) > yVelocityAbsLimit {
+                        let yFactor: CGFloat = (yVelocity < 0 ? -1.0 : 1.0)
+                        yVelocity = sqrt(yVelocityAbsLimit*yVelocityAbsLimit) * yFactor
+                    }
+                }
                 self._disc.position = initialPos
                 self._disc.velocity =
                     CGVector(dx: xVelocity, dy: yVelocity)

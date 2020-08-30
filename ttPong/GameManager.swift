@@ -46,7 +46,11 @@ class GameManager {
     }
     
     var availableDiscs: Int {
-        return _availableDiscs;
+        return _availableDiscs
+    }
+    
+    var totalDiscs: Int {
+        return GameManager.TOTAL_DISCS
     }
     
     func pickUpDisc() {

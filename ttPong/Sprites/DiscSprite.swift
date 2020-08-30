@@ -11,34 +11,17 @@ import SpriteKit
 
 class DiscSprite: SKSpriteNode {
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    private var _active = false
+    static let CollisionCateg: UInt32 = 0x1 << 2
     
     private var _activeTexture: SKTexture!
     private var _inactiveTexture: SKTexture!
     
-    /**
-     The disc is active when at least one of the pads is active.
-     
-     When the disc is active it is fully opaque, otherwise it is
-     partially transparent.
-     
-     The disc depends on an external stimulus to be active or inactive.
-     */
-    var isActive: Bool {
-        get {
-            _active
-        }
-        set {
-            _active = newValue
-            texture = _active ? _activeTexture : _inactiveTexture
-        }
-    }
+    private var _paused = false
+    private var _resumeVelocity: CGVector?
     
-    static let CollisionCateg: UInt32 = 0x1 << 2
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
     
     init(for sceneSize:CGSize) {
         let diameter = Double(sceneSize.height/12.0)
@@ -50,7 +33,7 @@ class DiscSprite: SKSpriteNode {
         _inactiveTexture = initTexture(diameter: intDiameter, active: false)
         _activeTexture = initTexture(diameter: intDiameter, active: true)
         
-        texture = _inactiveTexture
+        texture = _activeTexture
         
         physicsBody = SKPhysicsBody(circleOfRadius: size.width/2.0)
         physicsBody!.isDynamic = true
@@ -73,10 +56,7 @@ class DiscSprite: SKSpriteNode {
         ctxt.addEllipse(in: CGRect(x: 0.0, y: 0.0,
                                    width: Double(diameter),
                                    height:Double(diameter)))
-        ctxt.drawPath(using: .fill)
-        // TODO: Uncomment drawing of border arcs as soon as disc torque simulation
-        //       is in place.
-        
+        ctxt.drawPath(using: .fill)      
         // The border arcs - provide feedback on rotation - only when active.
         if active {
             ctxt.setStrokeColor(red: 1.0, green: 106.0/255.0,
@@ -108,6 +88,7 @@ class DiscSprite: SKSpriteNode {
         }
         _paused = true
         _resumeVelocity = physicsBody!.velocity
+        texture = _inactiveTexture
         physicsBody!.velocity = CGVector(dx: 0.0, dy: 0.0)
     }
     
@@ -120,7 +101,10 @@ class DiscSprite: SKSpriteNode {
                "A paused disc must have a defined _resumeVelocity!")
         physicsBody!.velocity = _resumeVelocity!
         _paused = false
+        texture = _activeTexture
     }
+    
+    var isActive: Bool { !_paused }
     
     var velocity: CGVector {
         get {
@@ -131,8 +115,5 @@ class DiscSprite: SKSpriteNode {
             physicsBody!.velocity = newValue
         }
     }
-    
-    private var _paused = false
-    private var _resumeVelocity: CGVector?
     
 }
