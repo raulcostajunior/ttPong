@@ -26,6 +26,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     static let PAD_INSET = CGFloat(12.0)
     static let ICON_H_SPACING = CGFloat(36.0)
+    // The arctan of 30 degrees - will be used to derive the maximum y velocity
+    // component for a maximum disc trajectory slope of 30 degrees.
+    static let ARCTAN_30_DEG: CGFloat = 1.0 / sqrt(30.0)
 
     private var _disc: DiscSprite!
     private var _leftPad: PadSprite!
@@ -34,6 +37,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private var _gameInfo: HelpSprite!
     
     private var _scoreDisp: SKLabelNode!
+    private var _highScoreDisp: SKLabelNode!
     private var _discsDisp: SKLabelNode!
     private var _msgDisp1: SKLabelNode!
     private var _msgDisp2: SKLabelNode!
@@ -99,13 +103,32 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _gameInfo.position = CGPoint(x: infoHPos, y: infoVPos)
         self.addChild(_gameInfo)
         
+        let scoreFont = UIFont(name: "Phosphate", size: 19)
+        let fontAttributes = [NSAttributedString.Key.font: scoreFont!]
+        let scoreMaxText = "SCORE - 9999"
+        let scoreMaxWidth =
+            (scoreMaxText as NSString).size(withAttributes: fontAttributes).width
+        
         _scoreDisp = SKLabelNode(fontNamed: "Phosphate")
         _scoreDisp.fontSize = 19
-        _scoreDisp.position = CGPoint(x: _rightPad.position.x - 50.0,
-                                     y: size.height - CourtScene.PAD_INSET)
-        _scoreDisp.horizontalAlignmentMode = .right
+        _scoreDisp.position =
+            // The x coordinate of the score display is calculated so that the
+            // set of score and high score in roughly centered in the right
+            // half of the screen - the reason for the 3.0/4.0 factor.
+            CGPoint(x: size.width*3.0/4.0 - scoreMaxWidth - 2.5,
+                    y: size.height - CourtScene.PAD_INSET)
+        _scoreDisp.horizontalAlignmentMode = .left
         _scoreDisp.verticalAlignmentMode = .top
         self.addChild(_scoreDisp)
+        
+        _highScoreDisp = SKLabelNode(fontNamed: "Phosphate")
+        _highScoreDisp.fontSize = 19
+        _highScoreDisp.position =
+            CGPoint(x: _scoreDisp.position.x + scoreMaxWidth + 5.0,
+                    y: size.height - CourtScene.PAD_INSET)
+        _highScoreDisp.horizontalAlignmentMode = .left
+        _highScoreDisp.verticalAlignmentMode = .top
+        self.addChild(_highScoreDisp)
         
         _discsDisp = SKLabelNode(fontNamed: "Phosphate")
         _discsDisp.fontSize = 19
@@ -232,6 +255,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _disc.isHidden = true
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
+            _highScoreDisp.isHidden = true
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
@@ -256,6 +280,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _disc.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
+            _highScoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
@@ -265,10 +290,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // Transient state - display timed message while
             // some actions are executed.
             _disc.isHidden = true
-            // Hides the number of discs available as this could lead
-            // to confusion. This number is shown in the message.
-            _discsDisp.isHidden = true
+            _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
+            _highScoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
@@ -278,6 +302,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _disc.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
+            _highScoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
@@ -296,6 +321,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _disc.isHidden = false
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
+            _highScoreDisp.isHidden = false
             _msgDisp1.isHidden = true
             _msgDisp2.isHidden = true
             _msgPaused.isHidden = true
@@ -314,6 +340,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _disc.isHidden = false
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
+            _highScoreDisp.isHidden = true
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = false
@@ -329,6 +356,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _disc.isHidden = true
             _discsDisp.isHidden = true
             _scoreDisp.isHidden = true
+            _highScoreDisp.isHidden = true
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
@@ -414,7 +442,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func didSimulatePhysics() {
-        _scoreDisp.text = scoreBoardText()
+        _scoreDisp.text = scoreText()
+        _highScoreDisp.text = highScoreText()
         _discsDisp.text = discsText()
         setMsgs()
     }
@@ -461,12 +490,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     xVelocity = -xVelocity
                 }
                 var yVelocity = CGFloat.random(in:-550.0...550.0)
-                // For the first launch, limit the angle to 30 degrees.
-                // This means dy has to have a maximum value of
-                // dx/sqrt(3) because arctan(1/sqrt(3)) = Pi/6 rad(30 degrees).
+                // For the first launch, limit the disc trajectory angle to 30
+                // degrees.
                 if GameManager.shared.availableDiscs == GameManager.shared.totalDiscs {
-                    let tan_30_inv: CGFloat = 1.0 / sqrt(30.0)
-                    let yVelocityAbsLimit = abs(xVelocity) * tan_30_inv
+                    let yVelocityAbsLimit = abs(xVelocity) * CourtScene.ARCTAN_30_DEG
                     if abs(yVelocity) > yVelocityAbsLimit {
                         let yFactor: CGFloat = (yVelocity < 0 ? -1.0 : 1.0)
                         yVelocity = sqrt(yVelocityAbsLimit*yVelocityAbsLimit) * yFactor
@@ -478,12 +505,16 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         })
     }
     
-    private func scoreBoardText() -> String {
+    private func scoreText() -> String {
         let fmtScore = String(format:"%03d",
                               GameManager.shared.scoreBoard.score)
+        return "SCORE - \(fmtScore)"
+    }
+    
+    private func highScoreText() -> String {
         let fmtHighScore = String(format:"%03d",
                                   GameManager.shared.scoreBoard.highScore)
-        return "SCORE - \(fmtScore)      HIGH - \(fmtHighScore)"
+        return "HIGH - \(fmtHighScore)"
     }
     
     private func discsText() -> String {
