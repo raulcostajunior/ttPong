@@ -17,9 +17,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         case LaunchingDisk
         case GameOngoing
         case LostDisc
-        case LostLastDisc
         case WaitToStartNewRally
         case GamePaused
+        case MatchAborted
+        case MatchAbortedNewRecord
         case MatchFinished
         case MatchFinishedNewRecord
     }
@@ -286,7 +287,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgPaused.isHidden = true
             _soundOption.isHidden = true
             _gameInfo.isHidden = true
-        case .LostDisc, .LostLastDisc:
+        case .LostDisc:
             // Transient state - display timed message while
             // some actions are executed.
             _disc.isHidden = true
@@ -350,8 +351,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 _state = .GameOngoing
                 _disc.resume()
             }
-        case .MatchFinished, .MatchFinishedNewRecord:
-            // TODO: Give NewRecord case its own handler - has to navigate to
+        case .MatchFinished, .MatchFinishedNewRecord,
+             .MatchAborted, .MatchAbortedNewRecord:
+            // TODO: Give NewRecord cases their own handler - has to navigate to
             //       new record entry string.
             _disc.isHidden = true
             _discsDisp.isHidden = true
@@ -362,7 +364,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgPaused.isHidden = true
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
-            gotoInitialState()
         }
     }
     
@@ -370,12 +371,26 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if touches.count == 3 &&
-            (_state == .GamePaused  || _state == .LostDisc || _state == .WaitToStartNewRally) {
+            (_state == .GamePaused  || _state == .WaitToStartNewRally) {
             // User chose to abort game
             self.alpha = 0.0
             let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
             self.run(fadeInScene)
-            self.gotoInitialState()
+            if GameManager.shared.scoreBoard.isNewRecord {
+                // TODO: add any sound or visual effect that seems fit.
+                // TODO: transition to new record handling instead of going to
+                //       initial state.
+                _state = .MatchAbortedNewRecord
+            }
+            else {
+                // TODO: add any sound or visual effect that seems fit.
+                _state = .MatchAborted
+            }
+            Timer.scheduledTimer(withTimeInterval: 3.0,
+                                 repeats: false,
+                                 block: { timer in
+                                    self.gotoInitialState()
+            })
         }
     }
     
@@ -422,19 +437,19 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     })
                 } else {
                     // Lost rally for the last disc
-                    _state = .LostLastDisc
-                    var nextState: CourtState!
                     if GameManager.shared.scoreBoard.isNewRecord {
                         // TODO: Add congratulation sound effect
-                        nextState = .MatchFinishedNewRecord
+                        // TODO: Transition to new record handling instead of
+                        //       to initial state.
+                        _state = .MatchFinishedNewRecord
                     } else {
                         // TODO: Add game finished sound effect
-                        nextState = .MatchFinished
+                        _state = .MatchFinished
                     }
                     Timer.scheduledTimer(withTimeInterval: 3.0,
                                          repeats: false,
                                          block: { timer in
-                                            self._state = nextState
+                                            self.gotoInitialState()
                     })
                 }
             }
@@ -532,46 +547,42 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         case .WaitToStartMatch:
             _msgDisp1.text = "To start a new match,"
             _msgDisp2.text = "touch and hold both pads."
+        case .MatchAborted:
+            _msgDisp1.text = "Game aborted :("
+            _msgDisp2.text = "Hope to have you back soon !"
+        case .MatchAbortedNewRecord:
+            _msgDisp1.text = "Game aborted :("
+            _msgDisp2.text = "You've set a new record !!"
         case .MatchFinishedNewRecord:
-            _msgDisp1.text = "Well done!"
-            _msgDisp2.text = "You've set a new record!"
+            _msgDisp1.text = "Well done !!!"
+            _msgDisp2.text = "You just set a new record !"
+        case .MatchFinished:
+            // No disc left and no record breaker
+            _msgDisp1.text = "Match ended!"
+            _msgDisp2.text = "Go ahead and play again !!"
         case .GamePaused:
             _msgDisp1.text = "To resume, touch one or both pads."
             _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
         case .LaunchingDisk:
-            _msgDisp1.text = "Get ready to play!"
+            _msgDisp1.text = "Get ready to play !"
             _msgDisp2.text = "To pause the game, release both pads."
         case .LostDisc:
             var discTxt: String!
             let availDiscs = GameManager.shared.availableDiscs
             if availDiscs >= 2 {
-                discTxt = ", you have \(availDiscs) discs left!"
+                discTxt = "You have \(availDiscs) discs left !"
             } else if availDiscs == 1 {
-                discTxt = ", make the most of your last disc!"
+                discTxt = "Make the most of your last disc !"
             }
             // There's at least one rally left ...
-            _msgDisp1.text = "Get ready\(discTxt!)"
-            _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
-        case .LostLastDisc:
-            if GameManager.shared.scoreBoard.isNewRecord {
-                _msgDisp1.text = "Well done!!!"
-                _msgDisp2.text = "You just set a new record!"
-            } else {
-                // No disc left and no record breaker
-                _msgDisp1.text = "Match ended!"
-                _msgDisp2.text = "Go ahead and play again!!"
-            }
+            _msgDisp1.text = discTxt
+            _msgDisp2.text = "Good luck !!"
         case .WaitToStartNewRally:
             _msgDisp1.text = "Hold both pads to launch a new disc."
-            _msgDisp2.text = "To abort, touch anywhere with 3 fingers"
+            _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
         case .GameOngoing:
             _msgDisp1.text = ""
             _msgDisp2.text = ""
-        case .MatchFinished:
-            // TODO: think about better finished message - maybe congratulate
-            //       if score is above a given threshold; display playing time.
-            _msgDisp1.text = "Thanks for playing!"
-            _msgDisp2.text = "Touch anywhere to start a new game."
         }
     }
 
