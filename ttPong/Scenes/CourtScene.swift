@@ -62,6 +62,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private var _minDxSpeed: CGFloat!
     private var _minDySpeed: CGFloat!
     
+    private var _curDxSpeed: CGFloat!
+    private var _maxDxSpeed: CGFloat!
+    private var _hitsInRally = 0
+    
     private var _state: CourtState = .WaitToStartMatch
     
     // MARK: - Initializers
@@ -194,6 +198,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         // Ratios defined from experimentation on an iPhone 5c (568x320 screen)
         _minDxSpeed = size.width * 0.92
         _minDySpeed = size.height * 0.25
+        _curDxSpeed = _minDxSpeed
+        _maxDxSpeed = _minDxSpeed * 1.4
         
         _leftLimit = _leftPad.position.x - _disc.size.width/2
         _rightLimit = _rightPad.position.x + _disc.size.width/2
@@ -233,11 +239,18 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // horizontal velocity component reverted, it is still in game.
             let hitLeftPad = (_disc.position.x < self.size.width/2)
             Timer.scheduledTimer(
-                withTimeInterval: 0.15,
+                withTimeInterval: 0.1,
                 repeats: false,
                 block: { timer in
                     if (hitLeftPad && self._disc.velocity.dx > 0.0) ||
                         (!hitLeftPad && self._disc.velocity.dx < 0.0) {
+                        self._hitsInRally += 1
+                        if self._hitsInRally % 4 == 0 &&
+                           self._curDxSpeed < self._maxDxSpeed {
+                             // At each fifth hit in rally increase the minimal
+                             // speed until it reaches the maximum.
+                             self._curDxSpeed += self._minDxSpeed / 10
+                        }
                         GameManager.shared.scoreBoard.increaseScore(by: 1)
                     }
                 }
@@ -433,9 +446,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // (avoid edge cases where the game would be too boring).
             // The ratio between the minimum Vx/Vy is the minimal disc slope.
             if let phys = _disc.physicsBody {
-                if abs(phys.velocity.dx) < _minDxSpeed {
+                if abs(phys.velocity.dx) < _curDxSpeed {
                     phys.velocity.dx =
-                        (phys.velocity.dx < 0 ? -_minDxSpeed : _minDxSpeed)
+                        (phys.velocity.dx < 0 ? -_curDxSpeed : _curDxSpeed)
                 }
                 if abs(phys.velocity.dy) < _minDySpeed {
                     phys.velocity.dy =
@@ -531,7 +544,11 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 self._discAppearance.alpha = 0.0
                 self._discAppearance.isHidden = true
                 self._state = CourtState.GameOngoing
-                var xVelocity = self._minDxSpeed!
+                self._hitsInRally = 0
+                // At the start of the rally decreases the velocity to the
+                // minimal value.
+                self._curDxSpeed = self._minDxSpeed!
+                var xVelocity = self._curDxSpeed!
                 if fromRight {
                     xVelocity = -xVelocity
                 }

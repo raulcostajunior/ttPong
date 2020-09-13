@@ -19,25 +19,29 @@ class ScoreBoard {
     
     private var _score = 0
     private var _highScore = 0
+    private var _newRecord = false
     
     var score:Int { return _score }
     var highScore:Int { return _highScore }
-    var isNewRecord:Bool { return _score >= _highScore }
+    var isNewRecord:Bool { return _newRecord }
     
     init(highScore: Int) {
         _score = 0
         _highScore = highScore
+        _newRecord = false
     }
     
     func increaseScore(by increment:Int) {
         _score += increment
         if _score > _highScore {
+            _newRecord = true
             _highScore = _score
         }
     }
     
     func resetScore() {
         _score = 0
+        _newRecord = false
     }
     
 }
