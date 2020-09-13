@@ -93,8 +93,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         
         _soundOption = SoundOptionSprite()
         let sndOptHPos = lHPos
-        let sndOptVPos =
-            self.size.height - (CourtScene.PAD_INSET + _soundOption.size.height/2)
+        let sndOptVPos = CourtScene.PAD_INSET + _soundOption.size.height/2
         _soundOption.position = CGPoint(x: sndOptHPos, y: sndOptVPos)
         self.addChild(_soundOption)
         
@@ -254,9 +253,12 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         switch _state {
         case .WaitToStartMatch:
             _disc.isHidden = true
-            _discsDisp.isHidden = true
-            _scoreDisp.isHidden = true
-            _highScoreDisp.isHidden = true
+            _discsDisp.isHidden = false
+            _discsDisp.fontColor = UIColor.white
+            _scoreDisp.isHidden = false
+            _scoreDisp.fontColor = UIColor.white
+            _highScoreDisp.isHidden = false
+            _highScoreDisp.fontColor = UIColor.white
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
@@ -280,8 +282,11 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // some actions are executed.
             _disc.isHidden = true
             _discsDisp.isHidden = false
+            _discsDisp.fontColor = UIColor.white
             _scoreDisp.isHidden = false
+            _scoreDisp.fontColor = UIColor.white
             _highScoreDisp.isHidden = false
+            _highScoreDisp.fontColor = UIColor.white
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
@@ -292,8 +297,11 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // some actions are executed.
             _disc.isHidden = true
             _discsDisp.isHidden = false
+            _discsDisp.fontColor = UIColor.white
             _scoreDisp.isHidden = false
+            _scoreDisp.fontColor = UIColor.white
             _highScoreDisp.isHidden = false
+            _highScoreDisp.fontColor = UIColor.white
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
@@ -302,13 +310,16 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         case .WaitToStartNewRally:
             _disc.isHidden = true
             _discsDisp.isHidden = false
+            _discsDisp.fontColor = UIColor.white
             _scoreDisp.isHidden = false
+            _scoreDisp.fontColor = UIColor.white
             _highScoreDisp.isHidden = false
+            _highScoreDisp.fontColor = UIColor.white
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
-            _soundOption.isHidden = true
-            _gameInfo.isHidden = true
+            _soundOption.isHidden = false
+            _gameInfo.isHidden = false
             resetPadsPositions()
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start new rally.
@@ -321,8 +332,11 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         case .GameOngoing:
             _disc.isHidden = false
             _discsDisp.isHidden = false
+            _discsDisp.fontColor = UIColor.white
             _scoreDisp.isHidden = false
+            _scoreDisp.fontColor = UIColor.white
             _highScoreDisp.isHidden = false
+            _highScoreDisp.fontColor = UIColor.white
             _msgDisp1.isHidden = true
             _msgDisp2.isHidden = true
             _msgPaused.isHidden = true
@@ -339,9 +353,12 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             }
         case .GamePaused:
             _disc.isHidden = false
-            _discsDisp.isHidden = true
-            _scoreDisp.isHidden = true
-            _highScoreDisp.isHidden = true
+            _discsDisp.isHidden = false
+            _discsDisp.fontColor = UIColor.gray
+            _scoreDisp.isHidden = false
+            _scoreDisp.fontColor = UIColor.gray
+            _highScoreDisp.isHidden = false
+            _highScoreDisp.fontColor = UIColor.gray
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = false
@@ -356,9 +373,12 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // TODO: Give NewRecord cases their own handler - has to navigate to
             //       new record entry string.
             _disc.isHidden = true
-            _discsDisp.isHidden = true
-            _scoreDisp.isHidden = true
-            _highScoreDisp.isHidden = true
+            _discsDisp.isHidden = false
+            _discsDisp.fontColor = UIColor.gray
+            _scoreDisp.isHidden = false
+            _scoreDisp.fontColor = UIColor.gray
+            _highScoreDisp.isHidden = false
+            _highScoreDisp.fontColor = UIColor.gray
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgPaused.isHidden = true
