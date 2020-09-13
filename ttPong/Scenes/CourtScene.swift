@@ -26,6 +26,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     }
     
     static let PAD_INSET = CGFloat(12.0)
+    static let TOP_BOTTOM_INSET = CGFloat(2.0)
     static let ICON_H_SPACING = CGFloat(36.0)
     // The arctan of 30 degrees - will be used to derive the maximum y velocity
     // component for a maximum disc trajectory slope of 30 degrees.
@@ -93,7 +94,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         
         _soundOption = SoundOptionSprite()
         let sndOptHPos = lHPos
-        let sndOptVPos = CourtScene.PAD_INSET + _soundOption.size.height/2
+        let sndOptVPos = CourtScene.TOP_BOTTOM_INSET +
+                         _soundOption.size.height/2
         _soundOption.position = CGPoint(x: sndOptHPos, y: sndOptVPos)
         self.addChild(_soundOption)
         
@@ -116,7 +118,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // set of score and high score in roughly centered in the right
             // half of the screen - the reason for the 3.0/4.0 factor.
             CGPoint(x: size.width*3.0/4.0 - scoreMaxWidth - 2.5,
-                    y: size.height - CourtScene.PAD_INSET)
+                    y: size.height - CourtScene.TOP_BOTTOM_INSET)
         _scoreDisp.horizontalAlignmentMode = .left
         _scoreDisp.verticalAlignmentMode = .top
         self.addChild(_scoreDisp)
@@ -125,7 +127,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _highScoreDisp.fontSize = 19
         _highScoreDisp.position =
             CGPoint(x: _scoreDisp.position.x + scoreMaxWidth + 5.0,
-                    y: size.height - CourtScene.PAD_INSET)
+                    y: size.height - CourtScene.TOP_BOTTOM_INSET)
         _highScoreDisp.horizontalAlignmentMode = .left
         _highScoreDisp.verticalAlignmentMode = .top
         self.addChild(_highScoreDisp)
@@ -133,7 +135,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _discsDisp = SKLabelNode(fontNamed: "Phosphate")
         _discsDisp.fontSize = 19
         _discsDisp.position = CGPoint(x: size.width/4,
-                                      y: size.height - CourtScene.PAD_INSET)
+                                      y: size.height - CourtScene.TOP_BOTTOM_INSET)
         _discsDisp.horizontalAlignmentMode = .center
         _discsDisp.verticalAlignmentMode = .top
         self.addChild(_discsDisp)
@@ -265,6 +267,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
             resetPadsPositions()
+            _leftPad.movable = false
+            _rightPad.movable = false
             _msgDisp1.removeAction(forKey: "fadeOut")
             _msgDisp2.removeAction(forKey: "fadeOut")
             _msgDisp1.alpha = 1.0
@@ -275,6 +279,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
+                _leftPad.movable = true
+                _rightPad.movable = true
                 launchDisc()
             }
         case .LaunchingDisk:
@@ -321,8 +327,12 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
             resetPadsPositions()
+            _leftPad.movable = false
+            _rightPad.movable = false
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start new rally.
+                _leftPad.movable = true
+                _rightPad.movable = true
                 _state = .LaunchingDisk
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
@@ -346,8 +356,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp2.removeAction(forKey: "fadeOut")
             _msgDisp1.alpha = 1.0
             _msgDisp2.alpha = 1.0
-            if !_leftPad.isActive && !_rightPad.isActive {
-                // Releasing both pads while match is ongoing, pauses it
+            if !_leftPad.isActive || !_rightPad.isActive {
+                // Releasing any pad while match is ongoing, pauses it
+                _leftPad.movable = false
+                _rightPad.movable = false
                 _state = .GamePaused
                 _disc.pause()
             }
@@ -364,7 +376,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgPaused.isHidden = false
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
-            if _leftPad.isActive || _rightPad.isActive {
+            if _leftPad.isActive && _rightPad.isActive {
+                // Touching both pads while match is paused, resumes it.
+                _leftPad.movable = true
+                _rightPad.movable = true
                 _state = .GameOngoing
                 _disc.resume()
             }
@@ -581,11 +596,11 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp1.text = "Match ended!"
             _msgDisp2.text = "Go ahead and play again !!"
         case .GamePaused:
-            _msgDisp1.text = "To resume, touch one or both pads."
+            _msgDisp1.text = "To resume, touch and hold both pads."
             _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
         case .LaunchingDisk:
             _msgDisp1.text = "Get ready to play !"
-            _msgDisp2.text = "To pause the game, release both pads."
+            _msgDisp2.text = "Releasing any pad pauses the game."
         case .LostDisc:
             var discTxt: String!
             let availDiscs = GameManager.shared.availableDiscs

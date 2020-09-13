@@ -48,6 +48,15 @@ class PadSprite: SKSpriteNode {
     var isActive: Bool { _active }
     
     /**
+     A pad is movable or not depending on an external
+     stimulus.
+     While the game is paused, a pad can be active or not
+     depending only on whether it is touched. It will be
+     movable only when the game is not paused.
+     */
+    var movable: Bool = false
+    
+    /**
      The collision category common to all pads.
      */
     static let CollisionCateg: UInt32 = 0x1 << 1
@@ -96,11 +105,13 @@ class PadSprite: SKSpriteNode {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         _active = true
         texture = _activeTexture
-        // Forced unwrap of sceneNode at this point is safe - the sprite must
-        // be a node in some scene to receive touch events.
-        self.position =
-            CGPoint(x: self.position.x,
-                    y: touches[touches.startIndex].location(in:self.sceneNode!).y)
+        if movable {
+            // Forced unwrap of sceneNode at this point is safe - the sprite must
+            // be a node in some scene to receive touch events.
+            self.position =
+                CGPoint(x: self.position.x,
+                        y: touches[touches.startIndex].location(in:self.sceneNode!).y)
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -109,6 +120,7 @@ class PadSprite: SKSpriteNode {
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard movable else { return };
         // Forced unwrap of sceneNode at this point is safe - the sprite must
         // be a node in some scene to receive touch events.
         self.position =
