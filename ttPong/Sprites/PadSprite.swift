@@ -93,7 +93,7 @@ class PadSprite: SKSpriteNode {
         if active {
             ctxt.setFillColor(red: 1.0, green: 0.5, blue: 0.0, alpha: 1.0)
         } else {
-            ctxt.setFillColor(red: 1.0, green: 0.5, blue: 0.0, alpha: 0.4)
+            ctxt.setFillColor(red: 1.0, green: 0.5, blue: 0.0, alpha: 0.3)
         }
         rectPath.fill()
         let textureImg: UIImage! = UIGraphicsGetImageFromCurrentImageContext()

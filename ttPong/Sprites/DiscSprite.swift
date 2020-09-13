@@ -46,7 +46,7 @@ class DiscSprite: SKSpriteNode {
     private func initTexture(diameter: Int, active: Bool) -> SKTexture? {
         UIGraphicsBeginImageContext(CGSize(width: diameter,
                                            height: diameter))
-        let discAlpha = CGFloat(active ? 1.0 : 0.5)
+        let discAlpha = CGFloat(active ? 1.0 : 0.2)
         
         let ctxt: CGContext! = UIGraphicsGetCurrentContext()
         // The disc body.
@@ -86,6 +86,7 @@ class DiscSprite: SKSpriteNode {
             return
         }
         _paused = true
+        self.isPaused = true
         _resumeVelocity = physicsBody!.velocity
         texture = _inactiveTexture
         physicsBody!.velocity = CGVector(dx: 0.0, dy: 0.0)
@@ -100,6 +101,7 @@ class DiscSprite: SKSpriteNode {
                "A paused disc must have a defined _resumeVelocity!")
         physicsBody!.velocity = _resumeVelocity!
         _paused = false
+        self.isPaused = false
         texture = _activeTexture
     }
     
