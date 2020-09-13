@@ -199,7 +199,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _minDxSpeed = size.width * 0.92
         _minDySpeed = size.height * 0.25
         _curDxSpeed = _minDxSpeed
-        _maxDxSpeed = _minDxSpeed * 1.4
+        _maxDxSpeed = _minDxSpeed * 1.6
         
         _leftLimit = _leftPad.position.x - _disc.size.width/2
         _rightLimit = _rightPad.position.x + _disc.size.width/2
@@ -245,7 +245,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     if (hitLeftPad && self._disc.velocity.dx > 0.0) ||
                         (!hitLeftPad && self._disc.velocity.dx < 0.0) {
                         self._hitsInRally += 1
-                        if self._hitsInRally % 4 == 0 &&
+                        if self._hitsInRally % 3 == 0 &&
                            self._curDxSpeed < self._maxDxSpeed {
                              // At each fifth hit in rally increase the minimal
                              // speed until it reaches the maximum.
