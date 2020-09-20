@@ -92,3 +92,5 @@ iOSInjectionProject/
 # Krita backup files
 #
 *.kra~
+
+*.DS_Store
