@@ -81,10 +81,6 @@ class DiscSprite: SKSpriteNode {
     }
     
     func pause() {
-        guard !_paused else {
-            print("pause called for a disc that is already paused!")
-            return
-        }
         _paused = true
         self.isPaused = true
         _resumeVelocity = physicsBody!.velocity
@@ -93,10 +89,6 @@ class DiscSprite: SKSpriteNode {
     }
     
     func resume() {
-        guard _paused else {
-            print("resume called for a disc that is not paused!")
-            return
-        }
         assert(_resumeVelocity != nil,
                "A paused disc must have a defined _resumeVelocity!")
         physicsBody!.velocity = _resumeVelocity!

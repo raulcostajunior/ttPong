@@ -47,6 +47,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     private var _discAppearance: SKEmitterNode!
     
+    private var _discReleaseEffect: SKAction!
+    private var _discHitEffect: SKAction!
+
     // A disc whose x position is outside the limits below is
     // considered lost.
     private var _leftLimit: CGFloat!
@@ -115,7 +118,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         let scoreMaxWidth =
             (scoreMaxText as NSString).size(withAttributes: fontAttributes).width
         
-        _scoreDisp = SKLabelNode(fontNamed: "Phosphate")
+        _scoreDisp = SKLabelNode(fontNamed: "Phosphate Solid")
         _scoreDisp.fontSize = 19
         _scoreDisp.position =
             // The x coordinate of the score display is calculated so that the
@@ -127,7 +130,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _scoreDisp.verticalAlignmentMode = .top
         self.addChild(_scoreDisp)
         
-        _highScoreDisp = SKLabelNode(fontNamed: "Phosphate")
+        _highScoreDisp = SKLabelNode(fontNamed: "Phosphate Solid")
         _highScoreDisp.fontSize = 19
         _highScoreDisp.position =
             CGPoint(x: _scoreDisp.position.x + scoreMaxWidth + 5.0,
@@ -136,7 +139,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _highScoreDisp.verticalAlignmentMode = .top
         self.addChild(_highScoreDisp)
         
-        _discsDisp = SKLabelNode(fontNamed: "Phosphate")
+        _discsDisp = SKLabelNode(fontNamed: "Phosphate Solid")
         _discsDisp.fontSize = 19
         _discsDisp.position = CGPoint(x: size.width/4,
                                       y: size.height - CourtScene.TOP_BOTTOM_INSET)
@@ -144,7 +147,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _discsDisp.verticalAlignmentMode = .top
         self.addChild(_discsDisp)
         
-        _msgDisp1 = SKLabelNode(fontNamed: "Phosphate")
+        _msgDisp1 = SKLabelNode(fontNamed: "Phosphate Solid")
         _msgDisp1.fontSize = 19
         _msgDisp1.fontColor = UIColor.yellow
         _msgDisp1.position = CGPoint(x: size.width/2,
@@ -153,7 +156,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _msgDisp1.verticalAlignmentMode = .center
         self.addChild(_msgDisp1)
         
-        _msgDisp2 = SKLabelNode(fontNamed: "Phosphate")
+        _msgDisp2 = SKLabelNode(fontNamed: "Phosphate Solid")
         _msgDisp2.fontSize = 19
         _msgDisp2.fontColor = UIColor.yellow
         _msgDisp2.position = CGPoint(x: size.width/2,
@@ -163,7 +166,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(_msgDisp2)
         
         
-        _msgPaused = SKLabelNode(fontNamed: "Phosphate")
+        _msgPaused = SKLabelNode(fontNamed: "Phosphate Solid")
         _msgPaused.text = "Game Paused"
         _msgPaused.fontSize = 22
         _msgPaused.fontColor = UIColor.white
@@ -205,6 +208,12 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _rightLimit = _rightPad.position.x + _disc.size.width/2
         _leftLimitIn = _leftPad.position.x + _leftPad.size.width/2
         _rightLimitIn = _rightPad.position.x - _rightPad.size.width/2
+        
+        // Sound effects initializations
+        _discReleaseEffect = SKAction.playSoundFileNamed("DiscRelease.caf",
+                                                         waitForCompletion: false)
+        _discHitEffect = SKAction.playSoundFileNamed("DiscHit.caf",
+                                                     waitForCompletion: false)
     }
     
     // MARK: - SKPhysicsContactDelegate
@@ -220,7 +229,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         let contactMask =
             contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
         if contactMask == DiscSprite.CollisionCateg | PadSprite.CollisionCateg {
-            // TODO: play sound effect for disc hitting a pad.
+            if !GameManager.shared.options.soundMuted {
+                run(_discHitEffect)
+            }
         }
     }
     
@@ -541,6 +552,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             withTimeInterval: 1.5,
             repeats: false,
             block: { timer in
+                if !GameManager.shared.options.soundMuted {
+                    self.run(self._discReleaseEffect)
+                }
                 self._discAppearance.alpha = 0.0
                 self._discAppearance.isHidden = true
                 self._state = CourtState.GameOngoing
