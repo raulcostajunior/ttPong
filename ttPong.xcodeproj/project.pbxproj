@@ -14,6 +14,8 @@
 		CB3F8779249636E100DBE5C4 /* NewRecordScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3F8778249636E100DBE5C4 /* NewRecordScene.swift */; };
 		CB3F877B249636F500DBE5C4 /* ScoreBoardScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3F877A249636F500DBE5C4 /* ScoreBoardScene.swift */; };
 		CB3F877D2496378800DBE5C4 /* HelpScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3F877C2496378800DBE5C4 /* HelpScene.swift */; };
+		CBA536BD2517B93900E6EFDE /* DiscHit.caf in Resources */ = {isa = PBXBuildFile; fileRef = CBA536BC2517B93900E6EFDE /* DiscHit.caf */; };
+		CBA536C52517BA1800E6EFDE /* DiscRelease.caf in Resources */ = {isa = PBXBuildFile; fileRef = CBA536C42517BA1800E6EFDE /* DiscRelease.caf */; };
 		CBB1B73024BC49A30033FA32 /* DiscAppearance.sks in Resources */ = {isa = PBXBuildFile; fileRef = CBB1B72E24BC49A30033FA32 /* DiscAppearance.sks */; };
 		CBB1B73124BC49A30033FA32 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CBB1B72F24BC49A30033FA32 /* Assets.xcassets */; };
 		CBB8F97324B382DB00761E6B /* SoundOptionSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBB8F97224B382DB00761E6B /* SoundOptionSprite.swift */; };
@@ -57,6 +59,8 @@
 		CB3F8778249636E100DBE5C4 /* NewRecordScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRecordScene.swift; sourceTree = "<group>"; };
 		CB3F877A249636F500DBE5C4 /* ScoreBoardScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreBoardScene.swift; sourceTree = "<group>"; };
 		CB3F877C2496378800DBE5C4 /* HelpScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpScene.swift; sourceTree = "<group>"; };
+		CBA536BC2517B93900E6EFDE /* DiscHit.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DiscHit.caf; sourceTree = "<group>"; };
+		CBA536C42517BA1800E6EFDE /* DiscRelease.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DiscRelease.caf; sourceTree = "<group>"; };
 		CBB1B72E24BC49A30033FA32 /* DiscAppearance.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = DiscAppearance.sks; sourceTree = "<group>"; };
 		CBB1B72F24BC49A30033FA32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CBB8F97224B382DB00761E6B /* SoundOptionSprite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundOptionSprite.swift; sourceTree = "<group>"; };
@@ -127,6 +131,8 @@
 		CBB1B72D24BC492F0033FA32 /* Effects */ = {
 			isa = PBXGroup;
 			children = (
+				CBA536C42517BA1800E6EFDE /* DiscRelease.caf */,
+				CBA536BC2517B93900E6EFDE /* DiscHit.caf */,
 				CBB1B72E24BC49A30033FA32 /* DiscAppearance.sks */,
 				CBB1B72F24BC49A30033FA32 /* Assets.xcassets */,
 			);
@@ -318,11 +324,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				CBBF94E6244AE65000789DE2 /* Main.storyboard in Resources */,
+				CBA536BD2517B93900E6EFDE /* DiscHit.caf in Resources */,
 				CBBF94E8244AE65100789DE2 /* Assets.xcassets in Resources */,
 				CB2C0961249F66C5005DD7C9 /* Phosphate.ttc in Resources */,
 				CBB1B73024BC49A30033FA32 /* DiscAppearance.sks in Resources */,
 				CBB1B73124BC49A30033FA32 /* Assets.xcassets in Resources */,
 				CBBF94EB244AE65100789DE2 /* LaunchScreen.storyboard in Resources */,
+				CBA536C52517BA1800E6EFDE /* DiscRelease.caf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
