@@ -578,7 +578,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             block: { timer in
                 // Makes sure the disc launch happens in the UI thread (main
                 // queue). All the SpriteKit update cycle methods run on the UI
-                // thread this is a strong enough guarantee.
+                // thread, so this is a strong enough guarantee.
                 DispatchQueue.main.async {
                     if !GameManager.shared.options.soundMuted {
                         self.run(self._discReleaseEffect)
