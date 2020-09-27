@@ -202,7 +202,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _minDxSpeed = size.width * 0.92
         _minDySpeed = size.height * 0.25
         _curDxSpeed = _minDxSpeed
-        _maxDxSpeed = _minDxSpeed * 1.6
+        _maxDxSpeed = _minDxSpeed * 2.0
         
         _leftLimit = _leftPad.position.x - _disc.size.width/2
         _rightLimit = _rightPad.position.x + _disc.size.width/2
@@ -248,22 +248,29 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         if contactMask == DiscSprite.CollisionCateg | PadSprite.CollisionCateg {
             // If a few milliseconds after hitting the pad the disc had it
             // horizontal velocity component reverted, it is still in game.
-            let hitLeftPad = (_disc.position.x < self.size.width/2)
             Timer.scheduledTimer(
-                withTimeInterval: 0.1,
+                withTimeInterval: 0.05,
                 repeats: false,
                 block: { timer in
-                    if (hitLeftPad && self._disc.velocity.dx > 0.0) ||
-                        (!hitLeftPad && self._disc.velocity.dx < 0.0) {
-                        self._hitsInRally += 1
-                        if self._hitsInRally % 3 == 0 &&
-                           self._curDxSpeed < self._maxDxSpeed {
-                             // At each fifth hit in rally increase the minimal
-                             // speed until it reaches the maximum.
-                             self._curDxSpeed += self._minDxSpeed / 10
+                    // The disc speed accessment and adjustments must happen on
+                    // the UI thread along with the SpriteKit update pipeline
+                    // methods.
+                    DispatchQueue.main.async {
+                        let hitLeftPad =
+                            (self._disc.position.x < self.size.width/2)
+                        if (hitLeftPad && self._disc.velocity.dx > 0.0) ||
+                            (!hitLeftPad && self._disc.velocity.dx < 0.0) {
+                            self._hitsInRally += 1
+                            GameManager.shared.scoreBoard.increaseScore(by: 1)
+                            if self._hitsInRally % 4 == 0 &&
+                                self._curDxSpeed < self._maxDxSpeed {
+                                // Periodically, on the number of hits in
+                                // the rally, increase the minimal speed
+                                // until it reaches the maximum.
+                                self._curDxSpeed += self._minDxSpeed / 10
+                            }
                         }
-                        GameManager.shared.scoreBoard.increaseScore(by: 1)
-                    }
+                    } // end of DispatchQueue.main.async
                 }
             )
         }
@@ -272,6 +279,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     // MARK: - Scene State handling
     
     func gotoInitialState() {
+        _disc.reset()
         _state = .WaitToStartMatch
         GameManager.shared.startNewGame()
     }
@@ -444,9 +452,15 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             Timer.scheduledTimer(withTimeInterval: 3.0,
                                  repeats: false,
                                  block: { timer in
-                                    self.gotoInitialState()
+                                    // Any scene state transition must happen
+                                    // in the UI thread along with the rest of
+                                    // the SpriteKit update pipeline.
+                                    DispatchQueue.main.async {
+                                        self.gotoInitialState()
+                                    }
             })
         }
+        super.touchesBegan(touches, with: event)
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -456,15 +470,13 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // Guarantees the mininal disc horizontal and vertical speeds
             // (avoid edge cases where the game would be too boring).
             // The ratio between the minimum Vx/Vy is the minimal disc slope.
-            if let phys = _disc.physicsBody {
-                if abs(phys.velocity.dx) < _curDxSpeed {
-                    phys.velocity.dx =
-                        (phys.velocity.dx < 0 ? -_curDxSpeed : _curDxSpeed)
-                }
-                if abs(phys.velocity.dy) < _minDySpeed {
-                    phys.velocity.dy =
-                        (phys.velocity.dy < 0 ? -_minDySpeed : _minDySpeed)
-                }
+            if abs(_disc.velocity.dx) < _curDxSpeed {
+                _disc.velocity.dx =
+                    (_disc.velocity.dx < 0 ? -_curDxSpeed : _curDxSpeed)
+            }
+            if abs(_disc.velocity.dy) < _minDySpeed {
+                _disc.velocity.dy =
+                    (_disc.velocity.dy < 0 ? -_minDySpeed : _minDySpeed)
             }
         }
     }
@@ -485,10 +497,16 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     // a new rally
                     _state = .LostDisc
                     GameManager.shared.pickUpDisc()
-                    Timer.scheduledTimer(withTimeInterval: 3.0,
-                                         repeats: false,
-                                         block: { timer in
-                                            self._state = .WaitToStartNewRally
+                    Timer.scheduledTimer(
+                        withTimeInterval: 3.0,
+                        repeats: false,
+                        block: { timer in
+                            // Any scene state transition must happen in the UI
+                            // thread along with the rest of the SpriteKit
+                            // update pipeline.
+                            DispatchQueue.main.async {
+                                 self._state = .WaitToStartNewRally
+                            }
                     })
                 } else {
                     // Lost rally for the last disc
@@ -501,11 +519,17 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                         // TODO: Add game finished sound effect
                         _state = .MatchFinished
                     }
-                    Timer.scheduledTimer(withTimeInterval: 3.0,
-                                         repeats: false,
-                                         block: { timer in
-                                            self.gotoInitialState()
-                    })
+                    Timer.scheduledTimer(
+                        withTimeInterval: 3.0,
+                        repeats: false,
+                        block: { timer in
+                            // Any scene state transition must happen in the UI
+                            // thread along with the rest of the SpriteKit
+                            // update pipeline.
+                            DispatchQueue.main.async {
+                                self.gotoInitialState()
+                            }
+                        })
                 }
             }
         }
@@ -552,33 +576,38 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             withTimeInterval: 1.5,
             repeats: false,
             block: { timer in
-                if !GameManager.shared.options.soundMuted {
-                    self.run(self._discReleaseEffect)
-                }
-                self._discAppearance.alpha = 0.0
-                self._discAppearance.isHidden = true
-                self._state = CourtState.GameOngoing
-                self._hitsInRally = 0
-                // At the start of the rally decreases the velocity to the
-                // minimal value.
-                self._curDxSpeed = self._minDxSpeed!
-                var xVelocity = self._curDxSpeed!
-                if fromRight {
-                    xVelocity = -xVelocity
-                }
-                var yVelocity = CGFloat.random(in:-550.0...550.0)
-                // For the first launch, limit the disc trajectory angle to 30
-                // degrees.
-                if GameManager.shared.availableDiscs == GameManager.shared.totalDiscs {
-                    let yVelocityAbsLimit = abs(xVelocity) * CourtScene.ARCTAN_30_DEG
-                    if abs(yVelocity) > yVelocityAbsLimit {
-                        let yFactor: CGFloat = (yVelocity < 0 ? -1.0 : 1.0)
-                        yVelocity = sqrt(yVelocityAbsLimit*yVelocityAbsLimit) * yFactor
+                // Makes sure the disc launch happens in the UI thread (main
+                // queue). All the SpriteKit update cycle methods run on the UI
+                // thread this is a strong enough guarantee.
+                DispatchQueue.main.async {
+                    if !GameManager.shared.options.soundMuted {
+                        self.run(self._discReleaseEffect)
                     }
-                }
-                self._disc.position = initialPos
-                self._disc.velocity =
-                    CGVector(dx: xVelocity, dy: yVelocity)
+                    self._discAppearance.alpha = 0.0
+                    self._discAppearance.isHidden = true
+                    self._state = CourtState.GameOngoing
+                    self._hitsInRally = 0
+                    // At the start of the rally decreases the velocity to the
+                    // minimal value.
+                    self._curDxSpeed = self._minDxSpeed!
+                    var xVelocity = self._curDxSpeed!
+                    if fromRight {
+                        xVelocity = -xVelocity
+                    }
+                    var yVelocity = CGFloat.random(in:-550.0...550.0)
+                    // For the first launch, limit the disc trajectory angle to 30
+                    // degrees.
+                    if GameManager.shared.availableDiscs == GameManager.shared.totalDiscs {
+                        let yVelocityAbsLimit = abs(xVelocity) * CourtScene.ARCTAN_30_DEG
+                        if abs(yVelocity) > yVelocityAbsLimit {
+                            let yFactor: CGFloat = (yVelocity < 0 ? -1.0 : 1.0)
+                            yVelocity = sqrt(yVelocityAbsLimit*yVelocityAbsLimit) * yFactor
+                        }
+                    }
+                    self._disc.position = initialPos
+                    self._disc.velocity =
+                        CGVector(dx: xVelocity, dy: yVelocity)
+                } // DispatchQueue.main.async end
         })
     }
     

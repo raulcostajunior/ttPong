@@ -112,11 +112,13 @@ class PadSprite: SKSpriteNode {
                 CGPoint(x: self.position.x,
                         y: touches[touches.startIndex].location(in:self.sceneNode!).y)
         }
+        super.touchesBegan(touches, with: event)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         _active = false
         texture = _inactiveTexture
+        super.touchesEnded(touches, with:event)
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {

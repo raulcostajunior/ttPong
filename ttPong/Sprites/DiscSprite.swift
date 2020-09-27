@@ -96,6 +96,14 @@ class DiscSprite: SKSpriteNode {
         self.isPaused = false
         texture = _activeTexture
     }
+
+    /// Resets the disc to its initial state - non paused but with zero velocity.
+    func reset() {
+        _paused = false
+        self.isPaused = false
+        texture = _activeTexture
+        physicsBody!.velocity = CGVector(dx:0.0, dy: 0.0)
+    }
     
     var isActive: Bool { !_paused }
     
