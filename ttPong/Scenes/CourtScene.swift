@@ -43,7 +43,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private var _discsDisp: SKLabelNode!
     private var _msgDisp1: SKLabelNode!
     private var _msgDisp2: SKLabelNode!
-    private var _msgPaused: SKLabelNode!
+    private var _msgTitle: SKLabelNode!
     
     private var _discAppearance: SKEmitterNode!
     
@@ -51,6 +51,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private var _discHitEffect: SKAction!
     private var _discGoneEffect: SKAction!
     private var _newRecordEffect: SKAction!
+    private var _gameOverEffect: SKAction!
 
     // A disc whose x position is outside the limits below is
     // considered lost.
@@ -78,7 +79,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-      
+    
     override init(size: CGSize) {
         super.init(size: size)
         backgroundColor = SKColor(red: 0.0, green: 0.0, blue:0.0, alpha: 1.0)
@@ -101,10 +102,31 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _rightPad.position = CGPoint(x: rHPos, y: vPos)
         self.addChild(_rightPad)
         
+        initDiscAppearanceEffect()
+        initToolsNodes(lHPos)
+        initGameStatusNodes(size)
+        initMsgDisplayingNodes(size)
+        initPhysics(size)
+        initSoundFx()
+    }
+    
+    fileprivate func initDiscAppearanceEffect() {
+        let discAppearancePath =
+            Bundle.main.path(forResource: "DiscAppearance",
+                             ofType: "sks")
+        _discAppearance =
+            NSKeyedUnarchiver.unarchiveObject(withFile: discAppearancePath!)
+            as? SKEmitterNode
+        _discAppearance.isHidden = true
+        _discAppearance.alpha = 0.0
+        self.addChild(_discAppearance)
+    }
+    
+    fileprivate func initToolsNodes(_ leftPadHPos: CGFloat) {
         _soundOption = SoundOptionSprite()
-        let sndOptHPos = lHPos
+        let sndOptHPos = leftPadHPos
         let sndOptVPos = CourtScene.TOP_BOTTOM_INSET +
-                         _soundOption.size.height/2
+            _soundOption.size.height/2
         _soundOption.position = CGPoint(x: sndOptHPos, y: sndOptVPos)
         self.addChild(_soundOption)
         
@@ -113,7 +135,38 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         let infoVPos = sndOptVPos
         _gameInfo.position = CGPoint(x: infoHPos, y: infoVPos)
         self.addChild(_gameInfo)
+    }
+    
+    fileprivate func initMsgDisplayingNodes(_ size: CGSize) {
+        _msgDisp1 = SKLabelNode(fontNamed: "Phosphate Solid")
+        _msgDisp1.fontSize = 19
+        _msgDisp1.fontColor = UIColor.yellow
+        _msgDisp1.position = CGPoint(x: size.width/2,
+                                     y: size.height/2 + _msgDisp1.fontSize)
+        _msgDisp1.horizontalAlignmentMode = .center
+        _msgDisp1.verticalAlignmentMode = .center
+        self.addChild(_msgDisp1)
         
+        _msgDisp2 = SKLabelNode(fontNamed: "Phosphate Solid")
+        _msgDisp2.fontSize = 19
+        _msgDisp2.fontColor = UIColor.yellow
+        _msgDisp2.position = CGPoint(x: size.width/2,
+                                     y: size.height/2 - 8)
+        _msgDisp2.horizontalAlignmentMode = .center
+        _msgDisp2.verticalAlignmentMode = .center
+        self.addChild(_msgDisp2)
+        
+        _msgTitle = SKLabelNode(fontNamed: "Phosphate Solid")
+        _msgTitle.fontSize = 22
+        _msgTitle.fontColor = UIColor.white
+        _msgTitle.position = CGPoint(x: size.width/2,
+                                     y: size.height/2 + _msgDisp1.fontSize*2 + 12)
+        _msgTitle.horizontalAlignmentMode = .center
+        _msgTitle.verticalAlignmentMode = .center
+        self.addChild(_msgTitle)
+    }
+    
+    fileprivate func initGameStatusNodes(_ size: CGSize) {
         let scoreFont = UIFont(name: "Phosphate", size: 19)
         let fontAttributes = [NSAttributedString.Key.font: scoreFont!]
         let scoreMaxText = "SCORE - 9999"
@@ -148,46 +201,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _discsDisp.horizontalAlignmentMode = .center
         _discsDisp.verticalAlignmentMode = .top
         self.addChild(_discsDisp)
-        
-        _msgDisp1 = SKLabelNode(fontNamed: "Phosphate Solid")
-        _msgDisp1.fontSize = 19
-        _msgDisp1.fontColor = UIColor.yellow
-        _msgDisp1.position = CGPoint(x: size.width/2,
-                                     y: size.height/2 + _msgDisp1.fontSize)
-        _msgDisp1.horizontalAlignmentMode = .center
-        _msgDisp1.verticalAlignmentMode = .center
-        self.addChild(_msgDisp1)
-        
-        _msgDisp2 = SKLabelNode(fontNamed: "Phosphate Solid")
-        _msgDisp2.fontSize = 19
-        _msgDisp2.fontColor = UIColor.yellow
-        _msgDisp2.position = CGPoint(x: size.width/2,
-                                     y: size.height/2 - 8)
-        _msgDisp2.horizontalAlignmentMode = .center
-        _msgDisp2.verticalAlignmentMode = .center
-        self.addChild(_msgDisp2)
-        
-        
-        _msgPaused = SKLabelNode(fontNamed: "Phosphate Solid")
-        _msgPaused.text = "Game Paused"
-        _msgPaused.fontSize = 22
-        _msgPaused.fontColor = UIColor.white
-        _msgPaused.position = CGPoint(x: size.width/2,
-                                      y: size.height/2 + _msgDisp1.fontSize*2 + 12)
-        _msgPaused.horizontalAlignmentMode = .center
-        _msgPaused.verticalAlignmentMode = .center
-        self.addChild(_msgPaused)
-        
-        let discAppearancePath =
-            Bundle.main.path(forResource: "DiscAppearance",
-                             ofType: "sks")
-        _discAppearance =
-            NSKeyedUnarchiver.unarchiveObject(withFile: discAppearancePath!)
-            as? SKEmitterNode
-        _discAppearance.isHidden = true
-        _discAppearance.alpha = 0.0
-        self.addChild(_discAppearance)
-        
+    }
+    
+    fileprivate func initPhysics(_ size: CGSize) {
         // Physics related initializations
         // Court has no gravity affecting it.
         self.physicsWorld.gravity = CGVector(dx:0.0, dy:0.0)
@@ -210,7 +226,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _rightLimit = _rightPad.position.x + _disc.size.width/2
         _leftLimitIn = _leftPad.position.x + _leftPad.size.width/2
         _rightLimitIn = _rightPad.position.x - _rightPad.size.width/2
-        
+    }
+    
+    fileprivate func initSoundFx() {
         // Sound effects initializations
         _discReleaseEffect =
             SKAction.playSoundFileNamed("DiscRelease.caf",
@@ -223,6 +241,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                                         waitForCompletion: false)
         _newRecordEffect =
             SKAction.playSoundFileNamed("NewRecord.wav",
+                                        waitForCompletion: false)
+        _gameOverEffect =
+            SKAction.playSoundFileNamed("GameOver.wav",
                                         waitForCompletion: false)
     }
     
@@ -239,9 +260,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         let contactMask =
             contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
         if contactMask == DiscSprite.CollisionCateg | PadSprite.CollisionCateg {
-            if !GameManager.shared.options.soundMuted {
-                run(_discHitEffect)
-            }
+            playSoundFx(_discHitEffect)
         }
     }
     
@@ -303,7 +322,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _highScoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
-            _msgPaused.isHidden = true
+            _msgTitle.isHidden = true
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
             resetPadsPositions()
@@ -332,7 +351,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _highScoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
-            _msgPaused.isHidden = true
+            _msgTitle.isHidden = true
             _soundOption.isHidden = true
             _gameInfo.isHidden = true
         case .LostDisc:
@@ -344,7 +363,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _highScoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
-            _msgPaused.isHidden = true
+            _msgTitle.isHidden = true
             _soundOption.isHidden = true
             _gameInfo.isHidden = true
         case .WaitToStartNewRally:
@@ -354,7 +373,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
              _highScoreDisp.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
-            _msgPaused.isHidden = true
+            _msgTitle.isHidden = true
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
             resetPadsPositions()
@@ -377,7 +396,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _highScoreDisp.isHidden = false
             _msgDisp1.isHidden = true
             _msgDisp2.isHidden = true
-            _msgPaused.isHidden = true
+            _msgTitle.isHidden = true
             _soundOption.isHidden = true
             _gameInfo.isHidden = true
             _msgDisp1.removeAction(forKey: "fadeOut")
@@ -404,9 +423,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
+            _msgTitle.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
-            _msgPaused.isHidden = false
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
             if _leftPad.isActive && _rightPad.isActive {
@@ -424,17 +443,15 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 _highScoreDisp.fontColor = UIColor.white
                 _disc.resume()
             }
-        case .MatchFinished, .MatchFinishedNewRecord,
-             .MatchAborted, .MatchAbortedNewRecord:
-            // TODO: Give NewRecord cases their own handler - has to navigate to
-            //       new record entry string.
+        case .MatchFinished, .MatchAborted,
+             .MatchFinishedNewRecord, .MatchAbortedNewRecord:
             _disc.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
+            _msgTitle.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
-            _msgPaused.isHidden = true
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
         }
@@ -450,13 +467,12 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
             self.run(fadeInScene)
             if GameManager.shared.scoreBoard.isNewRecord {
-                // TODO: add any sound or visual effect that seems fit.
+                playSoundFx(_newRecordEffect)
                 // TODO: transition to new record handling instead of going to
                 //       initial state.
                 _state = .MatchAbortedNewRecord
             }
             else {
-                // TODO: add any sound or visual effect that seems fit.
                 _state = .MatchAborted
             }
             Timer.scheduledTimer(withTimeInterval: 3.0,
@@ -496,7 +512,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // Detects and processes disc loss
             if _disc.position.x - _disc.size.width/2 < _leftLimit || _disc.position.x + _disc.size.width/2 > _rightLimit {
                 // Disc is completely to the left or to the right of the scene - player lost rally.
-                run(_discGoneEffect)
+                playSoundFx(_discGoneEffect)
                 _msgDisp1.alpha = 0.0
                 _msgDisp2.alpha = 0.0
                 let fadeInMsg = SKAction.fadeIn(withDuration: 0.5)
@@ -519,25 +535,41 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                             }
                     })
                 } else {
-                    // Lost rally for the last disc
-                    if GameManager.shared.scoreBoard.isNewRecord {
-                        run(_newRecordEffect)
-                        // TODO: Transition to new record handling instead of
-                        //       to initial state.
-                        _state = .MatchFinishedNewRecord
-                    } else {
-                        // TODO: Add game finished sound effect
-                        _state = .MatchFinished
-                    }
+                    // Lost rally for the last disc.
+                    _state = (
+                        GameManager.shared.scoreBoard.isNewRecord ?
+                            .MatchFinishedNewRecord : .MatchFinished
+                    )
+                    // Play new record or game over effects a little bit
+                    // delayed, so they can be distinguished from the sound
+                    // of the last disc gone.
                     Timer.scheduledTimer(
-                        withTimeInterval: 3.0,
+                        withTimeInterval: 0.8,
+                        repeats: false,
+                        block: {timer in
+                            DispatchQueue.main.async {
+                                self.playSoundFx(
+                                    GameManager.shared.scoreBoard.isNewRecord ?
+                                        self._newRecordEffect :
+                                        self._gameOverEffect
+                                )
+                            }
+                        })
+                    Timer.scheduledTimer(
+                        withTimeInterval: 5.0,
                         repeats: false,
                         block: { timer in
                             // Any scene state transition must happen in the UI
                             // thread along with the rest of the SpriteKit
                             // update pipeline.
                             DispatchQueue.main.async {
-                                self.gotoInitialState()
+                                if self._state == .MatchFinished {
+                                    self.gotoInitialState()
+                                } else if self._state == .MatchFinishedNewRecord {
+                                    // TODO: replace this with a transition to
+                                    // the new record scene.
+                                    self.gotoInitialState()
+                                }
                             }
                         })
                 }
@@ -590,9 +622,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 // queue). All the SpriteKit update cycle methods run on the UI
                 // thread, so this is a strong enough guarantee.
                 DispatchQueue.main.async {
-                    if !GameManager.shared.options.soundMuted {
-                        self.run(self._discReleaseEffect)
-                    }
+                    self.playSoundFx(self._discReleaseEffect)
                     self._discAppearance.alpha = 0.0
                     self._discAppearance.isHidden = true
                     self._state = CourtState.GameOngoing
@@ -643,25 +673,35 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         return txt
     }
     
+    private func playSoundFx(_ soundFx: SKAction)  {
+        if !GameManager.shared.options.soundMuted {
+            run(soundFx)
+        }
+    }
+    
     private func setMsgs() {
         switch _state {
         case .WaitToStartMatch:
             _msgDisp1.text = "To start a new match,"
             _msgDisp2.text = "touch and hold both pads."
         case .MatchAborted:
-            _msgDisp1.text = "Game aborted :("
-            _msgDisp2.text = "Hope to have you back soon !"
+            _msgTitle.text = "Game aborted"
+            _msgDisp1.text = "Hope to have you back soon !"
+            _msgDisp2.text = ""
         case .MatchAbortedNewRecord:
-            _msgDisp1.text = "Game aborted :("
-            _msgDisp2.text = "You've set a new record !!"
+            _msgTitle.text = "Game aborted, but ..."
+            _msgDisp1.text = "You've set a new record !!"
+            _msgDisp2.text = "Claim your glory!"
         case .MatchFinishedNewRecord:
+            _msgTitle.text = "New Record!"
             _msgDisp1.text = "Well done !!!"
-            _msgDisp2.text = "You just set a new record !"
+            _msgDisp2.text = "Claim your glory!"
         case .MatchFinished:
-            // No disc left and no record breaker
-            _msgDisp1.text = "Match ended!"
-            _msgDisp2.text = "Go ahead and play again !!"
+            _msgTitle.text = "Game Over"
+            _msgDisp1.text = "Go ahead and play again !!"
+            _msgDisp2.text = ""
         case .GamePaused:
+            _msgTitle.text = "Game Paused"
             _msgDisp1.text = "To resume, touch and hold both pads."
             _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
         case .LaunchingDisk:
