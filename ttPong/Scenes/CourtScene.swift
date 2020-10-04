@@ -49,6 +49,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     private var _discReleaseEffect: SKAction!
     private var _discHitEffect: SKAction!
+    private var _discGoneEffect: SKAction!
+    private var _newRecordEffect: SKAction!
 
     // A disc whose x position is outside the limits below is
     // considered lost.
@@ -210,10 +212,18 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _rightLimitIn = _rightPad.position.x - _rightPad.size.width/2
         
         // Sound effects initializations
-        _discReleaseEffect = SKAction.playSoundFileNamed("DiscRelease.caf",
-                                                         waitForCompletion: false)
-        _discHitEffect = SKAction.playSoundFileNamed("DiscHit.caf",
-                                                     waitForCompletion: false)
+        _discReleaseEffect =
+            SKAction.playSoundFileNamed("DiscRelease.caf",
+                                        waitForCompletion: false)
+        _discHitEffect =
+            SKAction.playSoundFileNamed("DiscHit.caf",
+                                        waitForCompletion: false)
+        _discGoneEffect =
+            SKAction.playSoundFileNamed("DiscGone.wav",
+                                        waitForCompletion: false)
+        _newRecordEffect =
+            SKAction.playSoundFileNamed("NewRecord.wav",
+                                        waitForCompletion: false)
     }
     
     // MARK: - SKPhysicsContactDelegate
@@ -486,8 +496,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // Detects and processes disc loss
             if _disc.position.x - _disc.size.width/2 < _leftLimit || _disc.position.x + _disc.size.width/2 > _rightLimit {
                 // Disc is completely to the left or to the right of the scene - player lost rally.
-                // TODO: Add disc lost sound effect!
-                 _msgDisp1.alpha = 0.0
+                run(_discGoneEffect)
+                _msgDisp1.alpha = 0.0
                 _msgDisp2.alpha = 0.0
                 let fadeInMsg = SKAction.fadeIn(withDuration: 0.5)
                 _msgDisp1.run(fadeInMsg)
@@ -511,7 +521,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 } else {
                     // Lost rally for the last disc
                     if GameManager.shared.scoreBoard.isNewRecord {
-                        // TODO: Add congratulation sound effect
+                        run(_newRecordEffect)
                         // TODO: Transition to new record handling instead of
                         //       to initial state.
                         _state = .MatchFinishedNewRecord
