@@ -51,6 +51,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private var _discHitEffect: SKAction!
     private var _discGoneEffect: SKAction!
     private var _newRecordEffect: SKAction!
+    private var _gameStartEffect: SKAction!
     private var _gameOverEffect: SKAction!
 
     // A disc whose x position is outside the limits below is
@@ -108,6 +109,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         initMsgDisplayingNodes(size)
         initPhysics(size)
         initSoundFx()
+
+        gotoInitialState()
     }
     
     fileprivate func initDiscAppearanceEffect() {
@@ -242,6 +245,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _newRecordEffect =
             SKAction.playSoundFileNamed("NewRecord.wav",
                                         waitForCompletion: false)
+        _gameStartEffect =
+            SKAction.playSoundFileNamed("GameStart.wav",
+                                        waitForCompletion: false)
         _gameOverEffect =
             SKAction.playSoundFileNamed("GameOver.wav",
                                         waitForCompletion: false)
@@ -310,6 +316,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     func gotoInitialState() {
         _disc.reset()
         _state = .WaitToStartMatch
+        playSoundFx(_gameStartEffect)
         GameManager.shared.startNewGame()
     }
     
@@ -320,9 +327,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
+            _msgTitle.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
-            _msgTitle.isHidden = true
             _soundOption.isHidden = false
             _gameInfo.isHidden = false
             resetPadsPositions()
@@ -682,6 +689,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private func setMsgs() {
         switch _state {
         case .WaitToStartMatch:
+            _msgTitle.text = "Let's Play !"
             _msgDisp1.text = "To start a new match,"
             _msgDisp2.text = "touch and hold both pads."
         case .MatchAborted:
@@ -693,11 +701,11 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp1.text = "You've set a new record !!"
             _msgDisp2.text = "Claim your glory!"
         case .MatchFinishedNewRecord:
-            _msgTitle.text = "New Record!"
+            _msgTitle.text = "New Record !"
             _msgDisp1.text = "Well done !!!"
             _msgDisp2.text = "Claim your glory!"
         case .MatchFinished:
-            _msgTitle.text = "Game Over"
+            _msgTitle.text = "Game Over !"
             _msgDisp1.text = "Go ahead and play again !!"
             _msgDisp2.text = ""
         case .GamePaused:

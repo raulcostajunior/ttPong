@@ -12,6 +12,7 @@
 		CB33F8072529FDDD00522045 /* DiscGone.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F8062529FDDD00522045 /* DiscGone.wav */; };
 		CB33F80C252A004E00522045 /* NewRecord.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F80B252A004E00522045 /* NewRecord.wav */; };
 		CB33F811252A0F7D00522045 /* GameOver.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F810252A0F7D00522045 /* GameOver.wav */; };
+		CB33F816252A22D700522045 /* GameStart.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F815252A22D700522045 /* GameStart.wav */; };
 		CB3F877324962CA700DBE5C4 /* Options.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3F877224962CA700DBE5C4 /* Options.swift */; };
 		CB3F877524962D4200DBE5C4 /* ScoreBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3F877424962D4200DBE5C4 /* ScoreBoard.swift */; };
 		CB3F8779249636E100DBE5C4 /* NewRecordScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3F8778249636E100DBE5C4 /* NewRecordScene.swift */; };
@@ -60,6 +61,7 @@
 		CB33F8062529FDDD00522045 /* DiscGone.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = DiscGone.wav; sourceTree = "<group>"; };
 		CB33F80B252A004E00522045 /* NewRecord.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = NewRecord.wav; sourceTree = "<group>"; };
 		CB33F810252A0F7D00522045 /* GameOver.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = GameOver.wav; sourceTree = "<group>"; };
+		CB33F815252A22D700522045 /* GameStart.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = GameStart.wav; sourceTree = "<group>"; };
 		CB3F877224962CA700DBE5C4 /* Options.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Options.swift; sourceTree = "<group>"; };
 		CB3F877424962D4200DBE5C4 /* ScoreBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreBoard.swift; sourceTree = "<group>"; };
 		CB3F8778249636E100DBE5C4 /* NewRecordScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRecordScene.swift; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 		CBB1B72D24BC492F0033FA32 /* Effects */ = {
 			isa = PBXGroup;
 			children = (
+				CB33F815252A22D700522045 /* GameStart.wav */,
 				CB33F810252A0F7D00522045 /* GameOver.wav */,
 				CB33F80B252A004E00522045 /* NewRecord.wav */,
 				CB33F8062529FDDD00522045 /* DiscGone.wav */,
@@ -333,6 +336,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB33F80C252A004E00522045 /* NewRecord.wav in Resources */,
+				CB33F816252A22D700522045 /* GameStart.wav in Resources */,
 				CB33F811252A0F7D00522045 /* GameOver.wav in Resources */,
 				CBBF94E6244AE65000789DE2 /* Main.storyboard in Resources */,
 				CBA536BD2517B93900E6EFDE /* DiscHit.caf in Resources */,
