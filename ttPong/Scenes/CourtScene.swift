@@ -172,7 +172,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     fileprivate func initGameStatusNodes(_ size: CGSize) {
         let scoreFont = UIFont(name: "Phosphate", size: 19)
         let fontAttributes = [NSAttributedString.Key.font: scoreFont!]
-        let scoreMaxText = "SCORE - 9999"
+        let scoreMaxText = "SCORE - 99999"
         let scoreMaxWidth =
             (scoreMaxText as NSString).size(withAttributes: fontAttributes).width
         
@@ -659,13 +659,13 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     }
     
     private func scoreText() -> String {
-        let fmtScore = String(format:"%03d",
+        let fmtScore = String(format:"%04d",
                               GameManager.shared.scoreBoard.score)
         return "SCORE - \(fmtScore)"
     }
     
     private func highScoreText() -> String {
-        let fmtHighScore = String(format:"%03d",
+        let fmtHighScore = String(format:"%04d",
                                   GameManager.shared.scoreBoard.highScore)
         return "HIGH - \(fmtHighScore)"
     }
