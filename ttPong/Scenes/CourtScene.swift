@@ -284,7 +284,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             // If a few milliseconds after hitting the pad the disc had it
             // horizontal velocity component reverted, it is still in game.
             Timer.scheduledTimer(
-                withTimeInterval: 0.05,
+                withTimeInterval: 0.15,
                 repeats: false,
                 block: { timer in
                     // The disc speed accessment and adjustments must happen on
