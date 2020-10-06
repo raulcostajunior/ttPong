@@ -13,9 +13,8 @@ import SpriteKit
 /**
  * Responsabilities:
  *
- *  + Access-point to the Game Data Store (this has the scoreboard and the options) single scoreboard
- *  + Instructs the Game Data Store to load and save data (life-cycle manager)
- *  + Abstract interscene transition knowledge from the individual scenes (by
+ *  + Access-point to the scoreboard and the game settings
+ *  + Abstracts interscene transition knowledge from the individual scenes (by
  *  providing higher level methods like presentGame, registerNewRecord,
  *  displayHelp, displayScoreBoard ...
  */
@@ -24,25 +23,29 @@ class GameManager {
     static let shared = GameManager()
     
     private static let TOTAL_DISCS = 4
-    
-    private let _dataStore = DataStore()
+
     private var _scoreBoard: ScoreBoard
     private var _availableDiscs = GameManager.TOTAL_DISCS
     
-    var options: Options
+    private var _soundMuted: Bool
+
+    private init() {
+        _soundMuted = UserDefaults.standard.bool(forKey: "SoundMuted")
+        _scoreBoard =
+            ScoreBoard(
+                highScore: UserDefaults.standard.integer(forKey: "HighScore"))
+    }
     
     var scoreBoard: ScoreBoard {
         return _scoreBoard
     }
-    
-    private init() {
-        self.options = _dataStore.loadOptions()
-        _scoreBoard = _dataStore.loadScoreBoard()
-    }
-    
-    deinit {
-        _dataStore.saveOptions(self.options)
-        _dataStore.saveScoreBoard(self.scoreBoard)
+
+    var soundMuted: Bool {
+        get { _soundMuted }
+        set {
+            _soundMuted = newValue
+            UserDefaults.standard.set(_soundMuted, forKey: "SoundMuted")
+        }
     }
     
     var availableDiscs: Int {
@@ -82,7 +85,14 @@ class GameManager {
         _availableDiscs = GameManager.TOTAL_DISCS;
         _scoreBoard.resetScore()
     }
-    
+
+    func registerNewRecord() {
+        guard _scoreBoard.isNewRecord else {
+            print("Error: there's no new record to register.")
+            return
+        }
+        UserDefaults.standard.set(_scoreBoard.highScore, forKey: "HighScore")
+    }
 
     func navigateToNewRecord() {
         guard let currentScene = _currentScene,

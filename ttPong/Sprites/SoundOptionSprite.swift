@@ -25,7 +25,7 @@ class SoundOptionSprite: SKSpriteNode {
         let nonMutedImg = UIImage(named:"speaker.2")
         _nonMutedTexture = SKTexture.init(image: nonMutedImg!)
         
-        _muted = GameManager.shared.options.soundMuted
+        _muted = GameManager.shared.soundMuted
         texture = (_muted ? _mutedTexture : _nonMutedTexture)
 
         isUserInteractionEnabled = true
@@ -37,7 +37,7 @@ class SoundOptionSprite: SKSpriteNode {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         _muted = !_muted
-        GameManager.shared.options.soundMuted = _muted
+        GameManager.shared.soundMuted = _muted
         texture = (_muted ? _mutedTexture : _nonMutedTexture)
         super.touchesEnded(touches, with: event)
     }

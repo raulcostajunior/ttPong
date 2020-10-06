@@ -474,6 +474,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
             self.run(fadeInScene)
             if GameManager.shared.scoreBoard.isNewRecord {
+                GameManager.shared.registerNewRecord()
                 playSoundFx(_newRecordEffect)
                 // TODO: transition to new record handling instead of going to
                 //       initial state.
@@ -543,10 +544,12 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     })
                 } else {
                     // Lost rally for the last disc.
-                    _state = (
-                        GameManager.shared.scoreBoard.isNewRecord ?
-                            .MatchFinishedNewRecord : .MatchFinished
-                    )
+                    if GameManager.shared.scoreBoard.isNewRecord {
+                        _state = .MatchFinishedNewRecord
+                        GameManager.shared.registerNewRecord()
+                    } else {
+                        _state = .MatchFinished
+                    }
                     // Play new record or game over effects a little bit
                     // delayed, so they can be distinguished from the sound
                     // of the last disc gone.
@@ -681,7 +684,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     }
     
     private func playSoundFx(_ soundFx: SKAction)  {
-        if !GameManager.shared.options.soundMuted {
+        if !GameManager.shared.soundMuted {
             run(soundFx)
         }
     }
