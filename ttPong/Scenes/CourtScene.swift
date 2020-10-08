@@ -10,6 +10,12 @@ import SpriteKit
 import GameplayKit
 
 
+// TODO: Add display Leaderboard tool button. When that button is touched, if
+//       GameCenter is connected, the Leaderboard is presented. If GameCenter
+//       is not connected, a message is displayed stating that leaderboards are
+//       only available when GameCenter is connected. Instruct the user that he
+//       / she can connect by going to Setting > GameCenter.
+
 class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     enum CourtState {
@@ -317,6 +323,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _disc.reset()
         _state = .WaitToStartMatch
         playSoundFx(_gameStartEffect)
+        GameManager.shared.updateHighScoreFromGameCenter()
         GameManager.shared.startNewGame()
     }
     

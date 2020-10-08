@@ -43,6 +43,13 @@ class ScoreBoard {
         _score = 0
         _newRecord = false
     }
+
+    func updateHighScore(_ newRecord: Int) {
+        _highScore = newRecord
+        if _highScore >= _score {
+            _newRecord = false
+        }
+    }
     
 }
 
