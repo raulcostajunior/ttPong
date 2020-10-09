@@ -500,13 +500,18 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             if GameManager.shared.scoreBoard.isNewRecord {
                 GameManager.shared.registerNewRecord()
                 playSoundFx(_newRecordEffect)
-                // TODO: transition to new record handling instead of going to
-                //       initial state.
                 _state = .MatchAbortedNewRecord
             }
             else {
                 _state = .MatchAborted
             }
+            // Restores the color of the text sprites that display the number
+            // of discs and the scores. It may be grayed out if the abort came
+            // from a paused game.
+            self._discsDisp.fontColor = UIColor.white
+            self._scoreDisp.fontColor = UIColor.white
+            self._highScoreDisp.fontColor = UIColor.white
+            
             Timer.scheduledTimer(withTimeInterval: 3.0,
                                  repeats: false,
                                  block: { timer in

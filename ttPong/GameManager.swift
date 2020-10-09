@@ -112,7 +112,13 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             print("Error: there's no new record to register.")
             return
         }
-        UserDefaults.standard.set(_scoreBoard.highScore, forKey: "HighScore")
+        if gameCenterSessionActive {
+            // TODO: register score with GameCenter
+        } else {
+            // When there's no GameCenter Session active, falls back to
+            // local high score registration.
+            UserDefaults.standard.set(_scoreBoard.highScore, forKey: "HighScore")
+        }
     }
 
     func displayRecords() {
