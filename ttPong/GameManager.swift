@@ -37,7 +37,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     }
 
 
-    // MARK: - Disc, Sound and Score Management
+    // MARK: - Options and Score Management
 
     private static let TOTAL_DISCS = 4
 
@@ -91,7 +91,9 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         // defined for the application. Calling it from here, where there's a
         // SKView already constructed is a guarantee that a RootViewController
         // has already been defined.
-        initGameCenterIntegration()
+        if (gameCenterIntegrationEnabled) {
+            initGameCenterIntegration()
+        }
         startNewGame()
     }
     
@@ -150,11 +152,42 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
 
     // MARK: - GameCenter Integration
 
-    private var _gameCenterEnabled = false
+    private var _gameCenterSessionActive = false
     private var _localPlayer: GKLocalPlayer!
     private var _previousPlayerID: String?
+    private var _gameCenterIntegrationEnabled =
+    UserDefaults.standard.object(
+        forKey: "GameCenterIntegrationEnabled") != nil ?
+        UserDefaults.standard.bool(forKey: "GameCenterIntegrationEnabled") :
+        true
 
-    var gameCenterEnabled: Bool { _gameCenterEnabled }
+    // Is there a live session with GameCenter for the
+    // local player?
+    var gameCenterSessionActive: Bool { _gameCenterSessionActive }
+
+    // Is GameCenter integration enabled? (if not, no attempt will be made
+    // to establish a session for the local player).
+    var gameCenterIntegrationEnabled: Bool {
+        get { _gameCenterIntegrationEnabled }
+        set {
+            if !_gameCenterIntegrationEnabled && newValue {
+                // Integration was disabled and is being enabled.
+                // Initialize the connection
+                initGameCenterIntegration()
+            } else if gameCenterIntegrationEnabled && !newValue {
+                // Integration is being disabled
+                clearGameCenterIntegration()
+            }
+            _gameCenterIntegrationEnabled = newValue
+            UserDefaults.standard.set(newValue,
+                                      forKey: "GameCenterIntegrationEnabled")
+        }
+    }
+
+    func clearGameCenterIntegration() {
+        _localPlayer.authenticateHandler = nil
+        _localPlayer = nil
+    }
 
     func initGameCenterIntegration() {
         _localPlayer = GKLocalPlayer.local
@@ -170,10 +203,9 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 }
                 return
             }
-
             if (self._localPlayer.isAuthenticated) {
                 //user has succesfully logged in
-                self._gameCenterEnabled = true
+                self._gameCenterSessionActive = true
                 if let previousPlayerID = self._previousPlayerID,
                     previousPlayerID != self._previousPlayerID {
                     // TODO: Present message stating that logged GameCenter
@@ -184,17 +216,21 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 self.updateHighScoreFromGameCenter()
             } else {
                 //game center is disabled on the device
-                self._gameCenterEnabled = false
+                self._gameCenterSessionActive = false
                 self._previousPlayerID = nil
                 // TODO:
                 // Present message stating that high-scores won't be registered
-                // when there's no GameCenter user logged in.
+                // when there's no GameCenter user logged in. This message
+                // should present two options: OK, OK and Disable Game Center.
+                // The integration should be re-enabable from a message box
+                // that is displayed when the user tries to see the leaderboard
+                // with the GameCenter integration disabled at the CourtScene.
             }
         }
     }
 
     func updateHighScoreFromGameCenter() {
-        guard _gameCenterEnabled else { return }
+        guard _gameCenterSessionActive else { return }
 
         // TODO: Get High Score from GameCenter - this method should
         //       use ScoreBoard.UpdateHighScore in the UI thread when it receives
