@@ -115,22 +115,17 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         UserDefaults.standard.set(_scoreBoard.highScore, forKey: "HighScore")
     }
 
-    func navigateToNewRecord() {
-        guard let currentScene = _currentScene,
-                  currentScene is CourtScene else {
-                    print("Error: the current scene is expected to be of type 'CourtScene'")
-                    return
-        }
-        let newRecordScene = NewRecordScene()
-        if let currentScene = _currentScene {
-            let trans = SKTransition.fade(withDuration:1.5)
-            currentScene.view?.presentScene(newRecordScene,
-                                            transition: trans)
-            _currentScene = newRecordScene
+    func displayRecords() {
+        if self.gameCenterSessionActive {
+            // TODO: display leaderboard
+        } else {
+            // TODO: display message stating that leaderboard requires
+            //       GameCenter integration and allow user to enable
+            //       GameCenter integration.
         }
     }
     
-    func navigateToInstructions() {
+    func navigateToAboutGameScene() {
         guard let currentScene = _currentScene,
                   currentScene is CourtScene else {
                     print("Error: the current scene is expected to be of type 'CourtScene'")

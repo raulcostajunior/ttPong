@@ -8,7 +8,6 @@
 
 import SpriteKit
 
-// TODO: Handle touch event
 class SoundOptionSprite: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) {

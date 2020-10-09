@@ -1,5 +1,5 @@
 //
-//  HelpScene.swift
+//  AboutGameScene.swift
 //  ttPong
 //
 //  Created by Raul Costa Junior on 14.06.20.
@@ -10,4 +10,4 @@ import Foundation
 import SpriteKit
 
 
-class HelpScene: SKScene {}
+class AboutGameScene: SKScene {}

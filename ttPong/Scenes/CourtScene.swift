@@ -42,7 +42,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private var _leftPad: PadSprite!
     private var _rightPad: PadSprite!
     private var _soundOption: SoundOptionSprite!
-    private var _gameInfo: HelpSprite!
+    private var _leaderBoard: LeaderBoardSprite!
+    private var _gameInfo: AboutGameSprite!
     
     private var _scoreDisp: SKLabelNode!
     private var _highScoreDisp: SKLabelNode!
@@ -139,8 +140,17 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _soundOption.position = CGPoint(x: sndOptHPos, y: sndOptVPos)
         self.addChild(_soundOption)
         
-        _gameInfo = HelpSprite()
-        let infoHPos = sndOptHPos + _soundOption.size.width/2 + CourtScene.ICON_H_SPACING
+        _leaderBoard = LeaderBoardSprite()
+        let leaderHPos = sndOptHPos + _soundOption.size.width/2 +
+            CourtScene.ICON_H_SPACING
+        let leaderVPos = CourtScene.TOP_BOTTOM_INSET +
+            _soundOption.size.height/2
+        _leaderBoard.position = CGPoint(x: leaderHPos, y: leaderVPos)
+        self.addChild(_leaderBoard)
+        
+        _gameInfo = AboutGameSprite()
+        let infoHPos = leaderHPos + _leaderBoard.size.width/2 +
+            CourtScene.ICON_H_SPACING
         let infoVPos = sndOptVPos
         _gameInfo.position = CGPoint(x: infoHPos, y: infoVPos)
         self.addChild(_gameInfo)
@@ -338,6 +348,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _soundOption.isHidden = false
+            _leaderBoard.isHidden = false
             _gameInfo.isHidden = false
             resetPadsPositions()
             _leftPad.movable = false
@@ -367,6 +378,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp2.isHidden = false
             _msgTitle.isHidden = true
             _soundOption.isHidden = true
+            _leaderBoard.isHidden = true
             _gameInfo.isHidden = true
         case .LostDisc:
             // Transient state - display timed message while
@@ -379,6 +391,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp2.isHidden = false
             _msgTitle.isHidden = true
             _soundOption.isHidden = true
+            _leaderBoard.isHidden = true
             _gameInfo.isHidden = true
         case .WaitToStartNewRally:
             _disc.isHidden = true
@@ -389,6 +402,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp2.isHidden = false
             _msgTitle.isHidden = true
             _soundOption.isHidden = false
+            _leaderBoard.isHidden = false
             _gameInfo.isHidden = false
             resetPadsPositions()
             _leftPad.movable = false
@@ -412,6 +426,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp2.isHidden = true
             _msgTitle.isHidden = true
             _soundOption.isHidden = true
+            _leaderBoard.isHidden = true
             _gameInfo.isHidden = true
             _msgDisp1.removeAction(forKey: "fadeOut")
             _msgDisp2.removeAction(forKey: "fadeOut")
@@ -441,6 +456,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _soundOption.isHidden = false
+            _leaderBoard.isHidden = false
             _gameInfo.isHidden = false
             if _leftPad.isActive && _rightPad.isActive {
                 // Touching both pads while match is paused, resumes it.
@@ -467,6 +483,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _soundOption.isHidden = false
+            _leaderBoard.isHidden = false
             _gameInfo.isHidden = false
         }
     }

@@ -1,5 +1,5 @@
 //
-//  HelpSprite.swift
+//  AboutGameSprite.swift
 //  ttPong
 //
 //  Created by Raul Costa Junior on 06.07.20.
@@ -9,7 +9,7 @@
 import SpriteKit
 
 // TODO: Handle touch event
-class HelpSprite: SKSpriteNode {
+class AboutGameSprite: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
