@@ -17,21 +17,21 @@ import Foundation
     
 class ScoreBoard {
     
-    private var _score = 0
-    private var _highScore = 0
+    private var _score: Int64 = 0
+    private var _highScore: Int64 = 0
     private var _newRecord = false
     
-    var score:Int { return _score }
-    var highScore:Int { return _highScore }
+    var score:Int64 { return _score }
+    var highScore:Int64 { return _highScore }
     var isNewRecord:Bool { return _newRecord }
     
-    init(highScore: Int) {
+    init(highScore: Int64) {
         _score = 0
         _highScore = highScore
         _newRecord = false
     }
     
-    func increaseScore(by increment:Int) {
+    func increaseScore(by increment:Int64) {
         _score += increment
         if _score > _highScore {
             _newRecord = true
@@ -44,10 +44,12 @@ class ScoreBoard {
         _newRecord = false
     }
 
-    func updateHighScore(_ newRecord: Int) {
-        _highScore = newRecord
-        if _highScore >= _score {
-            _newRecord = false
+    func updateHighScore(_ newRecord: Int64) {
+        if newRecord > _highScore {
+            _highScore = newRecord
+            if _highScore >= _score {
+                _newRecord = false
+            }
         }
     }
     

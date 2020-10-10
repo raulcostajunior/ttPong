@@ -33,13 +33,17 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         // from GameCenter whenever it is possible.
         _scoreBoard =
             ScoreBoard(
-                highScore: UserDefaults.standard.integer(forKey: "HighScore"))
+                highScore:
+                    Int64(UserDefaults.standard.integer(forKey: "HighScore")))
     }
 
 
     // MARK: - Options and Score Management
 
     private static let TOTAL_DISCS = 4
+
+    // The Leader Board ID defined in iTunesConnect
+    private static let LEADER_BOARD_ID = "board.normal"
 
     private var _scoreBoard: ScoreBoard
     private var _availableDiscs = GameManager.TOTAL_DISCS
@@ -72,6 +76,27 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             return
         }
         _availableDiscs -= 1
+    }
+
+    func registerNewRecord() {
+        guard _scoreBoard.isNewRecord else {
+            print("Error: there's no new record to register.")
+            return
+        }
+        if gameCenterSessionActive {
+            // TODO: register score with GameCenter
+            let reportedScore =
+                GKScore(leaderboardIdentifier: GameManager.LEADER_BOARD_ID)
+            reportedScore.value = _scoreBoard.highScore
+            GKScore.report([reportedScore]) { (error) in
+                if error != nil {
+                    print(error!.localizedDescription)
+                }
+            }
+        }
+        // Always registers high score locally as a fall-back for when no
+        // GameCenter integration is available.
+        UserDefaults.standard.set(_scoreBoard.highScore, forKey: "HighScore")
     }
 
 
@@ -107,47 +132,27 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         _scoreBoard.resetScore()
     }
 
-    func registerNewRecord() {
-        guard _scoreBoard.isNewRecord else {
-            print("Error: there's no new record to register.")
-            return
-        }
-        if gameCenterSessionActive {
-            // TODO: register score with GameCenter
-        } else {
-            // When there's no GameCenter Session active, falls back to
-            // local high score registration.
-            UserDefaults.standard.set(_scoreBoard.highScore, forKey: "HighScore")
-        }
-    }
-
     func displayRecords() {
         if self.gameCenterSessionActive {
-            // TODO: display leaderboard
+            let vc = GKGameCenterViewController()
+
+            vc.gameCenterDelegate = self
+            vc.viewState = .leaderboards
+            vc.leaderboardIdentifier = GameManager.LEADER_BOARD_ID
+            vc.leaderboardTimeScope = .allTime
+
+            let rootVc =
+                UIApplication.shared.windows.first!.rootViewController!
+            //show leader board in UI thread
+            DispatchQueue.main.async {
+                rootVc.present(vc,
+                               animated: true, completion: nil)
+            }
         } else {
             // TODO: display message stating that leaderboard requires
             //       GameCenter integration and allow user to enable
             //       GameCenter integration.
         }
-    }
-    
-    func navigateToAboutGameScene() {
-        guard let currentScene = _currentScene,
-                  currentScene is CourtScene else {
-                    print("Error: the current scene is expected to be of type 'CourtScene'")
-                    return
-        }
-        // TODO: Save the current court for later restoring.
-    }
-    
-    func goBackToCourt() {
-        guard let currentScene = _currentScene,
-                  !(currentScene is CourtScene) else {
-                    print("Error: the current scene cannot be of type 'CourtScene'")
-                    return
-        }
-        // TODO: Restore the court scene if there's a court scene to be restored.
-        //       Otherwise, creates a fresh CourtScene
     }
 
 
@@ -233,10 +238,25 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     func updateHighScoreFromGameCenter() {
         guard _gameCenterSessionActive else { return }
 
-        // TODO: Get High Score from GameCenter - this method should
-        //       use ScoreBoard.UpdateHighScore in the UI thread when it receives
-        //       a high score and this updated high score is greater than the
-        //       current high-score.
+        let gkLeaderboard = GKLeaderboard()
+        gkLeaderboard.identifier = GameManager.LEADER_BOARD_ID
+        gkLeaderboard.timeScope = .allTime
+        gkLeaderboard.playerScope = .global
+        gkLeaderboard.range = NSMakeRange(1, 3)
+
+        // Load the scores - it is important that the High-Score update happens
+        // in the UI thread so it is synchronized with any changes coming from
+        // the game loop.
+        gkLeaderboard.loadScores(
+            completionHandler: { (scores, error) -> Void in
+                if error == nil {
+                    if (scores?.count)! > 0 {
+                        DispatchQueue.main.async {
+                            self._scoreBoard.updateHighScore(scores![0].value)
+                        }
+                    }
+                }
+            })
     }
 
 
