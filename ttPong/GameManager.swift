@@ -34,7 +34,11 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         _scoreBoard =
             ScoreBoard(
                 highScore:
-                    Int64(UserDefaults.standard.integer(forKey: "HighScore")))
+                    Int64(UserDefaults.standard.integer(forKey: "HighScore")),
+                setAt:
+                    UserDefaults.standard.object(forKey: "HighScoreDate") != nil ?
+                    UserDefaults.standard.object(forKey: "HighScoreDate") as! Date :
+                    Date())
     }
 
 
@@ -96,7 +100,10 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         }
         // Always registers high score locally as a fall-back for when no
         // GameCenter integration is available.
-        UserDefaults.standard.set(_scoreBoard.highScore, forKey: "HighScore")
+        UserDefaults.standard.set(_scoreBoard.highScore,
+                                  forKey: "HighScore")
+        UserDefaults.standard.set(_scoreBoard.highScoreDate,
+                                  forKey: "HighScoreDate")
     }
 
 
@@ -108,6 +115,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         guard _currentScene == nil else {
             return;
         }
+
         _currentScene = CourtScene(size:view.bounds.size)
         _currentScene?.scaleMode = .aspectFill
         view.presentScene(_currentScene)
@@ -116,9 +124,8 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         // defined for the application. Calling it from here, where there's a
         // SKView already constructed is a guarantee that a RootViewController
         // has already been defined.
-        if (gameCenterIntegrationEnabled) {
-            initGameCenterIntegration()
-        }
+        initGameCenterIntegration()
+
         startNewGame()
     }
     
@@ -133,25 +140,54 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     }
 
     func displayRecords() {
+        let rootVc =
+            UIApplication.shared.windows.first!.rootViewController!
         if self.gameCenterSessionActive {
-            let vc = GKGameCenterViewController()
-
+            var vc: GKGameCenterViewController!
+            if #available(iOS 14.0, *) {
+                // For iOS 14 or later, the GameCenter view controller allows
+                // specifying the player scope.
+                vc = GKGameCenterViewController(
+                    leaderboardID: GameManager.LEADER_BOARD_ID,
+                    playerScope: .global,
+                    timeScope: .allTime)
+            } else {
+                vc = GKGameCenterViewController()
+                vc.leaderboardIdentifier = GameManager.LEADER_BOARD_ID
+                vc.leaderboardTimeScope = .allTime
+            }
             vc.gameCenterDelegate = self
-            vc.viewState = .leaderboards
-            vc.leaderboardIdentifier = GameManager.LEADER_BOARD_ID
-            vc.leaderboardTimeScope = .allTime
-
-            let rootVc =
-                UIApplication.shared.windows.first!.rootViewController!
             //show leader board in UI thread
             DispatchQueue.main.async {
                 rootVc.present(vc,
                                animated: true, completion: nil)
             }
         } else {
-            // TODO: display message stating that leaderboard requires
-            //       GameCenter integration and allow user to enable
-            //       GameCenter integration.
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "EEE, MMM d, yyyy - h:mm a"
+            dateFormatter.timeZone = TimeZone.current
+            let highScoreStamp =
+                dateFormatter.string(from: _scoreBoard.highScoreDate)
+            var messageBody: String
+            if _scoreBoard.highScore > 0 {
+                messageBody =
+                    "Registered at '\(highScoreStamp)'.\n\nTo enable the " +
+                    "Global Score Board, please sign in to GameCenter in " +
+                    "Settings > GameCenter."
+            } else {
+                messageBody =
+                    "\nTo enable the " +
+                    "Global Score Board, please sign in to GameCenter in " +
+                    "Settings > GameCenter."
+            }
+            let alert =
+                UIAlertController(
+                    title: "High Score: \(_scoreBoard.highScore) points",
+                    message: messageBody,
+                    preferredStyle: .alert)
+            alert.addAction(
+                UIAlertAction(title: "OK", style: .default, handler: nil))
+            rootVc.present(alert, animated: true)
         }
     }
 
@@ -161,39 +197,10 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     private var _gameCenterSessionActive = false
     private var _localPlayer: GKLocalPlayer!
     private var _previousPlayerID: String?
-    private var _gameCenterIntegrationEnabled =
-    UserDefaults.standard.object(
-        forKey: "GameCenterIntegrationEnabled") != nil ?
-        UserDefaults.standard.bool(forKey: "GameCenterIntegrationEnabled") :
-        true
 
     // Is there a live session with GameCenter for the
     // local player?
     var gameCenterSessionActive: Bool { _gameCenterSessionActive }
-
-    // Is GameCenter integration enabled? (if not, no attempt will be made
-    // to establish a session for the local player).
-    var gameCenterIntegrationEnabled: Bool {
-        get { _gameCenterIntegrationEnabled }
-        set {
-            if !_gameCenterIntegrationEnabled && newValue {
-                // Integration was disabled and is being enabled.
-                // Initialize the connection
-                initGameCenterIntegration()
-            } else if gameCenterIntegrationEnabled && !newValue {
-                // Integration is being disabled
-                clearGameCenterIntegration()
-            }
-            _gameCenterIntegrationEnabled = newValue
-            UserDefaults.standard.set(newValue,
-                                      forKey: "GameCenterIntegrationEnabled")
-        }
-    }
-
-    func clearGameCenterIntegration() {
-        _localPlayer.authenticateHandler = nil
-        _localPlayer = nil
-    }
 
     func initGameCenterIntegration() {
         _localPlayer = GKLocalPlayer.local
@@ -224,13 +231,6 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 //game center is disabled on the device
                 self._gameCenterSessionActive = false
                 self._previousPlayerID = nil
-                // TODO:
-                // Present message stating that high-scores won't be registered
-                // when there's no GameCenter user logged in. This message
-                // should present two options: OK, OK and Disable Game Center.
-                // The integration should be re-enabable from a message box
-                // that is displayed when the user tries to see the leaderboard
-                // with the GameCenter integration disabled at the CourtScene.
             }
         }
     }
@@ -252,7 +252,19 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 if let scores = boardScores, error == nil {
                     if (scores.count) > 0 {
                         DispatchQueue.main.async {
-                            self._scoreBoard.updateHighScore(scores[0].value)
+                            self._scoreBoard.highScoreFromGlobal(
+                                scores[0].value,
+                                setAt: scores[0].date)
+                            if self._scoreBoard.highScore == scores[0].value {
+                                // The high score has been updated; update the
+                                // local fall-back persistence.
+                                UserDefaults.standard.set(
+                                    self._scoreBoard.highScore,
+                                    forKey: "HighScore")
+                                UserDefaults.standard.set(
+                                    self._scoreBoard.highScoreDate,
+                                    forKey: "HighScoreDate")
+                            }
                         }
                     }
                 }

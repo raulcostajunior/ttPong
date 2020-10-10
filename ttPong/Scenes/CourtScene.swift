@@ -10,11 +10,10 @@ import SpriteKit
 import GameplayKit
 
 
-// TODO: Add display Leaderboard tool button. When that button is touched, if
-//       GameCenter is connected, the Leaderboard is presented. If GameCenter
-//       is not connected, a message is displayed stating that leaderboards are
-//       only available when GameCenter is connected. Instruct the user that he
-//       / she can connect by going to Setting > GameCenter.
+// TODO: Call setMsg on each state transition, not during each instance of the
+//       loop cycles. Use after set of a private state property. Also change
+//       message node visibility at that point. CPU for game waiting for first
+//       start is around 30% for iPhone 7.
 
 class CourtScene: SKScene, SKPhysicsContactDelegate {
     
@@ -729,13 +728,17 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp1.text = "Hope to have you back soon !"
             _msgDisp2.text = ""
         case .MatchAbortedNewRecord:
-            _msgTitle.text = "Game aborted, but ..."
-            _msgDisp1.text = "You've set a new record !!"
-            _msgDisp2.text = "Claim your glory!"
+            _msgTitle.text =
+                GameManager.shared.gameCenterSessionActive ?
+                "A New Global Record !!" : "A New Local Record !!"
+            _msgDisp1.text = "Game aborted, but congrats !"
+            _msgDisp2.text = ""
         case .MatchFinishedNewRecord:
-            _msgTitle.text = "New Record !"
+            _msgTitle.text =
+                GameManager.shared.gameCenterSessionActive ?
+                "New Global Record !" : "New Local Record"
             _msgDisp1.text = "Well done !!!"
-            _msgDisp2.text = "Claim your glory!"
+            _msgDisp2.text = ""
         case .MatchFinished:
             _msgTitle.text = "Game Over !"
             _msgDisp1.text = "Go ahead and play again !!"
