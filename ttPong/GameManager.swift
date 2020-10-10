@@ -248,11 +248,11 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         // in the UI thread so it is synchronized with any changes coming from
         // the game loop.
         gkLeaderboard.loadScores(
-            completionHandler: { (scores, error) -> Void in
-                if error == nil {
-                    if (scores?.count)! > 0 {
+            completionHandler: { (boardScores, error) -> Void in
+                if let scores = boardScores, error == nil {
+                    if (scores.count) > 0 {
                         DispatchQueue.main.async {
-                            self._scoreBoard.updateHighScore(scores![0].value)
+                            self._scoreBoard.updateHighScore(scores[0].value)
                         }
                     }
                 }
