@@ -272,7 +272,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     }
     
     // MARK: - SKPhysicsContactDelegate
-    
+
+    private var _leftPadAtContactBegin: CGPoint?
+    private var _rightPadAtContactBegin: CGPoint?
+
     func didBegin(_ contact:SKPhysicsContact) {
         guard state == .GameOngoing && _disc.position.x > _leftLimitIn &&
             _disc.position.x < _rightLimitIn
@@ -285,6 +288,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
         if contactMask == DiscSprite.CollisionCateg | PadSprite.CollisionCateg {
             playSoundFx(_discHitEffect)
+            _leftPadAtContactBegin = _leftPad.position
+            _rightPadAtContactBegin = _rightPad.position
         }
     }
     
@@ -299,6 +304,17 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         let contactMask =
             contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
         if contactMask == DiscSprite.CollisionCateg | PadSprite.CollisionCateg {
+            let hitLeftPad =
+                (self._disc.position.x < self.size.width/2)
+            // If the hit pad moved between contact begin and contact end,
+            // apply an Angular Impulse.
+            if let leftAtBegin = _leftPadAtContactBegin,
+               let rightAtBegin = _rightPadAtContactBegin {
+                let padYDelta =
+                    hitLeftPad ? _leftPad.position.y - leftAtBegin.y :
+                    _rightPad.position.y - rightAtBegin.y
+                _disc.physicsBody?.applyAngularImpulse(padYDelta * 0.0005)
+            }
             // If a few milliseconds after hitting the pad the disc had it
             // horizontal velocity component reverted, it is still in game.
             Timer.scheduledTimer(
@@ -309,8 +325,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     // the UI thread along with the SpriteKit update pipeline
                     // methods.
                     DispatchQueue.main.async {
-                        let hitLeftPad =
-                            (self._disc.position.x < self.size.width/2)
                         if (hitLeftPad && self._disc.velocity.dx > 0.0) ||
                             (!hitLeftPad && self._disc.velocity.dx < 0.0) {
                             self._hitsInRally += 1

@@ -39,6 +39,8 @@ class DiscSprite: SKSpriteNode {
         physicsBody!.isDynamic = true
         physicsBody!.linearDamping = 0.0   // No friction force actuating
         physicsBody!.restitution = 1.0     // No speed loss on collision
+        physicsBody!.allowsRotation = true
+        physicsBody!.angularDamping = 0.1
         physicsBody!.velocity = CGVector(dx: 0.0, dy: 0.0)
         physicsBody!.categoryBitMask = DiscSprite.CollisionCateg
     }
