@@ -217,17 +217,6 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     }
 
 
-    // MARK: - Helpers
-    fileprivate func openReviewUrl() {
-        let appID = "1535019034"
-        let urlStr =
-            "https://itunes.apple.com/app/id\(appID)?action=write-review"
-
-        guard let url = URL(string: urlStr), UIApplication.shared.canOpenURL(url) else { return }
-        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-    }
-
-
     // MARK: - GameCenter Integration
 
     private var _gameCenterSessionActive = false
@@ -312,6 +301,17 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
 
     func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
         gameCenterViewController.dismiss(animated: true, completion: nil)
+    }
+
+
+    // MARK: - Private Helper Methods
+    fileprivate func openReviewUrl() {
+        let appID = "1535019034"
+        let urlStr =
+            "https://itunes.apple.com/app/id\(appID)?action=write-review"
+
+        guard let url = URL(string: urlStr), UIApplication.shared.canOpenURL(url) else { return }
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
 
 }
