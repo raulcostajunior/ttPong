@@ -107,7 +107,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     }
 
 
-    // MARK: - Scene Navigation
+    // MARK: - Game Navigation
 
     private var _currentScene: SKScene?
     
@@ -189,6 +189,42 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 UIAlertAction(title: "OK", style: .default, handler: nil))
             rootVc.present(alert, animated: true)
         }
+    }
+
+    func displayAboutInfo() {
+        let appVersion =
+            Bundle.main.infoDictionary?["CFBundleShortVersionString"] as?
+               String
+        var messageBody =
+            appVersion != nil ? "Version \(appVersion!)\n" : ""
+        messageBody += "Author: Raul Costa Junior, 2020.\n\n" +
+                       "Please consider writing a review."
+        let alert =
+            UIAlertController(
+            title: "About ttPong",
+                message: messageBody,
+                preferredStyle: .actionSheet)
+        alert.addAction(
+            UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        alert.addAction(
+            UIAlertAction(title: "Write a review", style: .default,
+                          handler: { action in
+                            self.openReviewUrl()
+                          }))
+        let rootVc =
+            UIApplication.shared.windows.first!.rootViewController!
+        rootVc.present(alert, animated: true)
+    }
+
+
+    // MARK: - Helpers
+    fileprivate func openReviewUrl() {
+        let appID = "1535019034"
+        let urlStr =
+            "https://itunes.apple.com/app/id\(appID)?action=write-review"
+
+        guard let url = URL(string: urlStr), UIApplication.shared.canOpenURL(url) else { return }
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
 
 

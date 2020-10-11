@@ -18,6 +18,7 @@ class LeaderBoardSprite: SKSpriteNode {
         super.init(texture: nil,
                    color: UIColor.clear,
                    size: CGSize(width:40, height:40))
+        
         let rosetteImg = UIImage(named: "rosette")
         texture = SKTexture.init(image: rosetteImg!)
         

@@ -22,6 +22,13 @@ class AboutGameSprite: SKSpriteNode {
         
         let infoImg = UIImage(named: "help")
         texture = SKTexture.init(image: infoImg!)
+
+        isUserInteractionEnabled = true
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event:UIEvent?) {
+        GameManager.shared.displayAboutInfo()
+        super.touchesEnded(touches, with: event)
     }
     
 }
