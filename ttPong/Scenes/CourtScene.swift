@@ -10,11 +10,6 @@ import SpriteKit
 import GameplayKit
 
 
-// TODO: Call setMsg on each state transition, not during each instance of the
-//       loop cycles. Use after set of a private state property. Also change
-//       message node visibility at that point. CPU for game waiting for first
-//       start is around 30% for iPhone 7.
-
 class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     enum CourtState {
@@ -79,8 +74,16 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private var _maxDxSpeed: CGFloat!
     private var _hitsInRally = 0
     
-    private var _state: CourtState = .WaitToStartMatch
-    
+    private var _state = CourtState.WaitToStartMatch
+
+    private var state: CourtState {
+        get { _state }
+        set {
+            _state = newValue
+            setMsgs()
+        }
+    }
+
     // MARK: - Initializers
     
     required init?(coder aDecoder: NSCoder) {
@@ -271,7 +274,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     // MARK: - SKPhysicsContactDelegate
     
     func didBegin(_ contact:SKPhysicsContact) {
-        guard _state == .GameOngoing && _disc.position.x > _leftLimitIn &&
+        guard state == .GameOngoing && _disc.position.x > _leftLimitIn &&
             _disc.position.x < _rightLimitIn
             else {
             // We're only interested in collisions while game is ongoing
@@ -286,7 +289,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func didEnd(_ contact: SKPhysicsContact) {
-        guard _state == .GameOngoing && _disc.position.x > _leftLimitIn &&
+        guard state == .GameOngoing && _disc.position.x > _leftLimitIn &&
             _disc.position.x < _rightLimit
             else {
             // We're only interested in collisions while game is ongoing
@@ -330,7 +333,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     func gotoInitialState() {
         _disc.reset()
-        _state = .WaitToStartMatch
+        state = .WaitToStartMatch
         playSoundFx(_gameStartEffect)
         GameManager.shared.updateHighScoreFromGameCenter()
         GameManager.shared.startNewGame()
@@ -358,7 +361,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp2.alpha = 1.0
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start game
-                _state = .LaunchingDisk
+                state = .LaunchingDisk
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
@@ -410,7 +413,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 // Both pads are being touched - start new rally.
                 _leftPad.movable = true
                 _rightPad.movable = true
-                _state = .LaunchingDisk
+                state = .LaunchingDisk
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
@@ -433,7 +436,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp2.alpha = 1.0
             if !_leftPad.isActive || !_rightPad.isActive {
                 // Releasing any pad while match is ongoing, pauses it
-                _state = .GamePaused
+                state = .GamePaused
                 _leftPad.movable = false
                 _rightPad.movable = false
                 _leftPad.isPaused = true
@@ -459,7 +462,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _gameInfo.isHidden = false
             if _leftPad.isActive && _rightPad.isActive {
                 // Touching both pads while match is paused, resumes it.
-                _state = .GameOngoing
+                state = .GameOngoing
                 _leftPad.movable = true
                 _rightPad.movable = true
                 _leftPad.isPaused = false
@@ -491,7 +494,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if touches.count == 3 &&
-            (_state == .GamePaused  || _state == .WaitToStartNewRally) {
+            (state == .GamePaused  || state == .WaitToStartNewRally) {
             // User chose to abort game
             self.alpha = 0.0
             let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
@@ -499,10 +502,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             if GameManager.shared.scoreBoard.isNewRecord {
                 GameManager.shared.registerNewRecord()
                 playSoundFx(_newRecordEffect)
-                _state = .MatchAbortedNewRecord
+                state = .MatchAbortedNewRecord
             }
             else {
-                _state = .MatchAborted
+                state = .MatchAborted
             }
             // Restores the color of the text sprites that display the number
             // of discs and the scores. It may be grayed out if the abort came
@@ -544,7 +547,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func didEvaluateActions() {
-        if _state == .GameOngoing {
+        if state == .GameOngoing {
             // Detects and processes disc loss
             if _disc.position.x - _disc.size.width/2 < _leftLimit || _disc.position.x + _disc.size.width/2 > _rightLimit {
                 // Disc is completely to the left or to the right of the scene - player lost rally.
@@ -557,8 +560,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 if GameManager.shared.availableDiscs > 1 {
                     // There's at least one disc left; let user start
                     // a new rally
-                    _state = .LostDisc
                     GameManager.shared.pickUpDisc()
+                    state = .LostDisc
                     Timer.scheduledTimer(
                         withTimeInterval: 3.0,
                         repeats: false,
@@ -567,16 +570,16 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                             // thread along with the rest of the SpriteKit
                             // update pipeline.
                             DispatchQueue.main.async {
-                                 self._state = .WaitToStartNewRally
+                                 self.state = .WaitToStartNewRally
                             }
                     })
                 } else {
                     // Lost rally for the last disc.
                     if GameManager.shared.scoreBoard.isNewRecord {
-                        _state = .MatchFinishedNewRecord
+                        state = .MatchFinishedNewRecord
                         GameManager.shared.registerNewRecord()
                     } else {
-                        _state = .MatchFinished
+                        state = .MatchFinished
                     }
                     // Play new record or game over effects a little bit
                     // delayed, so they can be distinguished from the sound
@@ -601,9 +604,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                             // thread along with the rest of the SpriteKit
                             // update pipeline.
                             DispatchQueue.main.async {
-                                if self._state == .MatchFinished {
+                                if self.state == .MatchFinished {
                                     self.gotoInitialState()
-                                } else if self._state == .MatchFinishedNewRecord {
+                                } else if self.state == .MatchFinishedNewRecord {
                                     // TODO: replace this with a transition to
                                     // the new record scene.
                                     self.gotoInitialState()
@@ -619,7 +622,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _scoreDisp.text = scoreText()
         _highScoreDisp.text = highScoreText()
         _discsDisp.text = discsText()
-        setMsgs()
     }
     
     // MARK: - Private helper methods
@@ -663,7 +665,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     self.playSoundFx(self._discReleaseEffect)
                     self._discAppearance.alpha = 0.0
                     self._discAppearance.isHidden = true
-                    self._state = CourtState.GameOngoing
+                    self.state = CourtState.GameOngoing
                     self._hitsInRally = 0
                     // At the start of the rally decreases the velocity to the
                     // minimal value.
