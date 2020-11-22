@@ -82,31 +82,6 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         _availableDiscs -= 1
     }
 
-    func registerNewRecord() {
-        guard _scoreBoard.isNewRecord else {
-            print("Error: there's no new record to register.")
-            return
-        }
-        if gameCenterSessionActive {
-            // TODO: register score with GameCenter
-            let reportedScore =
-                GKScore(leaderboardIdentifier: GameManager.LEADER_BOARD_ID)
-            reportedScore.value = _scoreBoard.highScore
-            GKScore.report([reportedScore]) { (error) in
-                if error != nil {
-                    print(error!.localizedDescription)
-                }
-            }
-        }
-        // Always registers high score locally as a fall-back for when no
-        // GameCenter integration is available.
-        UserDefaults.standard.set(_scoreBoard.highScore,
-                                  forKey: "HighScore")
-        UserDefaults.standard.set(_scoreBoard.highScoreDate,
-                                  forKey: "HighScoreDate")
-    }
-
-
     // MARK: - Game Navigation
 
     private var _currentScene: SKScene?
@@ -164,6 +139,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             }
         } else {
             let dateFormatter = DateFormatter()
+            // TODO: internationalize the date format.
             dateFormatter.dateFormat = "EEE, MMM d, yyyy - h:mm a"
             dateFormatter.timeZone = TimeZone.current
             let highScoreStamp =
@@ -171,14 +147,15 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             var messageBody: String
             if _scoreBoard.highScore > 0 {
                 messageBody =
-                    "Registered at '\(highScoreStamp)'.\n\nTo enable the " +
-                    "Global Score Board, please sign in to GameCenter in " +
-                    "Settings > GameCenter."
+                    String.localizedStringWithFormat(
+                        NSLocalizedString("Registered at '%@'.\n\nTo enable the Global Score Board ...",
+                            comment: ""),
+                        highScoreStamp
+                    )
             } else {
                 messageBody =
-                    "\nTo enable the " +
-                    "Global Score Board, please sign in to GameCenter in " +
-                    "Settings > GameCenter."
+                    NSLocalizedString("\nTo enable the Global Score Board ...",
+                                      comment: "")
             }
             let alert =
                 UIAlertController(
@@ -196,21 +173,32 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             Bundle.main.infoDictionary?["CFBundleShortVersionString"] as?
                String
         var messageBody =
-            appVersion != nil ? "Version \(appVersion!)\n" : ""
-        messageBody += "Author: Raul Costa Junior, 2020.\n\n" +
-                       "Please consider writing a review."
+            appVersion != nil ?
+            String.localizedStringWithFormat(
+                NSLocalizedString("Version %@\n", comment: ""), appVersion!
+            ) : ""
+        messageBody +=
+            NSLocalizedString("Author: Raul Costa Junior, 2020.\n\n", comment: "")
+            +
+            NSLocalizedString("Please consider writing a review.", comment: "")
         let alert =
             UIAlertController(
-            title: "About ttPong",
+                title: NSLocalizedString("About ttPong", comment: ""),
                 message: messageBody,
                 preferredStyle: .actionSheet)
         alert.addAction(
-            UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            UIAlertAction(
+                title: NSLocalizedString("OK", comment: ""),
+                style: .cancel, handler: nil)
+        )
         alert.addAction(
-            UIAlertAction(title: "Write a review", style: .default,
-                          handler: { action in
-                            self.openReviewUrl()
-                          }))
+            UIAlertAction(
+                title: NSLocalizedString("Write a review", comment: ""),
+                style: .default,
+                handler: { action in
+                    self.openReviewUrl()
+                })
+        )
         let rootVc =
             UIApplication.shared.windows.first!.rootViewController!
         rootVc.present(alert, animated: true)
@@ -294,6 +282,29 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                     }
                 }
             })
+    }
+
+    func registerNewRecord() {
+        guard _scoreBoard.isNewRecord else {
+            print("Error: there's no new record to register.")
+            return
+        }
+        if gameCenterSessionActive {
+            let reportedScore =
+                GKScore(leaderboardIdentifier: GameManager.LEADER_BOARD_ID)
+            reportedScore.value = _scoreBoard.highScore
+            GKScore.report([reportedScore]) { (error) in
+                if error != nil {
+                    print(error!.localizedDescription)
+                }
+            }
+        }
+        // Always registers high score locally as a fall-back for when no
+        // GameCenter integration is available.
+        UserDefaults.standard.set(_scoreBoard.highScore,
+                                  forKey: "HighScore")
+        UserDefaults.standard.set(_scoreBoard.highScoreDate,
+                                  forKey: "HighScoreDate")
     }
 
 

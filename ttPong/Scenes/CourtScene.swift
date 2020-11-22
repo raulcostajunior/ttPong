@@ -190,7 +190,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     fileprivate func initGameStatusNodes(_ size: CGSize) {
         let scoreFont = UIFont(name: "Phosphate", size: 19)
         let fontAttributes = [NSAttributedString.Key.font: scoreFont!]
-        let scoreMaxText = "SCORE - 99999"
+        let scoreMaxText = NSLocalizedString("SCORE - 99999", comment: "")
         let scoreMaxWidth =
             (scoreMaxText as NSString).size(withAttributes: fontAttributes).width
         
@@ -708,21 +708,31 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private func scoreText() -> String {
         let fmtScore = String(format:"%04d",
                               GameManager.shared.scoreBoard.score)
-        return "SCORE - \(fmtScore)"
+        return String.localizedStringWithFormat(
+            NSLocalizedString("SCORE - %@", comment: ""),
+            fmtScore
+        )
     }
     
     private func highScoreText() -> String {
         let fmtHighScore = String(format:"%04d",
                                   GameManager.shared.scoreBoard.highScore)
-        return "HIGH - \(fmtHighScore)"
+        return String.localizedStringWithFormat(
+            NSLocalizedString("HIGH - %@", comment: ""),
+            fmtHighScore
+        )
     }
     
     private func discsText() -> String {
         let adsks = GameManager.shared.availableDiscs
         var txt = ""
         switch adsks {
-        case 1: txt = "LAST DISC"
-        default: txt = "DISCS - \(adsks)"
+        case 1: txt = NSLocalizedString("LAST DISC", comment: "")
+        default: txt =
+            String.localizedStringWithFormat(
+                NSLocalizedString("DISCS - %d", comment: ""),
+                adsks
+            )
         }
         return txt
     }
@@ -736,50 +746,74 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private func setMsgs() {
         switch _state {
         case .WaitToStartMatch:
-            _msgTitle.text = "Let's Play !"
-            _msgDisp1.text = "To start a new match,"
-            _msgDisp2.text = "touch and hold both pads."
+            _msgTitle.text =
+                NSLocalizedString("Let's Play !", comment: "")
+            _msgDisp1.text =
+                NSLocalizedString("To start a new match,", comment: "")
+            _msgDisp2.text =
+                NSLocalizedString("touch and hold both pads.", comment: "")
         case .MatchAborted:
-            _msgTitle.text = "Game aborted"
-            _msgDisp1.text = "Hope to have you back soon !"
+            _msgTitle.text =
+                NSLocalizedString("Game aborted", comment: "")
+            _msgDisp1.text =
+                NSLocalizedString("Hope to have you back soon !", comment: "")
             _msgDisp2.text = ""
         case .MatchAbortedNewRecord:
             _msgTitle.text =
                 GameManager.shared.gameCenterSessionActive ?
-                "A New Global Record !!" : "A New Local Record !!"
-            _msgDisp1.text = "Game aborted, but congrats !"
+                NSLocalizedString("A New Global Record !!", comment: "") :
+                NSLocalizedString("A New Local Record !!", comment: "")
+            _msgDisp1.text =
+                NSLocalizedString("Game aborted, but congrats !", comment: "")
             _msgDisp2.text = ""
         case .MatchFinishedNewRecord:
             _msgTitle.text =
                 GameManager.shared.gameCenterSessionActive ?
-                "New Global Record !" : "New Local Record"
-            _msgDisp1.text = "Well done !!!"
+                NSLocalizedString("A New Global Record !!", comment: "") :
+                NSLocalizedString("A New Local Record !!", comment: "")
+            _msgDisp1.text =
+                NSLocalizedString("Well done !!!", comment: "")
             _msgDisp2.text = ""
         case .MatchFinished:
-            _msgTitle.text = "Game Over !"
-            _msgDisp1.text = "Go ahead and play again !!"
+            _msgTitle.text =
+                NSLocalizedString("Game Over !", comment: "")
+            _msgDisp1.text =
+                NSLocalizedString("Go ahead and play again !!", comment: "")
             _msgDisp2.text = ""
         case .GamePaused:
-            _msgTitle.text = "Game Paused"
-            _msgDisp1.text = "To resume, touch and hold both pads."
-            _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
+            _msgTitle.text =
+                NSLocalizedString("Game Paused", comment: "")
+            _msgDisp1.text =
+                NSLocalizedString("To resume, touch and hold both pads.", comment: "")
+            _msgDisp2.text =
+                NSLocalizedString("To abort, touch anywhere with 3 fingers.", comment: "")
         case .LaunchingDisk:
-            _msgDisp1.text = "Get ready to play !"
-            _msgDisp2.text = "Releasing any pad pauses the game."
+            _msgDisp1.text =
+                NSLocalizedString("Get ready to play !", comment: "")
+            _msgDisp2.text =
+                NSLocalizedString("Releasing any pad pauses the game.", comment: "")
         case .LostDisc:
             var discTxt: String!
             let availDiscs = GameManager.shared.availableDiscs
             if availDiscs >= 2 {
-                discTxt = "You have \(availDiscs) discs left !"
+                discTxt =
+                    String.localizedStringWithFormat(
+                        NSLocalizedString("You have %d discs left !", comment: ""),
+                        availDiscs
+                    )
             } else if availDiscs == 1 {
-                discTxt = "Make the most of your last disc !"
+                discTxt =
+                    NSLocalizedString("Make the most of your last disc !", comment: "")
             }
             // There's at least one rally left ...
             _msgDisp1.text = discTxt
-            _msgDisp2.text = "Good luck !!"
+            _msgDisp2.text =
+                NSLocalizedString("Good luck !!", comment:"")
         case .WaitToStartNewRally:
-            _msgDisp1.text = "Hold both pads to launch a new disc."
-            _msgDisp2.text = "To abort, touch anywhere with 3 fingers."
+            _msgDisp1.text =
+                NSLocalizedString("Hold both pads to launch a new disc.", comment: "")
+            _msgDisp2.text =
+                NSLocalizedString("To abort, touch anywhere with 3 fingers.", comment: "")
         case .GameOngoing:
             _msgDisp1.text = ""
             _msgDisp2.text = ""

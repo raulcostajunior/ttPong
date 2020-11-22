@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-// TODO: Handle touch event
+
 class AboutGameSprite: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) {

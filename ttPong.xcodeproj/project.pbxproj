@@ -12,6 +12,7 @@
 		CB33F80C252A004E00522045 /* NewRecord.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F80B252A004E00522045 /* NewRecord.wav */; };
 		CB33F811252A0F7D00522045 /* GameOver.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F810252A0F7D00522045 /* GameOver.wav */; };
 		CB33F816252A22D700522045 /* GameStart.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F815252A22D700522045 /* GameStart.wav */; };
+		CB4E5D95256A6F0B004CC416 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CB4E5D97256A6F0B004CC416 /* Localizable.strings */; };
 		CB714D49252F2A1300D8476F /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB714D48252F2A1300D8476F /* GameKit.framework */; };
 		CBA536BD2517B93900E6EFDE /* DiscHit.caf in Resources */ = {isa = PBXBuildFile; fileRef = CBA536BC2517B93900E6EFDE /* DiscHit.caf */; };
 		CBA536C52517BA1800E6EFDE /* DiscRelease.caf in Resources */ = {isa = PBXBuildFile; fileRef = CBA536C42517BA1800E6EFDE /* DiscRelease.caf */; };
@@ -58,6 +59,10 @@
 		CB33F80B252A004E00522045 /* NewRecord.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = NewRecord.wav; sourceTree = "<group>"; };
 		CB33F810252A0F7D00522045 /* GameOver.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = GameOver.wav; sourceTree = "<group>"; };
 		CB33F815252A22D700522045 /* GameStart.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = GameStart.wav; sourceTree = "<group>"; };
+		CB4E5D96256A6F0B004CC416 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CB4E5D9E256A6F6A004CC416 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Main.strings"; sourceTree = "<group>"; };
+		CB4E5D9F256A6F6A004CC416 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		CB4E5DA0256A6F6A004CC416 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		CB714D48252F2A1300D8476F /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		CBA536BC2517B93900E6EFDE /* DiscHit.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DiscHit.caf; sourceTree = "<group>"; };
 		CBA536C42517BA1800E6EFDE /* DiscRelease.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DiscRelease.caf; sourceTree = "<group>"; };
@@ -180,6 +185,7 @@
 				CBBF94E7244AE65100789DE2 /* Assets.xcassets */,
 				CBBF94E9244AE65100789DE2 /* LaunchScreen.storyboard */,
 				CBBF94EC244AE65100789DE2 /* Info.plist */,
+				CB4E5D97256A6F0B004CC416 /* Localizable.strings */,
 			);
 			path = ttPong;
 			sourceTree = "<group>";
@@ -309,6 +315,7 @@
 			knownRegions = (
 				en,
 				Base,
+				"pt-BR",
 			);
 			mainGroup = CBBF94CE244AE65000789DE2;
 			productRefGroup = CBBF94D8244AE65000789DE2 /* Products */;
@@ -336,6 +343,7 @@
 				CB2C0961249F66C5005DD7C9 /* Phosphate.ttc in Resources */,
 				CB33F8072529FDDD00522045 /* DiscGone.wav in Resources */,
 				CBB1B73024BC49A30033FA32 /* DiscAppearance.sks in Resources */,
+				CB4E5D95256A6F0B004CC416 /* Localizable.strings in Resources */,
 				CBB1B73124BC49A30033FA32 /* Assets.xcassets in Resources */,
 				CBBF94EB244AE65100789DE2 /* LaunchScreen.storyboard in Resources */,
 				CBA536C52517BA1800E6EFDE /* DiscRelease.caf in Resources */,
@@ -409,10 +417,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		CB4E5D97256A6F0B004CC416 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CB4E5D96256A6F0B004CC416 /* en */,
+				CB4E5DA0256A6F6A004CC416 /* pt-BR */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		CBBF94E4244AE65000789DE2 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				CBBF94E5244AE65000789DE2 /* Base */,
+				CB4E5D9E256A6F6A004CC416 /* pt-BR */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -421,6 +439,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				CBBF94EA244AE65100789DE2 /* Base */,
+				CB4E5D9F256A6F6A004CC416 /* pt-BR */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -432,6 +451,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -492,6 +512,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -554,6 +575,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = raulcostajunior.ttPong;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -573,6 +595,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = raulcostajunior.ttPong;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

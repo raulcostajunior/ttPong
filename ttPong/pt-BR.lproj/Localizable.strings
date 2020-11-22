@@ -1,0 +1,42 @@
+/* GameManager.swift */
+"About ttPong" = "Sobre ttPong";
+"Author: Raul Costa Junior, 2020.\n\n" = "Autor: Raul Costa Junior, 2020.\n\n";
+"High Score: %d points" = "Recorde: %d pontos";
+"OK" = "OK";
+"Please consider writing a review." = "Por favor deixe um comentário sobre ttPong.";
+"Registered at '%@'.\n\nTo enable the Global Score Board ..." = "Registrado em '%@'.\n\nPara habilitar o Placar Global, faça login no GameCenter em Ajustes > GameCenter.";
+"\nTo enable the Global Score Board ..." = "\nPara habilitar o Placar Global, faça login no Gamecenter em Ajustes > GameCenter.";
+"Write a review" = "Comentar sobre ttPong";
+"Version %@\n" = "Versão %@\n";
+
+/* CourtScene.swift */
+"Game aborted" = "Partida encerrada";
+"Hope to have you back soon !" = "Espero você de volta em breve !";
+"Let's Play !" = "Vamos Jogar !";
+"To start a new match," = "Para iniciar partida,";
+"touch and hold both pads." = "toque e segure os dois anteparos.";
+"A New Global Record !!" = "Novo Recorde Global !!";
+"A New Local Record !!" = "Novo Recorde Local !!";
+"Game aborted, but congrats !" = "Partida encerrada, e parabéns !";
+"Well done !!!" = "Parabéns !!!";
+"Game Over !" = "Fim de Partida !";
+"Go ahead and play again !!" = "Vamos jogar de novo !!";
+"Game Paused" = "Jogo Pausado";
+"To resume, touch and hold both pads." = "Para continuar, toque e segure os dois anteparos.";
+"To abort, touch anywhere with 3 fingers." = "Para abortar, toque na tela com 3 dedos.";
+"Get ready to play !" = "Prepare-se para jogar !";
+"Releasing any pad pauses the game." = "Para pausar, solte pelo menos um anteparo.";
+"You have %d discs left !" = "Você tem %d discos mais !";
+"Make the most of your last disc !" ="Aproveite ao máximo seu último disco !";
+"Good luck !!" = "Boa Sorte !!";
+"Hold both pads to launch a new disc." = "Segure ambos os anteparos para lançar um disco.";
+"SCORE - %@" = "PLACAR - %@";
+"HIGH - %@" = "RECORDE - %@";
+"LAST DISC" = "ÚLTIMO DISCO";
+"DISCS - %d" = "DISCOS - %d";
+"SCORE - 99999" = "RECORDE - 99999";
+
+
+
+
+
