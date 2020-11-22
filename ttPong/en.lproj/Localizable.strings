@@ -4,8 +4,8 @@
 "High Score: %d points" = "High Score: %d points";
 "OK" = "OK";
 "Please consider writing a review." = "Please consider writing a review.";
-"Registered at '@'.\n\nTo enable the Global Score Board ..." = "Registered at '@'.\n\nTo enable the Global Score Board, please sign in to GameCenter in  Settings > GameCenter.";
-"\nTo enable the Global Score Board ..." = "\nTo enable the Global Score Board, please sign in to GameCenter in Settings > GameCenter.";
+"Registered at '%@'.\n\nTo enable the Global Score Board" = "On '%@'.\n\nTo enable the Global Score Board, please sign in to GameCenter in  Settings > GameCenter.";
+"To enable the Global Score Board" = "\nTo enable the Global Score Board, please sign in to GameCenter in Settings > GameCenter.";
 "Write a review" = "Write a review";
 "Version @\n" = "Version @\n";
 

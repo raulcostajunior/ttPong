@@ -140,7 +140,8 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         } else {
             let dateFormatter = DateFormatter()
             // TODO: internationalize the date format.
-            dateFormatter.dateFormat = "EEE, MMM d, yyyy - h:mm a"
+            dateFormatter.dateStyle = .medium
+            dateFormatter.timeStyle = .medium
             dateFormatter.timeZone = TimeZone.current
             let highScoreStamp =
                 dateFormatter.string(from: _scoreBoard.highScoreDate)
@@ -148,13 +149,13 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             if _scoreBoard.highScore > 0 {
                 messageBody =
                     String.localizedStringWithFormat(
-                        NSLocalizedString("Registered at '%@'.\n\nTo enable the Global Score Board ...",
+                        NSLocalizedString("Registered at '%@'.\n\nTo enable the Global Score Board",
                             comment: ""),
                         highScoreStamp
                     )
             } else {
                 messageBody =
-                    NSLocalizedString("\nTo enable the Global Score Board ...",
+                    NSLocalizedString("To enable the Global Score Board",
                                       comment: "")
             }
             let alert =
