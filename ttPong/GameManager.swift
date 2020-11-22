@@ -159,7 +159,10 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             }
             let alert =
                 UIAlertController(
-                    title: "High Score: \(_scoreBoard.highScore) points",
+                    title: String.localizedStringWithFormat(
+                        NSLocalizedString("High Score: %d points", comment: ""),
+                        _scoreBoard.highScore
+                    ),
                     message: messageBody,
                     preferredStyle: .alert)
             alert.addAction(

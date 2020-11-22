@@ -1,7 +1,7 @@
 /* GameManager.swift */
 "About ttPong" = "About ttPong";
 "Author: Raul Costa Junior, 2020.\n\n" = "Author: Raul Costa Junior, 2020.\n\n";
-"High Score: @ points" = "High Score: @ points";
+"High Score: %d points" = "High Score: %d points";
 "OK" = "OK";
 "Please consider writing a review." = "Please consider writing a review.";
 "Registered at '@'.\n\nTo enable the Global Score Board ..." = "Registered at '@'.\n\nTo enable the Global Score Board, please sign in to GameCenter in  Settings > GameCenter.";
