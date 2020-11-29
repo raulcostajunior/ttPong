@@ -1,0 +1,39 @@
+/* GameManager.swift */
+"About ttPong" = "Über ttPong";
+"Author: Raul Costa Junior, 2020.\n\n" = "Autor: Raul Costa Junior, 2020.\n\n";
+"High Score: %d points" = "Rekord: %d Punkte";
+"OK" = "OK";
+"Please consider writing a review." = "Bitte schreiben Sie eine Rezension.";
+"Registered at '%@'.\n\nTo enable the Global Score Board" = "Am '%@'.\n\nTo enable the Global Score Board, please sign in to GameCenter in  Settings > GameCenter.";
+"To enable the Global Score Board" = "\nTo enable the Global Score Board, please sign in to GameCenter in Settings > GameCenter.";
+"Write a review" = "Eine Rezension schreiben";
+"Version @\n" = "Version @\n";
+
+/* CourtScene.swift */
+"Game aborted" = "Spiel abgebrochen";
+"Hope to have you back soon !" = "Kommen Sie bald wieder !";
+"Let's Play !" = "Lass uns spielen !";
+"To start a new match," = "Halten Sie zu Beginn";
+"touch and hold both pads." = "beide Pads.";
+"A New Global Record !!" = "Ein neuer Weltrekord !!";
+"A New Local Record !!" = "Ein neuer lokaler Rekord !!";
+"Game aborted, but congrats !" = "Spiel abgebrochen, aber Glückwunsch !";
+"Well done !!!" = "Gut gemacht !!!";
+"Game Over !" = "Spiel beendet !";
+"Go ahead and play again !!" = "Lasst uns noch einmal spielen !!";
+"Game Paused" = "Spiel pausiert";
+"To resume, touch and hold both pads." = "Um fortzufahren, halten Sie beide Pads.";
+"To abort, touch anywhere with 3 fingers." = "Zum Abbrechen berühren Sie den Bildschirm mit 3 Fingern.";
+"Get ready to play !" = "Machen Sie sich bereit !";
+"Releasing any pad pauses the game." = "Freigeben eines beliebigen Blocks, um das Spiel zu pausieren.";
+"You have %d discs left !" = "Weitere %d Platten !";
+"Make the most of your last disc !" ="Machen Sie das Beste aus Ihrer letzten Platte !";
+"Good luck !!" = "Viel Glück !!";
+"Hold both pads to launch a new disc." = "Halten Sie beide Pads zum Starten einer neuen Platte.";
+"SCORE - %@" = "PUNKTE - %@";
+"HIGH - %@" = "REKORD - %@";
+"LAST DISC" = "LETZTE PLATTE";
+"DISCS - %d" = "PLATTEN - %d";
+"SCORE - 99999" = "PUNKTE - 99999";
+
+

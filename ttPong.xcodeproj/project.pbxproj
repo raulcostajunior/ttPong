@@ -54,6 +54,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CB01B7C52573F96300B5293B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
+		CB01B7C62573F96300B5293B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		CB01B7C72573F96300B5293B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CB2C0960249F66C5005DD7C9 /* Phosphate.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = Phosphate.ttc; sourceTree = "<group>"; };
 		CB33F8062529FDDD00522045 /* DiscGone.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = DiscGone.wav; sourceTree = "<group>"; };
 		CB33F80B252A004E00522045 /* NewRecord.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = NewRecord.wav; sourceTree = "<group>"; };
@@ -316,6 +319,7 @@
 				en,
 				Base,
 				"pt-BR",
+				de,
 			);
 			mainGroup = CBBF94CE244AE65000789DE2;
 			productRefGroup = CBBF94D8244AE65000789DE2 /* Products */;
@@ -422,6 +426,7 @@
 			children = (
 				CB4E5D96256A6F0B004CC416 /* en */,
 				CB4E5DA0256A6F6A004CC416 /* pt-BR */,
+				CB01B7C72573F96300B5293B /* de */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -431,6 +436,7 @@
 			children = (
 				CBBF94E5244AE65000789DE2 /* Base */,
 				CB4E5D9E256A6F6A004CC416 /* pt-BR */,
+				CB01B7C52573F96300B5293B /* de */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -440,6 +446,7 @@
 			children = (
 				CBBF94EA244AE65100789DE2 /* Base */,
 				CB4E5D9F256A6F6A004CC416 /* pt-BR */,
+				CB01B7C62573F96300B5293B /* de */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
