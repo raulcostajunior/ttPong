@@ -1,5 +1,5 @@
 # ttPong
-ttPong, **t**wo **t**humbs **Pong**, is a revisit to the traditional Pong game for mobile
+ttPong, **T**wo **T**humbs **Pong**, is a revisit to the traditional Pong game for mobile
 phones. The basic idea is to be your own "opponent" and to win by hitting the
 disc (ball) as many times as you can. 
 
