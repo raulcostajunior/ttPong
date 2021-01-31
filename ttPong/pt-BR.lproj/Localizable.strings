@@ -1,11 +1,10 @@
 /* GameManager.swift */
 "About ttPong" = "Sobre ttPong";
 "Author: Raul Costa Junior, 2020.\n\n" = "Autor: Raul Costa Junior, 2020.\n\n";
-"High Score: %d points" = "Recorde: %d pontos";
+"Score Board Disabled" = "Placar Desabilitado";
 "OK" = "OK";
 "Please consider writing a review." = "Por favor avalie o ttPong.";
-"Registered at '%@'.\n\nTo enable the Global Score Board" = "Em '%@'.\n\nPara habilitar o Placar Global, faça login no GameCenter em Ajustes > GameCenter.";
-"To enable the Global Score Board" = "\nPara ver o Placar Global, logue-se no Gamecenter em Ajustes > GameCenter.";
+"To enable the Score Board" = "\nPara habilitar o Placar, logue-se no Gamecenter em Ajustes > GameCenter.";
 "Write a review" = "Avaliar o ttPong";
 "Version %@\n" = "Versão %@\n";
 
@@ -32,11 +31,7 @@
 "Hold both pads to launch a new disc." = "Segure ambos os anteparos para lançar o disco.";
 "SCORE - %@" = "PLACAR - %@";
 "HIGH - %@" = "RECORDE - %@";
+"GLOBAL HIGH - %@" = "RECORDE GLOBAL - %@";
 "LAST DISC" = "ÚLTIMO DISCO";
 "DISCS - %d" = "DISCOS - %d";
 "SCORE - 99999" = "RECORDE - 99999";
-
-
-
-
-

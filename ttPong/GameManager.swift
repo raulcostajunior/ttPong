@@ -26,19 +26,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
 
     override private init() {
         _soundMuted = UserDefaults.standard.bool(forKey: "SoundMuted")
-        // For now, the score board is initialized with the locally persisted
-        // (and anonymous) high-score. After the connection to GameCenter is
-        // established and a local player is known, the global high-score will
-        // be retrieved. From there on, the high-score will always be updated
-        // from GameCenter whenever it is possible.
-        _scoreBoard =
-            ScoreBoard(
-                highScore:
-                    Int64(UserDefaults.standard.integer(forKey: "HighScore")),
-                setAt:
-                    UserDefaults.standard.object(forKey: "HighScoreDate") != nil ?
-                    UserDefaults.standard.object(forKey: "HighScoreDate") as! Date :
-                    Date())
+        _scoreBoard = ScoreBoard()
     }
 
 
@@ -76,7 +64,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     
     func pickUpDisc() {
         guard _availableDiscs > 0 else {
-            print("@pickUpDisc -> will return false")
+            print("@pickUpDisc -> there's no disc to be picked up - check the logic!")
             return
         }
         _availableDiscs -= 1
@@ -105,11 +93,6 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     }
     
     func startNewGame() {
-        guard let currentScene = _currentScene,
-                  currentScene is CourtScene else {
-                    print("Error: the current scene is expected to be of type 'CourtScene'")
-                    return
-        }
         _availableDiscs = GameManager.TOTAL_DISCS;
         _scoreBoard.resetScore()
     }
@@ -122,10 +105,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             if #available(iOS 14.0, *) {
                 // For iOS 14 or later, the GameCenter view controller allows
                 // specifying the player scope.
-                vc = GKGameCenterViewController(
-                    leaderboardID: GameManager.LEADER_BOARD_ID,
-                    playerScope: .global,
-                    timeScope: .allTime)
+                vc = GKGameCenterViewController(state: .leaderboards)
             } else {
                 vc = GKGameCenterViewController()
                 vc.leaderboardIdentifier = GameManager.LEADER_BOARD_ID
@@ -138,33 +118,10 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                                animated: true, completion: nil)
             }
         } else {
-            let dateFormatter = DateFormatter()
-            // TODO: internationalize the date format.
-            dateFormatter.dateStyle = .medium
-            dateFormatter.timeStyle = .medium
-            dateFormatter.timeZone = TimeZone.current
-            let highScoreStamp =
-                dateFormatter.string(from: _scoreBoard.highScoreDate)
-            var messageBody: String
-            if _scoreBoard.highScore > 0 {
-                messageBody =
-                    String.localizedStringWithFormat(
-                        NSLocalizedString("Registered at '%@'.\n\nTo enable the Global Score Board",
-                            comment: ""),
-                        highScoreStamp
-                    )
-            } else {
-                messageBody =
-                    NSLocalizedString("To enable the Global Score Board",
-                                      comment: "")
-            }
             let alert =
                 UIAlertController(
-                    title: String.localizedStringWithFormat(
-                        NSLocalizedString("High Score: %d points", comment: ""),
-                        _scoreBoard.highScore
-                    ),
-                    message: messageBody,
+                    title: NSLocalizedString("Score Board Disabled", comment: ""),
+                    message: NSLocalizedString("To enable the Score Board", comment: ""),
                     preferredStyle: .alert)
             alert.addAction(
                 UIAlertAction(title: "OK", style: .default, handler: nil))
@@ -243,7 +200,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                     self.startNewGame()
                 }
                 self._previousPlayerID = self._localPlayer.playerID
-                self.updateHighScoreFromGameCenter()
+                self.updateHighScoresFromGameCenter()
             } else {
                 //game center is disabled on the device
                 self._gameCenterSessionActive = false
@@ -252,63 +209,101 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         }
     }
 
-    func updateHighScoreFromGameCenter() {
+    func updateHighScoresFromGameCenter() {
         guard _gameCenterSessionActive else { return }
-
-        let gkLeaderboard = GKLeaderboard()
-        gkLeaderboard.identifier = GameManager.LEADER_BOARD_ID
-        gkLeaderboard.timeScope = .allTime
-        gkLeaderboard.playerScope = .global
-        gkLeaderboard.range = NSMakeRange(1, 3)
-
-        // Load the scores - it is important that the High-Score update happens
-        // in the UI thread so it is synchronized with any changes coming from
-        // the game loop.
-        gkLeaderboard.loadScores(
-            completionHandler: { (boardScores, error) -> Void in
-                if let scores = boardScores, error == nil {
-                    if (scores.count) > 0 {
-                        DispatchQueue.main.async {
-                            self._scoreBoard.highScoreFromGlobal(
-                                scores[0].value,
-                                setAt: scores[0].date)
-                            if self._scoreBoard.highScore == scores[0].value {
-                                // The high score has been updated; update the
-                                // local fall-back persistence.
-                                UserDefaults.standard.set(
-                                    self._scoreBoard.highScore,
-                                    forKey: "HighScore")
-                                UserDefaults.standard.set(
-                                    self._scoreBoard.highScoreDate,
-                                    forKey: "HighScoreDate")
-                            }
-                        }
+        
+        if #available(iOS 14.0, *) {
+            self.updateHighScoresFromGameCenter_14_newer()
+        } else {
+            self.updateHighScoresFromGameCenter_older_14()
+        }
+    }
+    
+    func updateHighScoresFromGameCenter_older_14() {
+        var globalHighScore: Int64 = 0
+        var playerHighScore: Int64 = 0
+        let globalLeaderBoard = GKLeaderboard()
+        globalLeaderBoard.identifier = GameManager.LEADER_BOARD_ID
+        globalLeaderBoard.timeScope = .allTime
+        globalLeaderBoard.playerScope = .global
+        globalLeaderBoard.loadScores(
+            completionHandler: { [weak self] (boardScores, error) -> Void in
+                 if let scores = boardScores, error == nil {
+                     if (scores.count) > 0 {
+                         globalHighScore = scores[0].value
+                        playerHighScore = scores[0].value
+                     }
+                     // highScoresGroup.leave()
+                    DispatchQueue.main.async {
+                        self?._scoreBoard.setHighScores(playerHighScore: playerHighScore, globalHighScore: globalHighScore)
                     }
+                 }
+             })
+         
+// Loads the player high score.
+//         var playerLeaderBoard: GKLeaderboard!
+//         playerLeaderBoard = GKLeaderboard(players:[GKLocalPlayer.local])
+//         playerLeaderBoard.timeScope = .allTime
+//         playerLeaderBoard.playerScope = .friendsOnly
+//         playerLeaderBoard.range = NSMakeRange(1, 2)
+//         highScoresGroup.enter()
+//         globalLeaderBoard.loadScores(
+//             completionHandler: { (boardScores, error) -> Void in
+//                 if let scores = boardScores, error == nil {
+//                     if (scores.count) > 0 {
+//                         playerHighScore = scores[0].value
+//                     }
+//                     highScoresGroup.leave()
+//                 }
+//             })
+//
+//         highScoresGroup.notify(queue: .main) {
+//             self._scoreBoard.setHighScores(playerHighScore: playerHighScore, globalHighScore: globalHighScore)
+//         }
+        
+    }
+    
+    
+    @available(iOS 14.0, *)
+    func updateHighScoresFromGameCenter_14_newer() {
+        var globalHighScore:Int64 = 0
+        var playerHighScore:Int64 = 0
+        
+        // Loads the LeaderBoard
+        var leaderBoard: GKLeaderboard?
+        // Loads the high score.
+        GKLeaderboard.loadLeaderboards(IDs: [GameManager.LEADER_BOARD_ID]) { [weak self] (leaderBoards, error) in
+            leaderBoard = leaderBoards?.first
+            leaderBoard?.loadEntries(for: .global, timeScope: .allTime, range: NSMakeRange(1,10)) { [weak self] (localPlayerEntry, entries, numOfPlayers, err) in
+                guard err == nil else { return }
+                if let lPlayerEntry = localPlayerEntry {
+                    playerHighScore = Int64(lPlayerEntry.score)
                 }
-            })
+                if let allPlayersEntries = entries, allPlayersEntries.count > 0 {
+                    globalHighScore = Int64(allPlayersEntries[0].score)
+                }
+                DispatchQueue.main.async {
+                    self?._scoreBoard.setHighScores(playerHighScore: playerHighScore, globalHighScore: globalHighScore)
+                }
+            }
+        }
     }
 
     func registerNewRecord() {
-        guard _scoreBoard.isNewRecord else {
+        guard (_scoreBoard.isNewGlobalRecord || _scoreBoard.isNewPlayerRecord) else {
             print("Error: there's no new record to register.")
             return
         }
         if gameCenterSessionActive {
             let reportedScore =
                 GKScore(leaderboardIdentifier: GameManager.LEADER_BOARD_ID)
-            reportedScore.value = _scoreBoard.highScore
+            reportedScore.value = _scoreBoard.playerHighScore
             GKScore.report([reportedScore]) { (error) in
                 if error != nil {
                     print(error!.localizedDescription)
                 }
             }
         }
-        // Always registers high score locally as a fall-back for when no
-        // GameCenter integration is available.
-        UserDefaults.standard.set(_scoreBoard.highScore,
-                                  forKey: "HighScore")
-        UserDefaults.standard.set(_scoreBoard.highScoreDate,
-                                  forKey: "HighScoreDate")
     }
 
 

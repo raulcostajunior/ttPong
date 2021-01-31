@@ -41,6 +41,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     private var _scoreDisp: SKLabelNode!
     private var _highScoreDisp: SKLabelNode!
+    private var _globalHighScore: SKLabelNode!
     private var _discsDisp: SKLabelNode!
     private var _msgDisp1: SKLabelNode!
     private var _msgDisp2: SKLabelNode!
@@ -215,6 +216,15 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _highScoreDisp.verticalAlignmentMode = .top
         self.addChild(_highScoreDisp)
         
+        _globalHighScore = SKLabelNode(fontNamed: "Phosphate Solid")
+        _globalHighScore.fontSize = 19
+        _globalHighScore.position =
+            CGPoint(x: size.width - scoreMaxWidth*2.0 ,
+                    y: CourtScene.TOP_BOTTOM_INSET + _soundOption.size.height/1.6)
+        _globalHighScore.horizontalAlignmentMode = .left
+        _globalHighScore.verticalAlignmentMode = .top
+        self.addChild(_globalHighScore)
+        
         _discsDisp = SKLabelNode(fontNamed: "Phosphate Solid")
         _discsDisp.fontSize = 19
         _discsDisp.position = CGPoint(x: size.width/4,
@@ -349,7 +359,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _disc.reset()
         state = .WaitToStartMatch
         playSoundFx(_gameStartEffect)
-        GameManager.shared.updateHighScoreFromGameCenter()
         GameManager.shared.startNewGame()
     }
     
@@ -360,6 +369,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
+            _globalHighScore.isHidden = false
             _msgTitle.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
@@ -390,6 +400,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
+            _globalHighScore.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgTitle.isHidden = true
@@ -403,6 +414,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
+            _globalHighScore.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgTitle.isHidden = true
@@ -414,6 +426,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
              _highScoreDisp.isHidden = false
+            _globalHighScore.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgTitle.isHidden = true
@@ -438,6 +451,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
+            _globalHighScore.isHidden = false
             _msgDisp1.isHidden = true
             _msgDisp2.isHidden = true
             _msgTitle.isHidden = true
@@ -461,6 +475,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 _scoreDisp.fontColor = UIColor.darkGray
                 _highScoreDisp.isPaused = true
                 _highScoreDisp.fontColor = UIColor.darkGray
+                _globalHighScore.isPaused = true
+                _globalHighScore.fontColor = UIColor.darkGray
                 _disc.pause()
             }
         case .GamePaused:
@@ -468,6 +484,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
+            _globalHighScore.isHidden = false
             _msgTitle.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
@@ -487,6 +504,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 _scoreDisp.fontColor = UIColor.white
                 _highScoreDisp.isPaused = false
                 _highScoreDisp.fontColor = UIColor.white
+                _globalHighScore.isPaused = false
+                _globalHighScore.fontColor = UIColor.white
                 _disc.resume()
             }
         case .MatchFinished, .MatchAborted,
@@ -495,6 +514,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
+            _globalHighScore.isHidden = false
             _msgTitle.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
@@ -513,7 +533,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             self.alpha = 0.0
             let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
             self.run(fadeInScene)
-            if GameManager.shared.scoreBoard.isNewRecord {
+            if (GameManager.shared.scoreBoard.isNewGlobalRecord || GameManager.shared.scoreBoard.isNewPlayerRecord) {
                 GameManager.shared.registerNewRecord()
                 playSoundFx(_newRecordEffect)
                 state = .MatchAbortedNewRecord
@@ -527,6 +547,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             self._discsDisp.fontColor = UIColor.white
             self._scoreDisp.fontColor = UIColor.white
             self._highScoreDisp.fontColor = UIColor.white
+            self._globalHighScore.fontColor = UIColor.white
             
             Timer.scheduledTimer(withTimeInterval: 3.0,
                                  repeats: false,
@@ -589,7 +610,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     })
                 } else {
                     // Lost rally for the last disc.
-                    if GameManager.shared.scoreBoard.isNewRecord {
+                    if GameManager.shared.scoreBoard.isNewPlayerRecord {
                         state = .MatchFinishedNewRecord
                         GameManager.shared.registerNewRecord()
                     } else {
@@ -604,7 +625,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                         block: {timer in
                             DispatchQueue.main.async {
                                 self.playSoundFx(
-                                    GameManager.shared.scoreBoard.isNewRecord ?
+                                    GameManager.shared.scoreBoard.isNewPlayerRecord ?
                                         self._newRecordEffect :
                                         self._gameOverEffect
                                 )
@@ -635,6 +656,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     override func didSimulatePhysics() {
         _scoreDisp.text = scoreText()
         _highScoreDisp.text = highScoreText()
+        _globalHighScore.text = globalHighScoreText()
         _discsDisp.text = discsText()
     }
     
@@ -716,9 +738,18 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     private func highScoreText() -> String {
         let fmtHighScore = String(format:"%04d",
-                                  GameManager.shared.scoreBoard.highScore)
+                                  GameManager.shared.scoreBoard.playerHighScore)
         return String.localizedStringWithFormat(
             NSLocalizedString("HIGH - %@", comment: ""),
+            fmtHighScore
+        )
+    }
+    
+    private func globalHighScoreText() -> String {
+        let fmtHighScore = String(format:"%04d",
+                                  GameManager.shared.scoreBoard.globalHighScore)
+        return String.localizedStringWithFormat(
+            NSLocalizedString("GLOBAL HIGH - %@", comment: ""),
             fmtHighScore
         )
     }

@@ -9,60 +9,50 @@
 import Foundation
 
 /**
- Game score board.
-
- For now, this does only contains the player's self assigned
- alias - just like old school arcade machines.
+ Game score board - keeps track of current game score, current player's record and global record.
  */
     
 class ScoreBoard {
     
     private var _score: Int64 = 0
-    private var _highScore: Int64 = 0
-    private var _highScoreDate: Date
-    private var _newRecord = false
+    private var _playerHighScore: Int64 = 0
+    private var _globalHighScore: Int64 = 0
+    private var _newPlayerRecord = false
+    private var _newGlobalRecord = false
     
     var score:Int64 { return _score }
-    var highScore:Int64 { return _highScore }
-    var highScoreDate: Date { return _highScoreDate }
-    var isNewRecord:Bool { return _newRecord }
+    var playerHighScore:Int64 { return _playerHighScore }
+    var globalHighScore: Int64 { return _globalHighScore }
+    var isNewPlayerRecord: Bool { return _newPlayerRecord }
+    var isNewGlobalRecord: Bool { return _newGlobalRecord }
     
-    init(highScore: Int64, setAt: Date) {
-        _score = 0
-        _highScore = highScore
-        _highScoreDate = setAt
-        _newRecord = false
+    func setHighScores(playerHighScore: Int64, globalHighScore: Int64) {
+        guard globalHighScore >= playerHighScore else {
+            print("@ScoreBoard.setHighScores: playerHighScore '\(playerHighScore) cannot be greater than globalHighScore '\(globalHighScore)'!")
+            return
+        }
+        _playerHighScore = playerHighScore
+        _globalHighScore = globalHighScore
+        _newPlayerRecord = _score > _playerHighScore
+        _newGlobalRecord = _score > _globalHighScore
     }
     
     func increaseScore(by increment:Int64) {
         _score += increment
-        if _score > _highScore {
-            _newRecord = true
-            _highScore = _score
-            _highScoreDate = Date()
+        if _score > _playerHighScore {
+            _newPlayerRecord = true
+            _playerHighScore = _score
+        }
+        if _score > _globalHighScore {
+            _newGlobalRecord = true
+            _globalHighScore = _score
         }
     }
     
     func resetScore() {
         _score = 0
-        _newRecord = false
-    }
-
-    func highScoreFromGlobal(_ globalRecord: Int64, setAt: Date) {
-        if globalRecord > _score {
-            // The global record is higher than the current score; even if
-            // the current local High-Score is higher, it will be set because
-            // we can't take any chance to allow the Global score to be
-            // tampered from the unsafelly persisted local high score. If the
-            // current score is higher than the global record, the user is on
-            // his/her way to register a new record globally.
-            _highScore = globalRecord
-            _highScoreDate = setAt
-            if _highScore >= _score {
-                _newRecord = false
-            }
-        }
+        _newPlayerRecord = false
+        _newGlobalRecord = false
     }
     
 }
-

@@ -1,11 +1,10 @@
 /* GameManager.swift */
 "About ttPong" = "Über ttPong";
 "Author: Raul Costa Junior, 2020.\n\n" = "Autor: Raul Costa Junior, 2020.\n\n";
-"High Score: %d points" = "Rekord: %d Punkte";
+"Score Board Disabled" = "Punktetafel deaktiviert";
 "OK" = "OK";
 "Please consider writing a review." = "Bitte schreiben Sie eine Rezension.";
-"Registered at '%@'.\n\nTo enable the Global Score Board" = "Am '%@'.\n\nUm die Globale Punktetafel zu aktivieren, melden Sie sich bitte im GameCenter unter Einstellungen > GameCenter an.";
-"To enable the Global Score Board" = "\nUm die Globale Punktetafel zu aktivieren, melden Sie sich bitte im GameCenter unter Einstellungen > GameCenter an.";
+"To enable the Score Board" = "\nUm die Punktetafel zu aktivieren, melden Sie sich bitte im GameCenter unter Einstellungen > GameCenter an.";
 "Write a review" = "Eine Rezension schreiben";
 "Version @\n" = "Version @\n";
 
@@ -32,6 +31,7 @@
 "Hold both pads to launch a new disc." = "Halten Sie beide Pads zum Starten einer neuen Platte.";
 "SCORE - %@" = "PUNKTE - %@";
 "HIGH - %@" = "REKORD - %@";
+"GLOBAL HIGH - %@" = "WELT REKORD - %@";
 "LAST DISC" = "LETZTE PLATTE";
 "DISCS - %d" = "PLATTEN - %d";
 "SCORE - 99999" = "PUNKTE - 99999";
