@@ -15,18 +15,18 @@ import Foundation
 class ScoreBoard {
     
     private var _score: Int64 = 0
+    // Negative values are used to indicate that high scores and player rank haven't being initialized
+    // yet. Those values depend on responses for network requests.
     private var _playerHighScore: Int64 = -1
     private var _globalHighScore: Int64 = -1
     private var _playerRank: Int64 = -1
     private var _newPlayerRecord = false
-    private var _newGlobalRecord = false
     
     var score:Int64 { return _score }
     var playerHighScore:Int64 { return _playerHighScore }
     var globalHighScore: Int64 { return _globalHighScore }
     var playerRank: Int64 { return _playerRank }
     var isNewPlayerRecord: Bool { return _newPlayerRecord }
-    var isNewGlobalRecord: Bool { return _newGlobalRecord }
     
     func setHighScores(playerHighScore: Int64, globalHighScore: Int64, playerRank: Int64) {
         guard globalHighScore >= playerHighScore else {
@@ -37,7 +37,6 @@ class ScoreBoard {
         _playerRank = playerRank
         _globalHighScore = globalHighScore
         _newPlayerRecord = _score > _playerHighScore
-        _newGlobalRecord = _score > _globalHighScore
     }
       
     func increaseScore(by increment:Int64) {
@@ -46,16 +45,11 @@ class ScoreBoard {
             _newPlayerRecord = true
             _playerHighScore = _score
         }
-        if _score > _globalHighScore {
-            _newGlobalRecord = true
-            _globalHighScore = _score
-        }
     }
     
     func resetScore() {
         _score = 0
         _newPlayerRecord = false
-        _newGlobalRecord = false
     }
     
 }

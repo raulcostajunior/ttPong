@@ -294,7 +294,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     }
 
     func registerNewRecord() {
-        guard (_scoreBoard.isNewGlobalRecord || _scoreBoard.isNewPlayerRecord) else {
+        guard (_scoreBoard.isNewPlayerRecord) else {
             print("Error: there's no new record to register.")
             return
         }

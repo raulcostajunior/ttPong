@@ -533,8 +533,12 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             self.alpha = 0.0
             let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
             self.run(fadeInScene)
-            if (GameManager.shared.scoreBoard.isNewGlobalRecord || GameManager.shared.scoreBoard.isNewPlayerRecord) {
+            if (GameManager.shared.scoreBoard.isNewPlayerRecord) {
                 GameManager.shared.registerNewRecord()
+                // TODO: refresh the high score information from the Game Center. If it is a new
+                //       record for the player of Global, congratulate the player - the transition
+                //       to the MatchFinishedNewRecord should only be done after the refreshed
+                //       high scores confirm that a new record has been achieved.
                 playSoundFx(_newRecordEffect)
                 state = .MatchAbortedNewRecord
             }
@@ -613,6 +617,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     if GameManager.shared.scoreBoard.isNewPlayerRecord {
                         state = .MatchFinishedNewRecord
                         GameManager.shared.registerNewRecord()
+                        // TODO: refresh the high score information from the Game Center. If it is a new
+                        //       record for the player of Global, congratulate the player - the transition
+                        //       to the MatchFinishedNewRecord should only be done after the refreshed
+                        //       high scores confirm that a new record has been achieved.
                     } else {
                         state = .MatchFinished
                     }
