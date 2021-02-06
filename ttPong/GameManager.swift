@@ -28,8 +28,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         _soundMuted = UserDefaults.standard.bool(forKey: "SoundMuted")
         _scoreBoard = ScoreBoard()
     }
-
-
+    
     // MARK: - Options and Score Management
 
     private static let TOTAL_DISCS = 4
@@ -220,54 +219,58 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     }
     
     func updateHighScoresFromGameCenter_older_14() {
-        var globalHighScore: Int64 = 0
-        var playerHighScore: Int64 = 0
+        var globalHighScore: Int64 = -1
+        var playerHighScore: Int64 = -1
+        var playerRank: Int64 = -1
+        
+        // Loads the global high score
         let globalLeaderBoard = GKLeaderboard()
+        let highScoresGroup = DispatchGroup()
         globalLeaderBoard.identifier = GameManager.LEADER_BOARD_ID
         globalLeaderBoard.timeScope = .allTime
         globalLeaderBoard.playerScope = .global
+        globalLeaderBoard.range = NSMakeRange(1,1)
+        highScoresGroup.enter()
         globalLeaderBoard.loadScores(
-            completionHandler: { [weak self] (boardScores, error) -> Void in
+            completionHandler: { (boardScores, error) -> Void in
                  if let scores = boardScores, error == nil {
                      if (scores.count) > 0 {
                          globalHighScore = scores[0].value
-                        playerHighScore = scores[0].value
                      }
-                     // highScoresGroup.leave()
-                    DispatchQueue.main.async {
-                        self?._scoreBoard.setHighScores(playerHighScore: playerHighScore, globalHighScore: globalHighScore)
-                    }
+                    highScoresGroup.leave()
                  }
-             })
+        })
          
-// Loads the player high score.
-//         var playerLeaderBoard: GKLeaderboard!
-//         playerLeaderBoard = GKLeaderboard(players:[GKLocalPlayer.local])
-//         playerLeaderBoard.timeScope = .allTime
-//         playerLeaderBoard.playerScope = .friendsOnly
-//         playerLeaderBoard.range = NSMakeRange(1, 2)
-//         highScoresGroup.enter()
-//         globalLeaderBoard.loadScores(
-//             completionHandler: { (boardScores, error) -> Void in
-//                 if let scores = boardScores, error == nil {
-//                     if (scores.count) > 0 {
-//                         playerHighScore = scores[0].value
-//                     }
-//                     highScoresGroup.leave()
-//                 }
-//             })
-//
-//         highScoresGroup.notify(queue: .main) {
-//             self._scoreBoard.setHighScores(playerHighScore: playerHighScore, globalHighScore: globalHighScore)
-//         }
-        
+        // Loads the player high score and rank.
+        let playerLeaderBoard = GKLeaderboard(players: [self._localPlayer])
+        playerLeaderBoard.identifier = GameManager.LEADER_BOARD_ID
+        playerLeaderBoard.timeScope = .allTime
+        playerLeaderBoard.range = NSMakeRange(1, 1)
+        highScoresGroup.enter()
+        playerLeaderBoard.loadScores(
+            completionHandler: { [weak self] (boardScores, error) -> Void in
+               if let scores = boardScores, error == nil {
+                   for score in scores {
+                       if score.player.playerID == self?._localPlayer.playerID {
+                           playerHighScore = score.value
+                           playerRank = Int64(score.rank)
+                           break;
+                       }
+                   }
+               }
+               highScoresGroup.leave()
+        })
+
+        highScoresGroup.notify(queue: .main) {
+            self._scoreBoard.setHighScores(playerHighScore: playerHighScore, globalHighScore: globalHighScore, playerRank: playerRank)
+        }
     }
-    
     
     @available(iOS 14.0, *)
     func updateHighScoresFromGameCenter_14_newer() {
-        var globalHighScore:Int64 = 0
-        var playerHighScore:Int64 = 0
+        var globalHighScore:Int64 = -1
+        var playerHighScore:Int64 = -1
+        var playerRank: Int64 = -1
         
         // Loads the LeaderBoard
         var leaderBoard: GKLeaderboard?
@@ -278,12 +281,13 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 guard err == nil else { return }
                 if let lPlayerEntry = localPlayerEntry {
                     playerHighScore = Int64(lPlayerEntry.score)
+                    playerRank = Int64(lPlayerEntry.rank)
                 }
                 if let allPlayersEntries = entries, allPlayersEntries.count > 0 {
                     globalHighScore = Int64(allPlayersEntries[0].score)
                 }
                 DispatchQueue.main.async {
-                    self?._scoreBoard.setHighScores(playerHighScore: playerHighScore, globalHighScore: globalHighScore)
+                    self?._scoreBoard.setHighScores(playerHighScore: playerHighScore, globalHighScore: globalHighScore, playerRank: playerRank)
                 }
             }
         }
