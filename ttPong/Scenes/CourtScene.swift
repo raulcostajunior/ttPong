@@ -12,6 +12,8 @@ import GameplayKit
 
 class CourtScene: SKScene, SKPhysicsContactDelegate {
     
+    // TOOO: Set visibility per state in a more compact way; too much redundant code in the updateState at this point
+    // TODO: Add state for new world record with the corresponding congratulation effects (v 2.0)
     enum CourtState {
         case WaitToStartMatch
         case LaunchingDisk
@@ -41,10 +43,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     
     private var _scoreDisp: SKLabelNode!
     private var _highScoreDisp: SKLabelNode!
-    private var _globalHighScore: SKLabelNode!
     private var _discsDisp: SKLabelNode!
     private var _msgDisp1: SKLabelNode!
     private var _msgDisp2: SKLabelNode!
+    private var _msgHighScore: SKLabelNode!
     private var _msgTitle: SKLabelNode!
     
     private var _discAppearance: SKEmitterNode!
@@ -178,8 +180,17 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _msgDisp2.verticalAlignmentMode = .center
         self.addChild(_msgDisp2)
         
+        _msgHighScore = SKLabelNode(fontNamed: "Phosphate Solid")
+        _msgHighScore.fontSize = 19
+        _msgHighScore.fontColor = UIColor.white
+        _msgHighScore.position = CGPoint(x: size.width/2,
+                                         y: size.height/2 - _msgDisp2.fontSize*2)
+        _msgHighScore.horizontalAlignmentMode = .center
+        _msgHighScore.verticalAlignmentMode = .center
+        self.addChild(_msgHighScore)
+        
         _msgTitle = SKLabelNode(fontNamed: "Phosphate Solid")
-        _msgTitle.fontSize = 22
+        _msgTitle.fontSize = 24
         _msgTitle.fontColor = UIColor.white
         _msgTitle.position = CGPoint(x: size.width/2,
                                      y: size.height/2 + _msgDisp1.fontSize*2 + 12)
@@ -215,16 +226,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _highScoreDisp.horizontalAlignmentMode = .left
         _highScoreDisp.verticalAlignmentMode = .top
         self.addChild(_highScoreDisp)
-        
-        _globalHighScore = SKLabelNode(fontNamed: "Phosphate Solid")
-        _globalHighScore.fontSize = 19
-        _globalHighScore.position =
-            CGPoint(x: size.width - scoreMaxWidth*2.0 ,
-                    y: CourtScene.TOP_BOTTOM_INSET + _soundOption.size.height/1.6)
-        _globalHighScore.horizontalAlignmentMode = .left
-        _globalHighScore.verticalAlignmentMode = .top
-        self.addChild(_globalHighScore)
-        
+               
         _discsDisp = SKLabelNode(fontNamed: "Phosphate Solid")
         _discsDisp.fontSize = 19
         _discsDisp.position = CGPoint(x: size.width/4,
@@ -368,11 +370,11 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _disc.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
-            _highScoreDisp.isHidden = false
-            _globalHighScore.isHidden = false
+            _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
             _msgTitle.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
+            _msgHighScore.isHidden = GameManager.shared.scoreBoard.globalHighScore < 0
             _soundOption.isHidden = false
             _leaderBoard.isHidden = false
             _gameInfo.isHidden = false
@@ -399,10 +401,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _disc.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
-            _highScoreDisp.isHidden = false
-            _globalHighScore.isHidden = false
+            _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
+            _msgHighScore.isHidden = true
             _msgTitle.isHidden = true
             _soundOption.isHidden = true
             _leaderBoard.isHidden = true
@@ -413,10 +415,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _disc.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
-            _highScoreDisp.isHidden = false
-            _globalHighScore.isHidden = false
+            _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
+            _msgHighScore.isHidden = true
             _msgTitle.isHidden = true
             _soundOption.isHidden = true
             _leaderBoard.isHidden = true
@@ -426,9 +428,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
              _highScoreDisp.isHidden = false
-            _globalHighScore.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
+            _msgHighScore.isHidden = GameManager.shared.scoreBoard.globalHighScore < 0
             _msgTitle.isHidden = true
             _soundOption.isHidden = false
             _leaderBoard.isHidden = false
@@ -451,10 +453,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
-            _globalHighScore.isHidden = false
             _msgDisp1.isHidden = true
             _msgDisp2.isHidden = true
             _msgTitle.isHidden = true
+            _msgHighScore.isHidden = true
             _soundOption.isHidden = true
             _leaderBoard.isHidden = true
             _gameInfo.isHidden = true
@@ -475,8 +477,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 _scoreDisp.fontColor = UIColor.darkGray
                 _highScoreDisp.isPaused = true
                 _highScoreDisp.fontColor = UIColor.darkGray
-                _globalHighScore.isPaused = true
-                _globalHighScore.fontColor = UIColor.darkGray
                 _disc.pause()
             }
         case .GamePaused:
@@ -484,10 +484,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
-            _globalHighScore.isHidden = false
             _msgTitle.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
+            _msgHighScore.isHidden = true
             _soundOption.isHidden = false
             _leaderBoard.isHidden = false
             _gameInfo.isHidden = false
@@ -504,9 +504,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 _scoreDisp.fontColor = UIColor.white
                 _highScoreDisp.isPaused = false
                 _highScoreDisp.fontColor = UIColor.white
-                _globalHighScore.isPaused = false
-                _globalHighScore.fontColor = UIColor.white
-                _disc.resume()
+                 _disc.resume()
             }
         case .MatchFinished, .MatchAborted,
              .MatchFinishedNewRecord, .MatchAbortedNewRecord:
@@ -514,10 +512,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = false
-            _globalHighScore.isHidden = false
             _msgTitle.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
+            _msgHighScore.isHidden = true
             _soundOption.isHidden = false
             _leaderBoard.isHidden = false
             _gameInfo.isHidden = false
@@ -533,13 +531,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             self.alpha = 0.0
             let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
             self.run(fadeInScene)
-            if (GameManager.shared.scoreBoard.isNewPlayerRecord) {
+            if GameManager.shared.scoreBoard.isNewPlayerRecord {
                 GameManager.shared.registerNewRecord()
-                // TODO: refresh the high score information from the Game Center. If it is a new
-                //       record for the player of Global, congratulate the player - the transition
-                //       to the MatchFinishedNewRecord should only be done after the refreshed
-                //       high scores confirm that a new record has been achieved.
                 playSoundFx(_newRecordEffect)
+                GameManager.shared.updateHighScoresFromGameCenter()
                 state = .MatchAbortedNewRecord
             }
             else {
@@ -551,7 +546,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             self._discsDisp.fontColor = UIColor.white
             self._scoreDisp.fontColor = UIColor.white
             self._highScoreDisp.fontColor = UIColor.white
-            self._globalHighScore.fontColor = UIColor.white
             
             Timer.scheduledTimer(withTimeInterval: 3.0,
                                  repeats: false,
@@ -617,10 +611,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     if GameManager.shared.scoreBoard.isNewPlayerRecord {
                         state = .MatchFinishedNewRecord
                         GameManager.shared.registerNewRecord()
-                        // TODO: refresh the high score information from the Game Center. If it is a new
-                        //       record for the player of Global, congratulate the player - the transition
-                        //       to the MatchFinishedNewRecord should only be done after the refreshed
-                        //       high scores confirm that a new record has been achieved.
+                        GameManager.shared.updateHighScoresFromGameCenter()
                     } else {
                         state = .MatchFinished
                     }
@@ -650,8 +641,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                                 if self.state == .MatchFinished {
                                     self.gotoInitialState()
                                 } else if self.state == .MatchFinishedNewRecord {
-                                    // TODO: replace this with a transition to
-                                    // the new record scene.
                                     self.gotoInitialState()
                                 }
                             }
@@ -664,7 +653,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     override func didSimulatePhysics() {
         _scoreDisp.text = scoreText()
         _highScoreDisp.text = highScoreText()
-        _globalHighScore.text = globalHighScoreText()
+        _msgHighScore.text = globalHighScoreText()
         _discsDisp.text = discsText()
     }
     
@@ -754,11 +743,13 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     }
     
     private func globalHighScoreText() -> String {
+        guard !_msgHighScore.isHidden else { return "" }
         let fmtHighScore = String(format:"%04d",
                                   GameManager.shared.scoreBoard.globalHighScore)
+        let fmtRank = String("# \(GameManager.shared.scoreBoard.playerRank)")
         return String.localizedStringWithFormat(
             NSLocalizedString("GLOBAL HIGH - %@", comment: ""),
-            fmtHighScore
+            fmtHighScore, fmtRank
         )
     }
     
@@ -785,52 +776,32 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private func setMsgs() {
         switch _state {
         case .WaitToStartMatch:
-            _msgTitle.text =
-                NSLocalizedString("Let's Play !", comment: "")
-            _msgDisp1.text =
-                NSLocalizedString("To start a new match,", comment: "")
-            _msgDisp2.text =
-                NSLocalizedString("touch and hold both pads.", comment: "")
+            _msgTitle.text = NSLocalizedString("Let's Play !", comment: "")
+            _msgDisp1.text = NSLocalizedString("To start a new match,", comment: "")
+            _msgDisp2.text = NSLocalizedString("touch and hold both pads.", comment: "")
         case .MatchAborted:
-            _msgTitle.text =
-                NSLocalizedString("Game aborted", comment: "")
-            _msgDisp1.text =
-                NSLocalizedString("Hope to have you back soon !", comment: "")
+            _msgTitle.text = NSLocalizedString("Game aborted", comment: "")
+            _msgDisp1.text = NSLocalizedString("Hope to have you back soon !", comment: "")
             _msgDisp2.text = ""
         case .MatchAbortedNewRecord:
-            _msgTitle.text =
-                GameManager.shared.gameCenterSessionActive ?
-                NSLocalizedString("A New Global Record !!", comment: "") :
-                NSLocalizedString("A New Local Record !!", comment: "")
-            _msgDisp1.text =
-                NSLocalizedString("Game aborted, but congrats !", comment: "")
+            _msgTitle.text = NSLocalizedString("A New Record !!", comment: "")
+            _msgDisp1.text = NSLocalizedString("Game aborted, but congrats !", comment: "")
             _msgDisp2.text = ""
         case .MatchFinishedNewRecord:
-            _msgTitle.text =
-                GameManager.shared.gameCenterSessionActive ?
-                NSLocalizedString("A New Global Record !!", comment: "") :
-                NSLocalizedString("A New Local Record !!", comment: "")
-            _msgDisp1.text =
-                NSLocalizedString("Well done !!!", comment: "")
+            _msgTitle.text = NSLocalizedString("A New Record !!", comment: "")
+            _msgDisp1.text = NSLocalizedString("Well done !!!", comment: "")
             _msgDisp2.text = ""
         case .MatchFinished:
-            _msgTitle.text =
-                NSLocalizedString("Game Over !", comment: "")
-            _msgDisp1.text =
-                NSLocalizedString("Go ahead and play again !!", comment: "")
+            _msgTitle.text = NSLocalizedString("Game Over !", comment: "")
+            _msgDisp1.text = NSLocalizedString("Go ahead and play again !!", comment: "")
             _msgDisp2.text = ""
         case .GamePaused:
-            _msgTitle.text =
-                NSLocalizedString("Game Paused", comment: "")
-            _msgDisp1.text =
-                NSLocalizedString("To resume, touch and hold both pads.", comment: "")
-            _msgDisp2.text =
-                NSLocalizedString("To abort, touch anywhere with 3 fingers.", comment: "")
+            _msgTitle.text = NSLocalizedString("Game Paused", comment: "")
+            _msgDisp1.text = NSLocalizedString("To resume, touch and hold both pads.", comment: "")
+            _msgDisp2.text = NSLocalizedString("To abort, touch anywhere with 3 fingers.", comment: "")
         case .LaunchingDisk:
-            _msgDisp1.text =
-                NSLocalizedString("Get ready to play !", comment: "")
-            _msgDisp2.text =
-                NSLocalizedString("Releasing any pad pauses the game.", comment: "")
+            _msgDisp1.text = NSLocalizedString("Get ready to play !", comment: "")
+            _msgDisp2.text = NSLocalizedString("Releasing any pad pauses the game.", comment: "")
         case .LostDisc:
             var discTxt: String!
             let availDiscs = GameManager.shared.availableDiscs
@@ -846,13 +817,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             }
             // There's at least one rally left ...
             _msgDisp1.text = discTxt
-            _msgDisp2.text =
-                NSLocalizedString("Good luck !!", comment:"")
+            _msgDisp2.text = NSLocalizedString("Good luck !!", comment:"")
         case .WaitToStartNewRally:
-            _msgDisp1.text =
-                NSLocalizedString("Hold both pads to launch a new disc.", comment: "")
-            _msgDisp2.text =
-                NSLocalizedString("To abort, touch anywhere with 3 fingers.", comment: "")
+            _msgDisp1.text = NSLocalizedString("Hold both pads to launch a new disc.", comment: "")
+            _msgDisp2.text = NSLocalizedString("To abort, touch anywhere with 3 fingers.", comment: "")
         case .GameOngoing:
             _msgDisp1.text = ""
             _msgDisp2.text = ""

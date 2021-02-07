@@ -195,7 +195,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 if let previousPlayerID = self._previousPlayerID,
                     previousPlayerID != self._previousPlayerID {
                     // TODO: Present message stating that logged GameCenter
-                    // player changed and that game will be restarted.
+                    // player changed and that game will be restarted. (v 2.0)
                     self.startNewGame()
                 }
                 self._previousPlayerID = self._localPlayer.playerID
@@ -218,7 +218,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         }
     }
     
-    func updateHighScoresFromGameCenter_older_14() {
+    fileprivate func updateHighScoresFromGameCenter_older_14() {
         var globalHighScore: Int64 = -1
         var playerHighScore: Int64 = -1
         var playerRank: Int64 = -1
@@ -267,7 +267,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     }
     
     @available(iOS 14.0, *)
-    func updateHighScoresFromGameCenter_14_newer() {
+    fileprivate func updateHighScoresFromGameCenter_14_newer() {
         var globalHighScore:Int64 = -1
         var playerHighScore:Int64 = -1
         var playerRank: Int64 = -1

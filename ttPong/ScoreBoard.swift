@@ -33,6 +33,10 @@ class ScoreBoard {
             print("@ScoreBoard.setHighScores: playerHighScore '\(playerHighScore) cannot be greater than globalHighScore '\(globalHighScore)'!")
             return
         }
+        guard playerHighScore >= 0 else {
+            print("@ScoreBoard.setHighScores: playerHighScore '\(playerHighScore) cannot be negative!")
+            return
+        }
         _playerHighScore = playerHighScore
         _playerRank = playerRank
         _globalHighScore = globalHighScore
@@ -41,7 +45,7 @@ class ScoreBoard {
       
     func increaseScore(by increment:Int64) {
         _score += increment
-        if _score > _playerHighScore {
+        if _playerHighScore >= 0 && _score > _playerHighScore {
             _newPlayerRecord = true
             _playerHighScore = _score
         }

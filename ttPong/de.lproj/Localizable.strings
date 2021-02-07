@@ -14,8 +14,7 @@
 "Let's Play !" = "Lass uns spielen !";
 "To start a new match," = "Halten Sie zu Beginn";
 "touch and hold both pads." = "beide Pads.";
-"A New Global Record !!" = "Ein neuer Weltrekord !!";
-"A New Local Record !!" = "Ein neuer lokaler Rekord !!";
+"A New Record !!" = "Ihr Neuer Rekord !!";
 "Game aborted, but congrats !" = "Spiel abgebrochen, aber Glückwunsch !";
 "Well done !!!" = "Gut gemacht !!!";
 "Game Over !" = "Spiel beendet !";
@@ -31,7 +30,7 @@
 "Hold both pads to launch a new disc." = "Halten Sie beide Pads zum Starten einer neuen Platte.";
 "SCORE - %@" = "PUNKTE - %@";
 "HIGH - %@" = "REKORD - %@";
-"GLOBAL HIGH - %@" = "WELT REKORD - %@";
+"GLOBAL HIGH - %@" = "WELT REKORD - %@    IHR RANK - %@";
 "LAST DISC" = "LETZTE PLATTE";
 "DISCS - %d" = "PLATTEN - %d";
 "SCORE - 99999" = "PUNKTE - 99999";

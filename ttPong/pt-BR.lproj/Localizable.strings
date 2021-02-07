@@ -14,8 +14,7 @@
 "Let's Play !" = "Vamos Jogar !";
 "To start a new match," = "Para iniciar,";
 "touch and hold both pads." = "segure os dois anteparos.";
-"A New Global Record !!" = "Novo Recorde Global !!";
-"A New Local Record !!" = "Novo Recorde Local !!";
+"A New Record !!" = "Seu Novo Recorde !!";
 "Game aborted, but congrats !" = "Jogo abortado, mas Parabéns !";
 "Well done !!!" = "Parabéns !!!";
 "Game Over !" = "Fim de Jogo !";
@@ -31,7 +30,7 @@
 "Hold both pads to launch a new disc." = "Segure ambos os anteparos para lançar o disco.";
 "SCORE - %@" = "PLACAR - %@";
 "HIGH - %@" = "RECORDE - %@";
-"GLOBAL HIGH - %@" = "RECORDE GLOBAL - %@";
+"GLOBAL HIGH - %@" = "RECORDE GLOBAL - %@    SUA POSIÇÃO - %@";
 "LAST DISC" = "ÚLTIMO DISCO";
 "DISCS - %d" = "DISCOS - %d";
 "SCORE - 99999" = "RECORDE - 99999";
