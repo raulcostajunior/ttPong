@@ -30,7 +30,8 @@
 "Hold both pads to launch a new disc." = "Segure ambos os anteparos para lançar o disco.";
 "SCORE - %@" = "PLACAR - %@";
 "HIGH - %@" = "RECORDE - %@";
-"GLOBAL HIGH - %@" = "RECORDE GLOBAL - %@    SUA POSIÇÃO - %@";
+"GLOBAL HIGH RANK" = "RECORDE GLOBAL - %@    SUA POSIÇÃO - %@";
+"GLOBAL HIGH" = "RECORDE GLOBAL - %@";
 "LAST DISC" = "ÚLTIMO DISCO";
 "DISCS - %d" = "DISCOS - %d";
 "SCORE - 99999" = "RECORDE - 99999";

@@ -293,7 +293,12 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         }
     }
 
-    func registerNewRecord() {
+    /**
+      Registers a new record for the current player with the GameCenter.
+     
+      - Parameter onScoreRegistered: callback to be executed upon successful record registration.
+     */
+    func registerNewRecord(onScoreRegistered: @escaping () -> Void) {
         guard (_scoreBoard.isNewPlayerRecord) else {
             print("Error: there's no new record to register.")
             return
@@ -302,9 +307,11 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             let reportedScore =
                 GKScore(leaderboardIdentifier: GameManager.LEADER_BOARD_ID)
             reportedScore.value = _scoreBoard.playerHighScore
-            GKScore.report([reportedScore]) { (error) in
+            GKScore.report([reportedScore]) {(error) in
                 if error != nil {
                     print(error!.localizedDescription)
+                } else {
+                    onScoreRegistered()
                 }
             }
         }

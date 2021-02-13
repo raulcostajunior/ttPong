@@ -30,7 +30,8 @@
 "Hold both pads to launch a new disc." = "Halten Sie beide Pads zum Starten einer neuen Platte.";
 "SCORE - %@" = "PUNKTE - %@";
 "HIGH - %@" = "REKORD - %@";
-"GLOBAL HIGH - %@" = "WELT REKORD - %@    IHR RANK - %@";
+"GLOBAL HIGH RANK" = "WELT REKORD - %@    IHR RANK - %@";
+"GLOBAL HIGH" = "WELT REKORD - %@";
 "LAST DISC" = "LETZTE PLATTE";
 "DISCS - %d" = "PLATTEN - %d";
 "SCORE - 99999" = "PUNKTE - 99999";

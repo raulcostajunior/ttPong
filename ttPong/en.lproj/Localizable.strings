@@ -30,7 +30,8 @@
 "Hold both pads to launch a new disc." = "Hold both pads to launch a new disc.";
 "SCORE - %@" = "SCORE - %@";
 "HIGH - %@" = "HIGH - %@";
-"GLOBAL HIGH - %@" = "GLOBAL HIGH - %@    YOUR RANK - %@";
+"GLOBAL HIGH RANK" = "GLOBAL HIGH - %@    YOUR RANK - %@";
+"GLOBAL HIGH" = "GLOBAL HIGH - %@";
 "LAST DISC" = "LAST DISC";
 "DISCS - %d" = "DISCS - %d";
 "SCORE - 99999" = "SCORE - 99999";

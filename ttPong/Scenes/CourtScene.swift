@@ -12,8 +12,8 @@ import GameplayKit
 
 class CourtScene: SKScene, SKPhysicsContactDelegate {
     
-    // TOOO: Set visibility per state in a more compact way; too much redundant code in the updateState at this point
-    // TODO: Add state for new world record with the corresponding congratulation effects (v 2.0)
+    // TOOO: (v 2.0) Set visibility per state in a more compact way; too much redundant code in the updateState at this point.
+    // TODO: (v 2.0) Add state for new world record with the corresponding congratulation effects.
     enum CourtState {
         case WaitToStartMatch
         case LaunchingDisk
@@ -362,6 +362,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         state = .WaitToStartMatch
         playSoundFx(_gameStartEffect)
         GameManager.shared.startNewGame()
+        GameManager.shared.updateHighScoresFromGameCenter()
     }
     
     private func updateSceneState() {
@@ -532,9 +533,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             let fadeInScene = SKAction.fadeIn(withDuration: 1.5)
             self.run(fadeInScene)
             if GameManager.shared.scoreBoard.isNewPlayerRecord {
-                GameManager.shared.registerNewRecord()
+                GameManager.shared.registerNewRecord() {
+                    GameManager.shared.updateHighScoresFromGameCenter()
+                }
                 playSoundFx(_newRecordEffect)
-                GameManager.shared.updateHighScoresFromGameCenter()
                 state = .MatchAbortedNewRecord
             }
             else {
@@ -554,6 +556,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                                     // in the UI thread along with the rest of
                                     // the SpriteKit update pipeline.
                                     DispatchQueue.main.async {
+                                        // TODO: remove the call to updateHighScoreFromGameCenter
+                                        GameManager.shared.updateHighScoresFromGameCenter()
                                         self.gotoInitialState()
                                     }
             })
@@ -610,8 +614,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     // Lost rally for the last disc.
                     if GameManager.shared.scoreBoard.isNewPlayerRecord {
                         state = .MatchFinishedNewRecord
-                        GameManager.shared.registerNewRecord()
-                        GameManager.shared.updateHighScoresFromGameCenter()
+                        GameManager.shared.registerNewRecord() {
+                            GameManager.shared.updateHighScoresFromGameCenter()
+                        }
                     } else {
                         state = .MatchFinished
                     }
@@ -638,9 +643,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                             // thread along with the rest of the SpriteKit
                             // update pipeline.
                             DispatchQueue.main.async {
-                                if self.state == .MatchFinished {
-                                    self.gotoInitialState()
-                                } else if self.state == .MatchFinishedNewRecord {
+                                if self.state == .MatchFinished || self.state == .MatchFinishedNewRecord {
+                                    // TODO: remove this call to updateHighScoresFromGameCenter
+                                    GameManager.shared.updateHighScoresFromGameCenter()
                                     self.gotoInitialState()
                                 }
                             }
@@ -651,10 +656,16 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func didSimulatePhysics() {
-        _scoreDisp.text = scoreText()
-        _highScoreDisp.text = highScoreText()
-        _msgHighScore.text = globalHighScoreText()
-        _discsDisp.text = discsText()
+        if _state != .GamePaused && _state != .LaunchingDisk && state != .LostDisc {
+            // A score or high-score change is possible in the current court state
+            _scoreDisp.text = scoreText()
+            _highScoreDisp.text = highScoreText()
+            _msgHighScore.text = globalHighScoreText()
+        }
+        if _state != .GameOngoing && _state != .GamePaused {
+            // An update of the number of disks is possible in the current court state
+            _discsDisp.text = discsText()
+        }
     }
     
     // MARK: - Private helper methods
@@ -746,11 +757,21 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         guard !_msgHighScore.isHidden else { return "" }
         let fmtHighScore = String(format:"%04d",
                                   GameManager.shared.scoreBoard.globalHighScore)
-        let fmtRank = String("# \(GameManager.shared.scoreBoard.playerRank)")
-        return String.localizedStringWithFormat(
-            NSLocalizedString("GLOBAL HIGH - %@", comment: ""),
-            fmtHighScore, fmtRank
-        )
+        
+        if GameManager.shared.scoreBoard.playerRank > 0 {
+            // The player is already ranked - display global record and player rank
+            let fmtRank = String("# \(GameManager.shared.scoreBoard.playerRank)")
+            return String.localizedStringWithFormat(
+                NSLocalizedString("GLOBAL HIGH RANK", comment: ""),
+                                  fmtHighScore, fmtRank
+            )
+        } else {
+            // The player is not ranked yet - display only the global record
+            return String.localizedStringWithFormat(
+                NSLocalizedString("GLOBAL HIGH", comment: ""),
+                                  fmtHighScore
+            )
+        }
     }
     
     private func discsText() -> String {
