@@ -11,11 +11,14 @@ import SpriteKit
 import GameKit
 
 class GameViewController: UIViewController {
+    
+    var adjustedSafeArea = false
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        if #available(iOS 11.0, *), let view = self.view {
-           view.frame = self.view.safeAreaLayoutGuide.layoutFrame
+        if #available(iOS 11.0, *), let view = self.view, !adjustedSafeArea {
+            view.frame = self.view.safeAreaLayoutGuide.layoutFrame
+            adjustedSafeArea = true
         }
         guard let view = self.view as! SKView? else { return }
         view.ignoresSiblingOrder = true

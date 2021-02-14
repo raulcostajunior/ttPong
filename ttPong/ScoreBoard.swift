@@ -37,7 +37,12 @@ class ScoreBoard {
             print("@ScoreBoard.setHighScores: playerHighScore '\(playerHighScore) cannot be negative!")
             return
         }
-        _playerHighScore = playerHighScore
+        if (playerHighScore > _playerHighScore) {
+            // We only update the player's high score if the "external" high score is larger than the current one.
+            // It is possible that the "external" high score comes has been retrieved before the current one had a
+            // change to be registered.
+            _playerHighScore = playerHighScore
+        }
         _playerRank = playerRank
         _globalHighScore = globalHighScore
         _newPlayerRecord = _score > _playerHighScore
