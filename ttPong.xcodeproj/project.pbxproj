@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C432F94D25EF864000401A94 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C432F94C25EF864000401A94 /* CloudKit.framework */; };
 		CB2C0961249F66C5005DD7C9 /* Phosphate.ttc in Resources */ = {isa = PBXBuildFile; fileRef = CB2C0960249F66C5005DD7C9 /* Phosphate.ttc */; };
 		CB33F8072529FDDD00522045 /* DiscGone.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F8062529FDDD00522045 /* DiscGone.wav */; };
 		CB33F80C252A004E00522045 /* NewRecord.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F80B252A004E00522045 /* NewRecord.wav */; };
@@ -54,6 +55,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C432F94825EF863A00401A94 /* ttPong.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ttPong.entitlements; sourceTree = "<group>"; };
+		C432F94C25EF864000401A94 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		CB01B7C52573F96300B5293B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
 		CB01B7C62573F96300B5293B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		CB01B7C72573F96300B5293B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -101,6 +104,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB714D49252F2A1300D8476F /* GameKit.framework in Frameworks */,
+				C432F94D25EF864000401A94 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,6 +136,7 @@
 		CB714D47252F2A1200D8476F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C432F94C25EF864000401A94 /* CloudKit.framework */,
 				CB714D48252F2A1300D8476F /* GameKit.framework */,
 			);
 			name = Frameworks;
@@ -176,6 +181,7 @@
 		CBBF94D9244AE65000789DE2 /* ttPong */ = {
 			isa = PBXGroup;
 			children = (
+				C432F94825EF863A00401A94 /* ttPong.entitlements */,
 				CBB1B72D24BC492F0033FA32 /* Effects */,
 				CB2C095F249F663A005DD7C9 /* Fonts */,
 				CBBF9521244CA82A00789DE2 /* Scenes */,
@@ -576,6 +582,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ttPong/ttPong.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7G8JJ3WHW6;
 				INFOPLIST_FILE = ttPong/Info.plist;
@@ -596,6 +603,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ttPong/ttPong.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7G8JJ3WHW6;
 				INFOPLIST_FILE = ttPong/Info.plist;
