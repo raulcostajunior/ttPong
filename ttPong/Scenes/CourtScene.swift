@@ -41,6 +41,13 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private var _leaderBoard: LeaderBoardSprite!
     private var _gameInfo: AboutGameSprite!
     
+    // The x coordinate of the scoreboard when
+    // both score and high-score are visible
+    private var _scoreHighScoreX: CGFloat!
+    // The x coordinate of the scoreboard when
+    // only the score is visible
+    private var _scoreX: CGFloat!
+    
     private var _scoreDisp: SKLabelNode!
     private var _highScoreDisp: SKLabelNode!
     private var _discsDisp: SKLabelNode!
@@ -116,7 +123,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(_rightPad)
         
         initDiscAppearanceEffect()
-        initToolsNodes(lHPos)
+        initToolsNodes(size)
         initGameStatusNodes(size)
         initMsgDisplayingNodes(size)
         initPhysics(size)
@@ -137,22 +144,24 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(_discAppearance)
     }
     
-    fileprivate func initToolsNodes(_ leftPadHPos: CGFloat) {
+    fileprivate func initToolsNodes(_ size: CGSize) {
+        // The tools are left centered at the bottom of the
+        // screen.
+        _leaderBoard = LeaderBoardSprite()
+        let leaderHPos = size.width/2
+        let leaderVPos = CourtScene.TOP_BOTTOM_INSET +
+            _leaderBoard.size.height/2
+        _leaderBoard.position = CGPoint(x: leaderHPos, y: leaderVPos)
+        self.addChild(_leaderBoard)
+        
         _soundOption = SoundOptionSprite()
-        let sndOptHPos = leftPadHPos
+        let sndOptHPos =
+            leaderHPos - _leaderBoard.size.width/2 - CourtScene.ICON_H_SPACING
         let sndOptVPos = CourtScene.TOP_BOTTOM_INSET +
             _soundOption.size.height/2
         _soundOption.position = CGPoint(x: sndOptHPos, y: sndOptVPos)
         self.addChild(_soundOption)
-        
-        _leaderBoard = LeaderBoardSprite()
-        let leaderHPos = sndOptHPos + _soundOption.size.width/2 +
-            CourtScene.ICON_H_SPACING
-        let leaderVPos = CourtScene.TOP_BOTTOM_INSET +
-            _soundOption.size.height/2
-        _leaderBoard.position = CGPoint(x: leaderHPos, y: leaderVPos)
-        self.addChild(_leaderBoard)
-        
+               
         _gameInfo = AboutGameSprite()
         let infoHPos = leaderHPos + _leaderBoard.size.width/2 +
             CourtScene.ICON_H_SPACING
@@ -206,13 +215,18 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         let scoreMaxWidth =
             (scoreMaxText as NSString).size(withAttributes: fontAttributes).width
         
+        // The x coordinate of the score display is calculated so that the
+        // set of score and high score in roughly centered in the right
+        // half of the screen - the reason for the 3.0/4.0 factor.
+        _scoreHighScoreX = size.width*3.0/4.0 - scoreMaxWidth - 2.5
+        // When only the score is visible - the player is not connected to
+        // GameCenter or still doesn't have a high score.
+        _scoreX = _scoreHighScoreX + scoreMaxWidth/2.0
+        
         _scoreDisp = SKLabelNode(fontNamed: "Phosphate Solid")
         _scoreDisp.fontSize = 19
         _scoreDisp.position =
-            // The x coordinate of the score display is calculated so that the
-            // set of score and high score in roughly centered in the right
-            // half of the screen - the reason for the 3.0/4.0 factor.
-            CGPoint(x: size.width*3.0/4.0 - scoreMaxWidth - 2.5,
+            CGPoint(x: _scoreX,
                     y: size.height - CourtScene.TOP_BOTTOM_INSET)
         _scoreDisp.horizontalAlignmentMode = .left
         _scoreDisp.verticalAlignmentMode = .top
@@ -221,7 +235,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _highScoreDisp = SKLabelNode(fontNamed: "Phosphate Solid")
         _highScoreDisp.fontSize = 19
         _highScoreDisp.position =
-            CGPoint(x: _scoreDisp.position.x + scoreMaxWidth + 5.0,
+            CGPoint(x: _scoreHighScoreX + scoreMaxWidth + 5.0,
                     y: size.height - CourtScene.TOP_BOTTOM_INSET)
         _highScoreDisp.horizontalAlignmentMode = .left
         _highScoreDisp.verticalAlignmentMode = .top
@@ -521,6 +535,13 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _leaderBoard.isHidden = false
             _gameInfo.isHidden = false
         }
+        
+        if !_scoreDisp.isHidden {
+            // Adjust the position of the score label depending on
+            // the visibility of high-score label.
+            _scoreDisp.position.x = _highScoreDisp.isHidden ? _scoreX : _scoreHighScoreX
+        }
+        
     }
     
     // MARK: - SKScene overrides
