@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C432F94D25EF864000401A94 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C432F94C25EF864000401A94 /* CloudKit.framework */; };
 		CB2C0961249F66C5005DD7C9 /* Phosphate.ttc in Resources */ = {isa = PBXBuildFile; fileRef = CB2C0960249F66C5005DD7C9 /* Phosphate.ttc */; };
 		CB33F8072529FDDD00522045 /* DiscGone.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F8062529FDDD00522045 /* DiscGone.wav */; };
 		CB33F80C252A004E00522045 /* NewRecord.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F80B252A004E00522045 /* NewRecord.wav */; };
@@ -104,7 +103,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB714D49252F2A1300D8476F /* GameKit.framework in Frameworks */,
-				C432F94D25EF864000401A94 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

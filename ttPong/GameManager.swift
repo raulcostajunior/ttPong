@@ -83,7 +83,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         _currentScene?.scaleMode = .aspectFill
         view.presentScene(_currentScene)
         
-        getiCloudUserID()
+        // getiCloudUserID()
         
         // initGameCenterIntegration is not called directly from the private
         // initializer because it depends on a defined RootViewController being
@@ -169,29 +169,29 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     }
     
     // MARK: - CloudKit Integration
-    private var _gameUserID: String?
-    private var _gameUserEmail: String?
-    
-    func getiCloudUserID() {
-        
-        /* Solution based on iCloud Key-Value store - to see how the key/value can be shared among different
-           apps from the same team - this could be used for instance to share a gamer alias and Avatar among
-           multiple games, see https://developer.apple.com/library/archive/documentation/General/Conceptual/iCloudDesignGuide/Chapters/iCloudFundametals.html#//apple_ref/doc/uid/TP40012094-CH6-SW26
-        */
-        if NSUbiquitousKeyValueStore.default.synchronize() {
-            if let uuidStr = NSUbiquitousKeyValueStore.default.string(forKey: "ttPongUserID") {
-                // It is not the first time the current iCloud user has accessed the game.
-                self._gameUserID = uuidStr
-            } else {
-                let uuid = NSUUID()
-                NSUbiquitousKeyValueStore.default.set(uuid.uuidString, forKey: "ttPongUserID")
-                NSUbiquitousKeyValueStore.default.synchronize()
-                self._gameUserID = uuid.uuidString
-            }
-        } else {
-            // An error occurred during synchronization
-            print("Error during iCloud Key-Value Store synchronization!")
-        }
+//    private var _gameUserID: String?
+//    private var _gameUserEmail: String?
+//
+//    func getiCloudUserID() {
+//
+//        /* Solution based on iCloud Key-Value store - to see how the key/value can be shared among different
+//           apps from the same team - this could be used for instance to share a gamer alias and Avatar among
+//           multiple games, see https://developer.apple.com/library/archive/documentation/General/Conceptual/iCloudDesignGuide/Chapters/iCloudFundametals.html#//apple_ref/doc/uid/TP40012094-CH6-SW26
+//        */
+//        if NSUbiquitousKeyValueStore.default.synchronize() {
+//            if let uuidStr = NSUbiquitousKeyValueStore.default.string(forKey: "ttPongUserID") {
+//                // It is not the first time the current iCloud user has accessed the game.
+//                self._gameUserID = uuidStr
+//            } else {
+//                let uuid = NSUUID()
+//                NSUbiquitousKeyValueStore.default.set(uuid.uuidString, forKey: "ttPongUserID")
+//                NSUbiquitousKeyValueStore.default.synchronize()
+//                self._gameUserID = uuid.uuidString
+//            }
+//        } else {
+//            // An error occurred during synchronization
+//            print("Error during iCloud Key-Value Store synchronization!")
+//        }
         
         
         /* Solution based on iCloudKit Container - if any additional user information, like e-mail, is needed;
@@ -209,9 +209,9 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
 //                print(error.debugDescription)
 //            }
 //        })
-    }
+//    }
   
-    /* getiCloudUserEmail was commented out because it didn't work to retrieve the e-mail, even when the user granted the
+    /* getiCloudUserEmail was commented out because it didn't work to retrieve the e-mail, even when the user grants the
        required permission. */
 //    func getiCloudUserEmail() {
 //        if let gameUserRec = self._gameUserRecord {
