@@ -11,14 +11,7 @@ import Foundation
 import GameKit
 import SpriteKit
 
-/**
- * Responsabilities:
- *
- *  + Interface with GameCenter for LeaderBoard management.
- *  + Abstracts interscene transition knowledge from the individual scenes (by
- *  providing higher level methods like presentGame, registerNewRecord,
- *  displayHelp, displayScoreBoard ...
- */
+
 class GameManager: NSObject, GKGameCenterControllerDelegate {
 
     // MARK: - Singleton support
@@ -273,6 +266,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         }
     }
 
+    // TODO: Move to ScoreBoard class
     func updateHighScoresFromGameCenter() {
         guard _gameCenterSessionActive else { return }
         
@@ -283,6 +277,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         }
     }
     
+    // TODO: Move to ScoreBoard class
     fileprivate func updateHighScoresFromGameCenter_older_14() {
         var globalHighScore: Int64 = -1
         var playerHighScore: Int64 = -1
@@ -330,7 +325,9 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             self._scoreBoard.setHighScores(playerHighScore: playerHighScore, globalHighScore: globalHighScore, playerRank: playerRank)
         }
     }
-    
+
+    // TODO: move uppdateHighScoreFromGameCenter_14_newer to
+    //       ScoreBoard class.
     @available(iOS 14.0, *)
     fileprivate func updateHighScoresFromGameCenter_14_newer() {
         var globalHighScore:Int64 = -1
@@ -358,6 +355,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         }
     }
 
+    // TODO: Move registerNewRecord to ScoreBoard class.
     /**
       Registers a new record for the current player with the GameCenter.
      

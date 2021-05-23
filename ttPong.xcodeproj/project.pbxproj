@@ -34,6 +34,7 @@
 		CBC2FDBA2530BA99003E3A86 /* LeaderBoardSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC2FDB92530BA99003E3A86 /* LeaderBoardSprite.swift */; };
 		CBD45983252CDC6E000AC0E0 /* ScoreBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBD45982252CDC6E000AC0E0 /* ScoreBoard.swift */; };
 		CBDFE8EA24797F74003EE801 /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDFE8E924797F74003EE801 /* GameManager.swift */; };
+		CBEBDF94265A2C1200D6D049 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBEBDF93265A2C1200D6D049 /* ThemeManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +96,7 @@
 		CBC2FDB92530BA99003E3A86 /* LeaderBoardSprite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardSprite.swift; sourceTree = "<group>"; };
 		CBD45982252CDC6E000AC0E0 /* ScoreBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScoreBoard.swift; sourceTree = "<group>"; };
 		CBDFE8E924797F74003EE801 /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
+		CBEBDF93265A2C1200D6D049 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,6 +195,7 @@
 				CBBF94E9244AE65100789DE2 /* LaunchScreen.storyboard */,
 				CBBF94EC244AE65100789DE2 /* Info.plist */,
 				CB4E5D97256A6F0B004CC416 /* Localizable.strings */,
+				CBEBDF93265A2C1200D6D049 /* ThemeManager.swift */,
 			);
 			path = ttPong;
 			sourceTree = "<group>";
@@ -299,7 +302,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1140;
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1250;
 				ORGANIZATIONNAME = "Raul Costa Junior";
 				TargetAttributes = {
 					CBBF94D6244AE65000789DE2 = {
@@ -390,6 +393,7 @@
 				CBC2FDBA2530BA99003E3A86 /* LeaderBoardSprite.swift in Sources */,
 				CBBF951C244CA63200789DE2 /* PadSprite.swift in Sources */,
 				CBB8F97524B3830A00761E6B /* AboutGameSprite.swift in Sources */,
+				CBEBDF94265A2C1200D6D049 /* ThemeManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
