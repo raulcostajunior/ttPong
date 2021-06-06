@@ -12,8 +12,8 @@ import GameplayKit
 
 class CourtScene: SKScene, SKPhysicsContactDelegate {
     
-    // TOOO: (v 2.0) Set visibility per state in a more compact way; too much redundant code in the updateState at this point.
-    // TODO: (v 2.0) Add state for new world record with the corresponding congratulation effects.
+    // TOOO: (v 1.6) Set visibility per state in a more compact way; too much redundant code in the updateState at this point.
+    // TODO: (v 1.6) Add state for new world record with the corresponding congratulation effects.
     enum CourtState {
         case WaitToStartMatch
         case LaunchingDisk
@@ -39,6 +39,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private var _rightPad: PadSprite!
     private var _soundOption: SoundOptionSprite!
     private var _leaderBoard: LeaderBoardSprite!
+    private var _themeOption: ThemeOptionSprite!
     private var _gameInfo: AboutGameSprite!
     
     // The x coordinate of the scoreboard when
@@ -145,12 +146,11 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     }
     
     fileprivate func initToolsNodes(_ size: CGSize) {
-        // The tools are left centered at the bottom of the
-        // screen.
+        // The tools are centered at the bottom of the screen.
         _leaderBoard = LeaderBoardSprite()
-        let leaderHPos = size.width/2
-        let leaderVPos = CourtScene.TOP_BOTTOM_INSET +
-            _leaderBoard.size.height/2
+        let leaderHPos =
+            (size.width - _leaderBoard.size.width - CourtScene.ICON_H_SPACING)/2
+        let leaderVPos = CourtScene.TOP_BOTTOM_INSET+_leaderBoard.size.height/2
         _leaderBoard.position = CGPoint(x: leaderHPos, y: leaderVPos)
         self.addChild(_leaderBoard)
         
@@ -161,9 +161,17 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _soundOption.size.height/2
         _soundOption.position = CGPoint(x: sndOptHPos, y: sndOptVPos)
         self.addChild(_soundOption)
+        
+        _themeOption = ThemeOptionSprite()
+        let themeOptHPos = leaderHPos + _leaderBoard.size.width/2 +
+            CourtScene.ICON_H_SPACING
+        let themeOptVPos = CourtScene.TOP_BOTTOM_INSET +
+            _leaderBoard.size.height/2
+        _themeOption.position = CGPoint(x: themeOptHPos, y: themeOptVPos)
+        self.addChild(_themeOption)
                
         _gameInfo = AboutGameSprite()
-        let infoHPos = leaderHPos + _leaderBoard.size.width/2 +
+        let infoHPos = themeOptHPos + _leaderBoard.size.width/2 +
             CourtScene.ICON_H_SPACING
         let infoVPos = sndOptVPos
         _gameInfo.position = CGPoint(x: infoHPos, y: infoVPos)
@@ -374,6 +382,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     func gotoInitialState() {
         _disc.reset()
         state = .WaitToStartMatch
+        showToolNodes()
         playSoundFx(_gameStartEffect)
         GameManager.shared.startNewGame()
         GameManager.shared.updateHighScoresFromGameCenter()
@@ -390,9 +399,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgHighScore.isHidden = GameManager.shared.scoreBoard.globalHighScore < 0
-            _soundOption.isHidden = false
-            _leaderBoard.isHidden = false
-            _gameInfo.isHidden = false
             resetPadsPositions()
             _leftPad.movable = false
             _rightPad.movable = false
@@ -403,6 +409,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start game
                 state = .LaunchingDisk
+                hideToolNodes()
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
@@ -421,9 +428,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp2.isHidden = false
             _msgHighScore.isHidden = true
             _msgTitle.isHidden = true
-            _soundOption.isHidden = true
-            _leaderBoard.isHidden = true
-            _gameInfo.isHidden = true
         case .LostDisc:
             // Transient state - display timed message while
             // some actions are executed.
@@ -435,9 +439,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp2.isHidden = false
             _msgHighScore.isHidden = true
             _msgTitle.isHidden = true
-            _soundOption.isHidden = true
-            _leaderBoard.isHidden = true
-            _gameInfo.isHidden = true
         case .WaitToStartNewRally:
             _disc.isHidden = true
             _discsDisp.isHidden = false
@@ -447,9 +448,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp2.isHidden = false
             _msgHighScore.isHidden = GameManager.shared.scoreBoard.globalHighScore < 0
             _msgTitle.isHidden = true
-            _soundOption.isHidden = false
-            _leaderBoard.isHidden = false
-            _gameInfo.isHidden = false
             resetPadsPositions()
             _leftPad.movable = false
             _rightPad.movable = false
@@ -458,6 +456,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 _leftPad.movable = true
                 _rightPad.movable = true
                 state = .LaunchingDisk
+                hideToolNodes()
                 let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
                 _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
                 _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
@@ -472,9 +471,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp2.isHidden = true
             _msgTitle.isHidden = true
             _msgHighScore.isHidden = true
-            _soundOption.isHidden = true
-            _leaderBoard.isHidden = true
-            _gameInfo.isHidden = true
             _msgDisp1.removeAction(forKey: "fadeOut")
             _msgDisp2.removeAction(forKey: "fadeOut")
             _msgDisp1.alpha = 1.0
@@ -482,6 +478,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             if !_leftPad.isActive || !_rightPad.isActive {
                 // Releasing any pad while match is ongoing, pauses it
                 state = .GamePaused
+                showToolNodes()
                 _leftPad.movable = false
                 _rightPad.movable = false
                 _leftPad.isPaused = true
@@ -503,12 +500,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgHighScore.isHidden = true
-            _soundOption.isHidden = false
-            _leaderBoard.isHidden = false
-            _gameInfo.isHidden = false
             if _leftPad.isActive && _rightPad.isActive {
                 // Touching both pads while match is paused, resumes it.
                 state = .GameOngoing
+                hideToolNodes()
                 _leftPad.movable = true
                 _rightPad.movable = true
                 _leftPad.isPaused = false
@@ -531,9 +526,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgHighScore.isHidden = true
-            _soundOption.isHidden = false
-            _leaderBoard.isHidden = false
-            _gameInfo.isHidden = false
         }
         
         if !_scoreDisp.isHidden {
@@ -559,9 +551,11 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 }
                 playSoundFx(_newRecordEffect)
                 state = .MatchAbortedNewRecord
+                showToolNodes()
             }
             else {
                 state = .MatchAborted
+                showToolNodes()
             }
             // Restores the color of the text sprites that display the number
             // of discs and the scores. It may be grayed out if the abort came
@@ -620,6 +614,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     // a new rally
                     GameManager.shared.pickUpDisc()
                     state = .LostDisc
+                    showToolNodes()
                     Timer.scheduledTimer(
                         withTimeInterval: 3.0,
                         repeats: false,
@@ -628,18 +623,21 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                             // thread along with the rest of the SpriteKit
                             // update pipeline.
                             DispatchQueue.main.async {
-                                 self.state = .WaitToStartNewRally
+                                self.state = .WaitToStartNewRally
+                                self.showToolNodes()
                             }
                     })
                 } else {
                     // Lost rally for the last disc.
                     if GameManager.shared.scoreBoard.isNewPlayerRecord {
                         state = .MatchFinishedNewRecord
+                        showToolNodes()
                         GameManager.shared.registerNewRecord() {
                             GameManager.shared.updateHighScoresFromGameCenter()
                         }
                     } else {
                         state = .MatchFinished
+                        showToolNodes()
                     }
                     // Play new record or game over effects a little bit
                     // delayed, so they can be distinguished from the sound
@@ -731,6 +729,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     self._discAppearance.alpha = 0.0
                     self._discAppearance.isHidden = true
                     self.state = CourtState.GameOngoing
+                    self.hideToolNodes()
                     self._hitsInRally = 0
                     // At the start of the rally decreases the velocity to the
                     // minimal value.
@@ -813,6 +812,20 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         if !GameManager.shared.soundMuted {
             run(soundFx)
         }
+    }
+    
+    private func hideToolNodes() {
+        _soundOption.isHidden = true
+        _leaderBoard.isHidden = true
+        _themeOption.isHidden = true
+        _gameInfo.isHidden = true
+    }
+    
+    private func showToolNodes() {
+        _soundOption.isHidden = false
+        _leaderBoard.isHidden = false
+        _themeOption.isHidden = false
+        _gameInfo.isHidden = false
     }
     
     private func setMsgs() {

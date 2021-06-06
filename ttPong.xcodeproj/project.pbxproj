@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C418115E266CE67600555FBF /* ThemeOptionSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = C418115D266CE67600555FBF /* ThemeOptionSprite.swift */; };
 		CB2C0961249F66C5005DD7C9 /* Phosphate.ttc in Resources */ = {isa = PBXBuildFile; fileRef = CB2C0960249F66C5005DD7C9 /* Phosphate.ttc */; };
 		CB33F8072529FDDD00522045 /* DiscGone.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F8062529FDDD00522045 /* DiscGone.wav */; };
 		CB33F80C252A004E00522045 /* NewRecord.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F80B252A004E00522045 /* NewRecord.wav */; };
@@ -55,6 +56,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C418115D266CE67600555FBF /* ThemeOptionSprite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThemeOptionSprite.swift; sourceTree = "<group>"; };
 		C432F94825EF863A00401A94 /* ttPong.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ttPong.entitlements; sourceTree = "<group>"; };
 		C432F94C25EF864000401A94 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		CB01B7C52573F96300B5293B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
@@ -186,16 +188,16 @@
 				CB2C095F249F663A005DD7C9 /* Fonts */,
 				CBBF9521244CA82A00789DE2 /* Scenes */,
 				CBBF951A244CA5EB00789DE2 /* Sprites */,
+				CBBF94E7244AE65100789DE2 /* Assets.xcassets */,
 				CBBF94DA244AE65000789DE2 /* AppDelegate.swift */,
 				CBBF94E2244AE65000789DE2 /* GameViewController.swift */,
 				CBDFE8E924797F74003EE801 /* GameManager.swift */,
 				CBD45982252CDC6E000AC0E0 /* ScoreBoard.swift */,
+				CBEBDF93265A2C1200D6D049 /* ThemeManager.swift */,
 				CBBF94E4244AE65000789DE2 /* Main.storyboard */,
-				CBBF94E7244AE65100789DE2 /* Assets.xcassets */,
 				CBBF94E9244AE65100789DE2 /* LaunchScreen.storyboard */,
 				CBBF94EC244AE65100789DE2 /* Info.plist */,
 				CB4E5D97256A6F0B004CC416 /* Localizable.strings */,
-				CBEBDF93265A2C1200D6D049 /* ThemeManager.swift */,
 			);
 			path = ttPong;
 			sourceTree = "<group>";
@@ -226,6 +228,7 @@
 				CBBF951B244CA63200789DE2 /* PadSprite.swift */,
 				CBB8F97224B382DB00761E6B /* SoundOptionSprite.swift */,
 				CBB8F97424B3830A00761E6B /* AboutGameSprite.swift */,
+				C418115D266CE67600555FBF /* ThemeOptionSprite.swift */,
 				CBC2FDB92530BA99003E3A86 /* LeaderBoardSprite.swift */,
 			);
 			path = Sprites;
@@ -387,6 +390,7 @@
 				CBBF9520244CA77A00789DE2 /* BeamGenSprite.swift in Sources */,
 				CBB8F97324B382DB00761E6B /* SoundOptionSprite.swift in Sources */,
 				CBBF94E3244AE65000789DE2 /* GameViewController.swift in Sources */,
+				C418115E266CE67600555FBF /* ThemeOptionSprite.swift in Sources */,
 				CBBF94DB244AE65000789DE2 /* AppDelegate.swift in Sources */,
 				CBD45983252CDC6E000AC0E0 /* ScoreBoard.swift in Sources */,
 				CBBF951E244CA6F700789DE2 /* DiscSprite.swift in Sources */,
@@ -593,7 +597,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = raulcostajunior.ttPong;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -614,7 +618,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = raulcostajunior.ttPong;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
