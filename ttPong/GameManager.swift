@@ -79,7 +79,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         // getiCloudUserID()
         
         // initGameCenterIntegration is not called directly from the private
-        // initializer because it depends on a defined RootViewController being
+        // initializer because it depends on a RootViewController being
         // defined for the application. Calling it from here, where there's a
         // SKView already constructed is a guarantee that a RootViewController
         // has already been defined.
@@ -194,14 +194,13 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 self._gameCenterSessionActive = true
                 if let previousPlayerID = self._previousPlayerID,
                     previousPlayerID != self._previousPlayerID {
-                    // TODO: Present message stating that logged GameCenter
-                    // player changed and that game will be restarted. (v 2.0)
+                    // GameCenter player changed
                     self.startNewGame()
                 }
                 self._previousPlayerID = self._localPlayer.playerID
                 self.updateHighScoresFromGameCenter()
             } else {
-                //game center is disabled on the device
+                // GameCenter is disabled on the device
                 self._gameCenterSessionActive = false
                 self._previousPlayerID = nil
             }
