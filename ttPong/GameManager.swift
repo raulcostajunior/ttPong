@@ -166,6 +166,15 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     }
     
     // MARK: - GameCenter Integration
+    
+    // TODO: move GameCenterIntegration to its own class, GameCenterGateway,
+    //       along with the three fields (private vars below) as public r.o.
+    // TODO: move score related functionalities to ScoreBoard, which will have
+    //       a LEADER_BOARD_ID as an initialization parameter. It will use the
+    //       GameCenterGateway services to retrieve and update high scores. Add
+    //       functionality to store records that couldn't be saved due to lack
+    //       of connectivity and flush those records whenever the connectivity
+    //       is restored in the lifetime of the hosting process.
 
     private var _gameCenterSessionActive = false
     private var _localPlayer: GKLocalPlayer!
@@ -184,8 +193,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                     UIApplication.shared.windows.first!.rootViewController!
                 //show game center sign in controller
                 DispatchQueue.main.async {
-                    rootVc.present(vc!,
-                                   animated: true, completion: nil)
+                    rootVc.present(vc!, animated: true, completion: nil)
                 }
                 return
             }

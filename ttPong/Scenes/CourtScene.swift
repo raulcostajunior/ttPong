@@ -649,8 +649,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                             DispatchQueue.main.async {
                                 self.playSoundFx(
                                     GameManager.shared.scoreBoard.isNewPlayerRecord ?
-                                        self._newRecordEffect :
-                                        self._gameOverEffect
+                                    self._newRecordEffect : self._gameOverEffect
                                 )
                             }
                         })
