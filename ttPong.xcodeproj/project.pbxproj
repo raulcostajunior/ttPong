@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,6 +14,7 @@
 		CB33F811252A0F7D00522045 /* GameOver.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F810252A0F7D00522045 /* GameOver.wav */; };
 		CB33F816252A22D700522045 /* GameStart.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F815252A22D700522045 /* GameStart.wav */; };
 		CB4E5D95256A6F0B004CC416 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CB4E5D97256A6F0B004CC416 /* Localizable.strings */; };
+		CB6FE80C26B6895800477F17 /* Connectivity in Frameworks */ = {isa = PBXBuildFile; productRef = CB6FE80B26B6895800477F17 /* Connectivity */; };
 		CB714D49252F2A1300D8476F /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB714D48252F2A1300D8476F /* GameKit.framework */; };
 		CBA536BD2517B93900E6EFDE /* DiscHit.caf in Resources */ = {isa = PBXBuildFile; fileRef = CBA536BC2517B93900E6EFDE /* DiscHit.caf */; };
 		CBA536C52517BA1800E6EFDE /* DiscRelease.caf in Resources */ = {isa = PBXBuildFile; fileRef = CBA536C42517BA1800E6EFDE /* DiscRelease.caf */; };
@@ -107,6 +108,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB714D49252F2A1300D8476F /* GameKit.framework in Frameworks */,
+				CB6FE80C26B6895800477F17 /* Connectivity in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +260,9 @@
 			dependencies = (
 			);
 			name = ttPong;
+			packageProductDependencies = (
+				CB6FE80B26B6895800477F17 /* Connectivity */,
+			);
 			productName = ttPong;
 			productReference = CBBF94D7244AE65000789DE2 /* ttPong.app */;
 			productType = "com.apple.product-type.application";
@@ -332,6 +337,9 @@
 				de,
 			);
 			mainGroup = CBBF94CE244AE65000789DE2;
+			packageReferences = (
+				CB6FE80A26B6895800477F17 /* XCRemoteSwiftPackageReference "connectivity" */,
+			);
 			productRefGroup = CBBF94D8244AE65000789DE2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -750,6 +758,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CB6FE80A26B6895800477F17 /* XCRemoteSwiftPackageReference "connectivity" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rwbutler/connectivity";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CB6FE80B26B6895800477F17 /* Connectivity */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CB6FE80A26B6895800477F17 /* XCRemoteSwiftPackageReference "connectivity" */;
+			productName = Connectivity;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CBBF94CF244AE65000789DE2 /* Project object */;
 }
