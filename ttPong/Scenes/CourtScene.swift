@@ -12,7 +12,6 @@ import GameplayKit
 
 class CourtScene: SKScene, SKPhysicsContactDelegate {
     
-    // TOOO: (v 1.6) Set visibility per state in a more compact way; too much redundant code in the updateState at this point.
     // TODO: (v 1.6) Add state for new world record with the corresponding congratulation effects.
     enum CourtState {
         case WaitToStartMatch
@@ -85,15 +84,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     private var _maxDxSpeed: CGFloat!
     private var _hitsInRally = 0
     
-    private var _state = CourtState.WaitToStartMatch
-
-    private var state: CourtState {
-        get { _state }
-        set {
-            _state = newValue
-            setMsgs()
-        }
-    }
+    private var state: CourtState = .WaitToStartMatch
 
     // MARK: - Initializers
     
@@ -130,7 +121,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         initPhysics(size)
         initSoundFx()
 
-        gotoInitialState()
+        gotoWaitToStartMatchState()
     }
     
     fileprivate func initDiscAppearanceEffect() {
@@ -366,6 +357,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                             (!hitLeftPad && self._disc.velocity.dx < 0.0) {
                             self._hitsInRally += 1
                             GameManager.shared.scoreBoard.increaseScore(by: 1)
+                            self.updateScoreText()
+                            self.updateHighScoreText()
                             if self._hitsInRally % 3 == 0 &&
                                 self._curDxSpeed < self._maxDxSpeed {
                                 // Periodically, on the number of hits in
@@ -381,162 +374,359 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     }
     
     // MARK: - Scene State handling
-    
-    func gotoInitialState() {
+       
+    fileprivate func gotoWaitToStartMatchState() {
         self._disc.reset()
         state = .WaitToStartMatch
+        
         showToolNodes()
         playSoundFx(_gameStartEffect)
+        
         GameManager.shared.startNewGame()
         GameManager.shared.updateHighScoresFromGameCenter()
+        
+        // Visibility of elements on screen for the WaitToStartMach state
+        _disc.isHidden = true
+        _discsDisp.isHidden = false
+        _scoreDisp.isHidden = false
+        _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
+        _msgTitle.isHidden = false
+        _msgDisp1.isHidden = false
+        _msgDisp2.isHidden = false
+        _msgHighScore.isHidden = GameManager.shared.scoreBoard.globalHighScore < 0
+        resetPadsPositions()
+        _leftPad.movable = false
+        _rightPad.movable = false
+        _msgDisp1.removeAction(forKey: "fadeOut")
+        _msgDisp2.removeAction(forKey: "fadeOut")
+        _msgDisp1.alpha = 1.0
+        _msgDisp2.alpha = 1.0
+        
+        adjustScorePosition()
+        _discsDisp.text = discsText()
+        updateScoreText()
+        updateGlobalHighText()
+        updateHighScoreText()
+        
+        _msgTitle.text = NSLocalizedString("Let's Play !", comment: "")
+        _msgDisp1.text = NSLocalizedString("To start a new match,", comment: "")
+        _msgDisp2.text = NSLocalizedString("touch and hold both pads.", comment: "")
     }
     
-    private func updateSceneState() {
-        switch _state {
-        case .WaitToStartMatch:
+    fileprivate func gotoWaitToStartNewRallyState() {
+        state = .WaitToStartNewRally
+        showToolNodes()
+        
+        _disc.isHidden = true
+        _discsDisp.isHidden = false
+        _scoreDisp.isHidden = false
+        _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
+        _msgDisp1.isHidden = false
+        _msgDisp2.isHidden = false
+        _msgHighScore.isHidden = GameManager.shared.scoreBoard.globalHighScore < 0
+        _msgTitle.isHidden = true
+        resetPadsPositions()
+        _leftPad.movable = false
+        _rightPad.movable = false
+        
+        adjustScorePosition()
+        updateGlobalHighText()
+        updateHighScoreText()
+        
+        _msgDisp1.text =
+            NSLocalizedString("Hold both pads to launch a new disc.", comment: "")
+        _msgDisp2.text =
+            NSLocalizedString("To abort, touch anywhere with 3 fingers.", comment: "")
+    }
+    
+    fileprivate func gotoLaunchingDiskState() {
+        state = .LaunchingDisk
+        hideToolNodes()
+        let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
+        _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
+        _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
+        _leftPad.movable = true
+        _rightPad.movable = true
+        
+        // Visibility of items on screen for the LaunchingDisk state.
+        _disc.isHidden = true
+        _discsDisp.isHidden = false
+        _scoreDisp.isHidden = false
+        _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
+        _msgDisp1.isHidden = false
+        _msgDisp2.isHidden = false
+        _msgHighScore.isHidden = true
+        _msgTitle.isHidden = true
+        
+        adjustScorePosition()
+        updateHighScoreText()
+        
+        _msgDisp1.text =
+            NSLocalizedString("Get ready to play !", comment: "")
+        _msgDisp2.text =
+            NSLocalizedString("Releasing any pad pauses the game.", comment: "")
+    }
+    
+    fileprivate func gotoGameOngoingState() {
+        state = .GameOngoing
+               
+        hideToolNodes()
+        _leftPad.movable = true
+        _rightPad.movable = true
+        _leftPad.isPaused = false
+        _rightPad.isPaused = false
+        _discsDisp.isPaused = false
+        _discsDisp.fontColor = UIColor.white
+        _scoreDisp.isPaused = false
+        _scoreDisp.fontColor = UIColor.white
+        _highScoreDisp.isPaused = false
+        _highScoreDisp.fontColor = UIColor.white
+        _disc.isHidden = false
+        _discsDisp.isHidden = false
+        _scoreDisp.isHidden = false
+        _highScoreDisp.isHidden =
+            GameManager.shared.scoreBoard.playerHighScore < 0
+        _msgDisp1.isHidden = true
+        _msgDisp2.isHidden = true
+        _msgTitle.isHidden = true
+        _msgHighScore.isHidden = true
+        _msgDisp1.removeAction(forKey: "fadeOut")
+        _msgDisp2.removeAction(forKey: "fadeOut")
+        _msgDisp1.alpha = 1.0
+        _msgDisp2.alpha = 1.0
+        
+        adjustScorePosition()
+        updateHighScoreText()
+        
+        _msgDisp1.text = ""
+        _msgDisp2.text = ""
+    }
+    
+    fileprivate func gotoGamePausedState() {
+        state = .GamePaused
+        
+        showToolNodes()
+        _leftPad.movable = false
+        _rightPad.movable = false
+        _leftPad.isPaused = true
+        _rightPad.isPaused = true
+        _discsDisp.isPaused = true
+        _discsDisp.fontColor = UIColor.darkGray
+        _scoreDisp.isPaused = true
+        _scoreDisp.fontColor = UIColor.darkGray
+        _highScoreDisp.isPaused = true
+        _highScoreDisp.fontColor = UIColor.darkGray
+        
+        _msgTitle.text =
+            NSLocalizedString("Game Paused", comment: "")
+        _msgDisp1.text =
+            NSLocalizedString("To resume, touch and hold both pads.", comment: "")
+        _msgDisp2.text =
+            NSLocalizedString("To abort, touch anywhere with 3 fingers.", comment: "")
+    }
+    
+    fileprivate func gotoFinishedOrAbortedState(
+        aborted: Bool, isRecord: Bool) {
+        
+        showToolNodes()
+        _disc.isHidden = true
+        _discsDisp.isHidden = false
+        _scoreDisp.isHidden = false
+        _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
+        _msgTitle.isHidden = false
+        _msgDisp1.isHidden = false
+        _msgDisp2.isHidden = false
+        _msgHighScore.isHidden = true
+        
+        adjustScorePosition()
+        updateHighScoreText()
+        
+        if aborted && !isRecord {
+            state = .MatchAborted
+            _msgTitle.text = NSLocalizedString("Game aborted", comment: "")
+            _msgDisp1.text = NSLocalizedString("Hope to have you back soon !", comment: "")
+            _msgDisp2.text = ""
+        } else if aborted && isRecord {
+            state = .MatchAbortedNewRecord
+            _msgTitle.text = NSLocalizedString("A New Record !!", comment: "")
+            _msgDisp1.text = NSLocalizedString("Game aborted, but congrats !", comment: "")
+            _msgDisp2.text = ""
+        } else if !aborted && isRecord {
+            state = .MatchFinishedNewRecord
+            _msgTitle.text = NSLocalizedString("A New Record !!", comment: "")
+            _msgDisp1.text = NSLocalizedString("Well done !!!", comment: "")
+            _msgDisp2.text = ""
+        } else /* !aborted && !isRecord */ {
+            state = .MatchFinished
+            _msgTitle.text = NSLocalizedString("Game Over !", comment: "")
+            _msgDisp1.text = NSLocalizedString("Go ahead and play again !!", comment: "")
+            _msgDisp2.text = ""
+        }
+        if aborted {
+            // Restores the color of the text sprites that display the number
+            // of discs and the scores. It may be grayed out if the abort came
+            // from a paused game.
+            self._discsDisp.fontColor = UIColor.white
+            self._scoreDisp.fontColor = UIColor.white
+            self._highScoreDisp.fontColor = UIColor.white
+        }
+    }
+    
+    fileprivate func gotoLostDiscState() {
+        state = .LostDisc
+        
+        playSoundFx(_discGoneEffect)
+        _msgDisp1.alpha = 0.0
+        _msgDisp2.alpha = 0.0
+        let fadeInMsg = SKAction.fadeIn(withDuration: 0.5)
+        _msgDisp1.run(fadeInMsg)
+        _msgDisp2.run(fadeInMsg)
+        
+        var discTxt: String!
+        let availDiscs = GameManager.shared.availableDiscs
+        if availDiscs >= 2 {
+            discTxt =
+                String.localizedStringWithFormat(
+                    NSLocalizedString("You have %d discs left !", comment: ""),
+                    availDiscs
+                )
+        } else if availDiscs == 1 {
+            discTxt =
+                NSLocalizedString("Make the most of your last disc !", comment: "")
+        }
+        // There's at least one rally left ...
+        _msgDisp1.text = discTxt
+        _msgDisp2.text = NSLocalizedString("Good luck !!", comment:"")
+        
+        if availDiscs > 1 {
+            // There's at least one disc left; let user start
+            // a new rally
+            GameManager.shared.pickUpDisc()
+            _discsDisp.text = discsText()
+            
+            // Set visibility of screen elements for LostDisc state.
+            showToolNodes()
             _disc.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
             _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
-            _msgTitle.isHidden = false
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
-            _msgHighScore.isHidden = GameManager.shared.scoreBoard.globalHighScore < 0
-            resetPadsPositions()
-            _leftPad.movable = false
-            _rightPad.movable = false
-            _msgDisp1.removeAction(forKey: "fadeOut")
-            _msgDisp2.removeAction(forKey: "fadeOut")
-            _msgDisp1.alpha = 1.0
-            _msgDisp2.alpha = 1.0
+            _msgHighScore.isHidden = true
+            _msgTitle.isHidden = true
+            
+            adjustScorePosition()
+            updateHighScoreText()
+            
+            Timer.scheduledTimer(
+                withTimeInterval: 3.0,
+                repeats: false,
+                block: { timer in
+                    // Any scene state transition must happen in the UI
+                    // thread along with the rest of the SpriteKit
+                    // update pipeline.
+                    DispatchQueue.main.async {
+                        self.gotoWaitToStartNewRallyState()
+                    }
+            })
+            
+        } else {
+            // Lost rally for the last disc.
+            if GameManager.shared.scoreBoard.isNewPlayerRecord {
+                gotoFinishedOrAbortedState(aborted: false, isRecord: true)
+                GameManager.shared.registerNewRecord() {
+                    GameManager.shared.updateHighScoresFromGameCenter()
+                }
+            } else {
+                gotoFinishedOrAbortedState(aborted: false, isRecord: false)
+            }
+            // Play new record or game over effects a little bit
+            // delayed, so they can be distinguished from the sound
+            // of the last disc gone.
+            Timer.scheduledTimer(
+                withTimeInterval: 0.8,
+                repeats: false,
+                block: {timer in
+                    DispatchQueue.main.async {
+                        self.playSoundFx(
+                            GameManager.shared.scoreBoard.isNewPlayerRecord ?
+                            self._newRecordEffect : self._gameOverEffect
+                        )
+                    }
+                })
+            Timer.scheduledTimer(
+                withTimeInterval: 5.0,
+                repeats: false,
+                block: { timer in
+                    // Any scene state transition must happen in the UI
+                    // thread along with the rest of the SpriteKit
+                    // update pipeline.
+                    DispatchQueue.main.async {
+                        if self.state == .MatchFinished || self.state == .MatchFinishedNewRecord {
+                            // TODO: remove this call to updateHighScoresFromGameCenter
+                            GameManager.shared.updateHighScoresFromGameCenter()
+                            self.gotoWaitToStartMatchState()
+                        }
+                    }
+                })
+        }
+    }
+    
+    
+    fileprivate func updateSceneState() {
+        switch state {
+        case .WaitToStartMatch:
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start game
-                state = .LaunchingDisk
-                hideToolNodes()
-                let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
-                _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
-                _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
-                _leftPad.movable = true
-                _rightPad.movable = true
                 launchDisc()
+            } else {
+                // Sleep for a while to decrease battery consumption during
+                // wait.
+                Thread.sleep(forTimeInterval: 0.4)
             }
         case .LaunchingDisk:
-            // Transient state - display timed message while
-            // some actions are executed.
-            _disc.isHidden = true
-            _discsDisp.isHidden = false
-            _scoreDisp.isHidden = false
-            _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
-            _msgDisp1.isHidden = false
-            _msgDisp2.isHidden = false
-            _msgHighScore.isHidden = true
-            _msgTitle.isHidden = true
+            // LaunchingDisk is a transient state - displays timed message
+            // while some actions are executed. There's nothing while in it
+            break
         case .LostDisc:
-            // Transient state - display timed message while
-            // some actions are executed.
-            _disc.isHidden = true
-            _discsDisp.isHidden = false
-            _scoreDisp.isHidden = false
-            _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
-            _msgDisp1.isHidden = false
-            _msgDisp2.isHidden = false
-            _msgHighScore.isHidden = true
-            _msgTitle.isHidden = true
+            // LostDisc is a transient state - displays timed message while
+            // some actions are executed. There's nothing to do here.
+            break
         case .WaitToStartNewRally:
-            _disc.isHidden = true
-            _discsDisp.isHidden = false
-            _scoreDisp.isHidden = false
-            _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
-            _msgDisp1.isHidden = false
-            _msgDisp2.isHidden = false
-            _msgHighScore.isHidden = GameManager.shared.scoreBoard.globalHighScore < 0
-            _msgTitle.isHidden = true
-            resetPadsPositions()
-            _leftPad.movable = false
-            _rightPad.movable = false
             if _leftPad.isActive && _rightPad.isActive {
                 // Both pads are being touched - start new rally.
-                _leftPad.movable = true
-                _rightPad.movable = true
-                state = .LaunchingDisk
-                hideToolNodes()
-                let fadeOutMsg = SKAction.fadeOut(withDuration: 3.5)
-                _msgDisp1.run(fadeOutMsg, withKey:"fadeOut")
-                _msgDisp2.run(fadeOutMsg, withKey:"fadeOut")
                 launchDisc()
+            } else {
+                // Sleep for a while to decrease battery consumption during
+                // wait.
+                Thread.sleep(forTimeInterval: 0.4)
             }
+            
         case .GameOngoing:
-            _disc.isHidden = false
-            _discsDisp.isHidden = false
-            _scoreDisp.isHidden = false
-            _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
-            _msgDisp1.isHidden = true
-            _msgDisp2.isHidden = true
-            _msgTitle.isHidden = true
-            _msgHighScore.isHidden = true
-            _msgDisp1.removeAction(forKey: "fadeOut")
-            _msgDisp2.removeAction(forKey: "fadeOut")
-            _msgDisp1.alpha = 1.0
-            _msgDisp2.alpha = 1.0
             if !_leftPad.isActive || !_rightPad.isActive {
-                // Releasing any pad while match is ongoing, pauses it
-                state = .GamePaused
-                showToolNodes()
-                _leftPad.movable = false
-                _rightPad.movable = false
-                _leftPad.isPaused = true
-                _rightPad.isPaused = true
-                _discsDisp.isPaused = true
-                _discsDisp.fontColor = UIColor.darkGray
-                _scoreDisp.isPaused = true
-                _scoreDisp.fontColor = UIColor.darkGray
-                _highScoreDisp.isPaused = true
-                _highScoreDisp.fontColor = UIColor.darkGray
                 _disc.pause()
+                gotoGamePausedState()
             }
         case .GamePaused:
-            _disc.isHidden = false
-            _discsDisp.isHidden = false
-            _scoreDisp.isHidden = false
-            _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
-            _msgTitle.isHidden = false
-            _msgDisp1.isHidden = false
-            _msgDisp2.isHidden = false
-            _msgHighScore.isHidden = true
             if _leftPad.isActive && _rightPad.isActive {
                 // Touching both pads while match is paused, resumes it.
-                state = .GameOngoing
-                hideToolNodes()
-                _leftPad.movable = true
-                _rightPad.movable = true
-                _leftPad.isPaused = false
-                _rightPad.isPaused = false
-                _discsDisp.isPaused = false
-                _discsDisp.fontColor = UIColor.white
-                _scoreDisp.isPaused = false
-                _scoreDisp.fontColor = UIColor.white
-                _highScoreDisp.isPaused = false
-                _highScoreDisp.fontColor = UIColor.white
-                 _disc.resume()
+                gotoGameOngoingState()
+                _disc.resume()
+            } else {
+                // Sleep for a while to decrease battery consumption during
+                // pause - needs to be a small interval to avoid compromising
+                // the reaction interval available for the player when the
+                // disc speed is resumed.
+                Thread.sleep(forTimeInterval: 0.01)
             }
         case .MatchFinished, .MatchAborted,
              .MatchFinishedNewRecord, .MatchAbortedNewRecord:
-            _disc.isHidden = true
-            _discsDisp.isHidden = false
-            _scoreDisp.isHidden = false
-            _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
-            _msgTitle.isHidden = false
-            _msgDisp1.isHidden = false
-            _msgDisp2.isHidden = false
-            _msgHighScore.isHidden = true
+            // All these four states are transient - they just display timed
+            // messages while some actions are executed. There's nothing to do
+            // here.
+            break
         }
-        
-        if !_scoreDisp.isHidden {
-            // Adjust the position of the score label depending on
-            // the visibility of high-score label.
-            _scoreDisp.position.x = _highScoreDisp.isHidden ? _scoreX : _scoreHighScoreX
-        }
-        
+       
     }
     
     // MARK: - SKScene overrides
@@ -553,20 +743,11 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     GameManager.shared.updateHighScoresFromGameCenter()
                 }
                 playSoundFx(_newRecordEffect)
-                state = .MatchAbortedNewRecord
-                showToolNodes()
+                gotoFinishedOrAbortedState(aborted: true, isRecord: true)
             }
             else {
-                state = .MatchAborted
-                showToolNodes()
+                gotoFinishedOrAbortedState(aborted: true, isRecord: false)
             }
-            // Restores the color of the text sprites that display the number
-            // of discs and the scores. It may be grayed out if the abort came
-            // from a paused game.
-            self._discsDisp.fontColor = UIColor.white
-            self._scoreDisp.fontColor = UIColor.white
-            self._highScoreDisp.fontColor = UIColor.white
-            
             Timer.scheduledTimer(withTimeInterval: 3.0,
                                  repeats: false,
                                  block: { timer in
@@ -576,7 +757,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                                     DispatchQueue.main.async {
                                         // TODO: remove the call to updateHighScoreFromGameCenter
                                         GameManager.shared.updateHighScoresFromGameCenter()
-                                        self.gotoInitialState()
+                                        self.gotoWaitToStartMatchState()
                                     }
             })
         }
@@ -609,91 +790,15 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     override func didEvaluateActions() {
         if state == .GameOngoing {
             // Detects and processes disc loss
-            if _disc.position.x - _disc.size.width/2 < _leftLimit || _disc.position.x + _disc.size.width/2 > _rightLimit {
-                // Disc is completely to the left or to the right of the scene - player lost rally.
-                playSoundFx(_discGoneEffect)
-                _msgDisp1.alpha = 0.0
-                _msgDisp2.alpha = 0.0
-                let fadeInMsg = SKAction.fadeIn(withDuration: 0.5)
-                _msgDisp1.run(fadeInMsg)
-                _msgDisp2.run(fadeInMsg)
-                if GameManager.shared.availableDiscs > 1 {
-                    // There's at least one disc left; let user start
-                    // a new rally
-                    GameManager.shared.pickUpDisc()
-                    state = .LostDisc
-                    showToolNodes()
-                    Timer.scheduledTimer(
-                        withTimeInterval: 3.0,
-                        repeats: false,
-                        block: { timer in
-                            // Any scene state transition must happen in the UI
-                            // thread along with the rest of the SpriteKit
-                            // update pipeline.
-                            DispatchQueue.main.async {
-                                self.state = .WaitToStartNewRally
-                                self.showToolNodes()
-                            }
-                    })
-                } else {
-                    // Lost rally for the last disc.
-                    if GameManager.shared.scoreBoard.isNewPlayerRecord {
-                        state = .MatchFinishedNewRecord
-                        showToolNodes()
-                        GameManager.shared.registerNewRecord() {
-                            GameManager.shared.updateHighScoresFromGameCenter()
-                        }
-                    } else {
-                        state = .MatchFinished
-                        showToolNodes()
-                    }
-                    // Play new record or game over effects a little bit
-                    // delayed, so they can be distinguished from the sound
-                    // of the last disc gone.
-                    Timer.scheduledTimer(
-                        withTimeInterval: 0.8,
-                        repeats: false,
-                        block: {timer in
-                            DispatchQueue.main.async {
-                                self.playSoundFx(
-                                    GameManager.shared.scoreBoard.isNewPlayerRecord ?
-                                    self._newRecordEffect : self._gameOverEffect
-                                )
-                            }
-                        })
-                    Timer.scheduledTimer(
-                        withTimeInterval: 5.0,
-                        repeats: false,
-                        block: { timer in
-                            // Any scene state transition must happen in the UI
-                            // thread along with the rest of the SpriteKit
-                            // update pipeline.
-                            DispatchQueue.main.async {
-                                if self.state == .MatchFinished || self.state == .MatchFinishedNewRecord {
-                                    // TODO: remove this call to updateHighScoresFromGameCenter
-                                    GameManager.shared.updateHighScoresFromGameCenter()
-                                    self.gotoInitialState()
-                                }
-                            }
-                        })
-                }
+            if _disc.position.x - _disc.size.width/2 < _leftLimit ||
+               _disc.position.x + _disc.size.width/2 > _rightLimit {
+                // Disc is completely to the left or to the right of the scene.
+                // Player lost rally.
+                gotoLostDiscState()
             }
         }
     }
-    
-    override func didSimulatePhysics() {
-        if _state != .GamePaused && _state != .LaunchingDisk && state != .LostDisc {
-            // A score or high-score change is possible in the current court state
-            _scoreDisp.text = scoreText()
-            _highScoreDisp.text = highScoreText()
-            _msgHighScore.text = globalHighScoreText()
-        }
-        if _state != .GameOngoing && _state != .GamePaused {
-            // An update of the number of disks is possible in the current court state
-            _discsDisp.text = discsText()
-        }
-    }
-    
+       
     // MARK: - Private helper methods
     
     private func resetPadsPositions() {
@@ -724,6 +829,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         let fadeInDisc = SKAction.fadeIn(withDuration: 1.5)
         _discAppearance.run(fadeInDisc)
         
+        gotoLaunchingDiskState()
+        
         Timer.scheduledTimer(
             withTimeInterval: 1.5,
             repeats: false,
@@ -735,7 +842,6 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     self.playSoundFx(self._discReleaseEffect)
                     self._discAppearance.alpha = 0.0
                     self._discAppearance.isHidden = true
-                    self.state = CourtState.GameOngoing
                     self.hideToolNodes()
                     self._hitsInRally = 0
                     // At the start of the rally decreases the velocity to the
@@ -758,7 +864,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                     self._disc.position = initialPos
                     self._disc.velocity =
                         CGVector(dx: xVelocity, dy: yVelocity)
-                } // DispatchQueue.main.async end
+                    
+                    self.gotoGameOngoingState()
+                }
         })
     }
     
@@ -801,6 +909,18 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    private func updateScoreText() {
+        _scoreDisp.text = scoreText()
+    }
+    
+    private func updateHighScoreText() {
+        _highScoreDisp.text = highScoreText()
+    }
+    
+    private func updateGlobalHighText() {
+        _msgHighScore.text = globalHighScoreText()
+    }
+    
     private func discsText() -> String {
         let adsks = GameManager.shared.availableDiscs
         var txt = ""
@@ -835,58 +955,13 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _gameInfo.isHidden = false
     }
     
-    private func setMsgs() {
-        switch _state {
-        case .WaitToStartMatch:
-            _msgTitle.text = NSLocalizedString("Let's Play !", comment: "")
-            _msgDisp1.text = NSLocalizedString("To start a new match,", comment: "")
-            _msgDisp2.text = NSLocalizedString("touch and hold both pads.", comment: "")
-        case .MatchAborted:
-            _msgTitle.text = NSLocalizedString("Game aborted", comment: "")
-            _msgDisp1.text = NSLocalizedString("Hope to have you back soon !", comment: "")
-            _msgDisp2.text = ""
-        case .MatchAbortedNewRecord:
-            _msgTitle.text = NSLocalizedString("A New Record !!", comment: "")
-            _msgDisp1.text = NSLocalizedString("Game aborted, but congrats !", comment: "")
-            _msgDisp2.text = ""
-        case .MatchFinishedNewRecord:
-            _msgTitle.text = NSLocalizedString("A New Record !!", comment: "")
-            _msgDisp1.text = NSLocalizedString("Well done !!!", comment: "")
-            _msgDisp2.text = ""
-        case .MatchFinished:
-            _msgTitle.text = NSLocalizedString("Game Over !", comment: "")
-            _msgDisp1.text = NSLocalizedString("Go ahead and play again !!", comment: "")
-            _msgDisp2.text = ""
-        case .GamePaused:
-            _msgTitle.text = NSLocalizedString("Game Paused", comment: "")
-            _msgDisp1.text = NSLocalizedString("To resume, touch and hold both pads.", comment: "")
-            _msgDisp2.text = NSLocalizedString("To abort, touch anywhere with 3 fingers.", comment: "")
-        case .LaunchingDisk:
-            _msgDisp1.text = NSLocalizedString("Get ready to play !", comment: "")
-            _msgDisp2.text = NSLocalizedString("Releasing any pad pauses the game.", comment: "")
-        case .LostDisc:
-            var discTxt: String!
-            let availDiscs = GameManager.shared.availableDiscs
-            if availDiscs >= 2 {
-                discTxt =
-                    String.localizedStringWithFormat(
-                        NSLocalizedString("You have %d discs left !", comment: ""),
-                        availDiscs
-                    )
-            } else if availDiscs == 1 {
-                discTxt =
-                    NSLocalizedString("Make the most of your last disc !", comment: "")
-            }
-            // There's at least one rally left ...
-            _msgDisp1.text = discTxt
-            _msgDisp2.text = NSLocalizedString("Good luck !!", comment:"")
-        case .WaitToStartNewRally:
-            _msgDisp1.text = NSLocalizedString("Hold both pads to launch a new disc.", comment: "")
-            _msgDisp2.text = NSLocalizedString("To abort, touch anywhere with 3 fingers.", comment: "")
-        case .GameOngoing:
-            _msgDisp1.text = ""
-            _msgDisp2.text = ""
+    fileprivate func adjustScorePosition() {
+        if !_scoreDisp.isHidden {
+            // Adjust the position of the score label depending on
+            // the visibility of high-score label.
+            _scoreDisp.position.x =
+                _highScoreDisp.isHidden ? _scoreX : _scoreHighScoreX
         }
     }
-
+    
 }
