@@ -682,7 +682,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             } else {
                 // Sleep for a while to decrease battery consumption during
                 // wait.
-                Thread.sleep(forTimeInterval: 0.4)
+                Thread.sleep(forTimeInterval: 0.15)
             }
         case .LaunchingDisk:
             // LaunchingDisk is a transient state - displays timed message
@@ -699,7 +699,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             } else {
                 // Sleep for a while to decrease battery consumption during
                 // wait.
-                Thread.sleep(forTimeInterval: 0.4)
+                Thread.sleep(forTimeInterval: 0.15)
             }
             
         case .GameOngoing:
