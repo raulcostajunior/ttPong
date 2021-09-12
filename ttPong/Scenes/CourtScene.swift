@@ -30,9 +30,9 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     static let PAD_INSET = CGFloat(12.0)
     static let TOP_BOTTOM_INSET = CGFloat(2.0)
     static let ICON_H_SPACING = CGFloat(36.0)
-    // The arctan of 30 degrees - will be used to derive the maximum y velocity
-    // component for a maximum disc trajectory slope of 30 degrees.
-    static let ARCTAN_30_DEG: CGFloat = 1.0 / sqrt(30.0)
+    // The arctan of 45 degrees - will be used to derive the maximum y velocity
+    // component for a maximum disc trajectory slope of 45 degrees.
+    static let ARCTAN_45_DEG: CGFloat = 1.0 / sqrt(45.0)
 
     private var _disc: DiscSprite!
     private var _leftPad: PadSprite!
@@ -271,12 +271,15 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         _leftPad.physicsBody!.contactTestBitMask = DiscSprite.CollisionCateg
         _rightPad.physicsBody!.contactTestBitMask = DiscSprite.CollisionCateg
         // Minimum velocity components proportional to scene size
-        // Ratios defined from experimentation on an iPhone 5c (568x320 screen)
-        _minDxSpeed = size.width * 0.92
+        // Ratios defined from experimentation on an iPhone 7.
+        _minDxSpeed = size.width * 1.3
         _minDySpeed = size.height * 0.25
         _curDxSpeed = _minDxSpeed
-        _maxDxSpeed = _minDxSpeed * 2.0
-        
+        _maxDxSpeed = _minDxSpeed * 1.6
+        // Disc is initially stopped
+        self._disc.velocity = CGVector(dx: 0.0, dy:0.0)
+        // Limits for positions of the disk for considering whether it is in
+        // game or not.
         _leftLimit = _leftPad.position.x - _disc.size.width/2
         _rightLimit = _rightPad.position.x + _disc.size.width/2
         _leftLimitIn = _leftPad.position.x + _leftPad.size.width/2
@@ -363,12 +366,12 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                             (!hitLeftPad && self._disc.velocity.dx < 0.0) {
                             self._hitsInRally += 1
                             GameManager.shared.scoreBoard.increaseScore(by: 1)
-                            if self._hitsInRally % 4 == 0 &&
+                            if self._hitsInRally % 3 == 0 &&
                                 self._curDxSpeed < self._maxDxSpeed {
                                 // Periodically, on the number of hits in
                                 // the rally, increase the minimal speed
                                 // until it reaches the maximum.
-                                self._curDxSpeed += self._minDxSpeed / 10
+                                self._curDxSpeed += self._minDxSpeed / 18
                             }
                         }
                     } // end of DispatchQueue.main.async
@@ -380,7 +383,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     // MARK: - Scene State handling
     
     func gotoInitialState() {
-        _disc.reset()
+        self._disc.reset()
         state = .WaitToStartMatch
         showToolNodes()
         playSoundFx(_gameStartEffect)
@@ -583,7 +586,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
     override func update(_ currentTime: TimeInterval) {
         updateSceneState()
 
-        if _disc.isActive {
+        if _disc.isActive && state == .GameOngoing {
             // Guarantees the mininal disc horizontal and vertical speeds
             // (avoid edge cases where the game would be too boring).
             // The ratio between the minimum Vx/Vy is the minimal disc slope.
@@ -595,6 +598,11 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                 _disc.velocity.dy =
                     (_disc.velocity.dy < 0 ? -_minDySpeed : _minDySpeed)
             }
+        } else if _disc.isHidden {
+            // The disc physical body should always be static when it is not
+            // visible (save resources).
+            _disc.velocity.dx = 0.0
+            _disc.velocity.dy = 0.0
         }
     }
     
@@ -738,10 +746,10 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
                         xVelocity = -xVelocity
                     }
                     var yVelocity = CGFloat.random(in:-550.0...550.0)
-                    // For the first launch, limit the disc trajectory angle to 30
-                    // degrees.
+                    // For the first launch, limit the disc trajectory angle to
+                    // 45 degrees.
                     if GameManager.shared.availableDiscs == GameManager.shared.totalDiscs {
-                        let yVelocityAbsLimit = abs(xVelocity) * CourtScene.ARCTAN_30_DEG
+                        let yVelocityAbsLimit = abs(xVelocity) * CourtScene.ARCTAN_45_DEG
                         if abs(yVelocity) > yVelocityAbsLimit {
                             let yFactor: CGFloat = (yVelocity < 0 ? -1.0 : 1.0)
                             yVelocity = sqrt(yVelocityAbsLimit*yVelocityAbsLimit) * yFactor
