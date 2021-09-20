@@ -184,6 +184,12 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     // local player?
     var gameCenterSessionActive: Bool { _gameCenterSessionActive }
 
+    private var _gameCenterConnDelegate: GameCenterConnDelegate?
+
+    func setGameCenterConnDelegate(_ delegate: GameCenterConnDelegate) {
+        _gameCenterConnDelegate = delegate
+    }
+
     func initGameCenterIntegration() {
         _localPlayer = GKLocalPlayer.local
 
@@ -203,10 +209,15 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 if let previousPlayerID = self._previousPlayerID,
                     previousPlayerID != self._previousPlayerID {
                     // GameCenter player changed
+                    self._gameCenterConnDelegate?.GameCenterPlayerDisconnected(
+                        playerId: self._previousPlayerID ?? "")
                     self.startNewGame()
                 }
                 self._previousPlayerID = self._localPlayer.playerID
                 self.updateHighScoresFromGameCenter()
+                print("Will call gamecenter conn delegate connected")
+                self._gameCenterConnDelegate?.GameCenterPlayerConnected(
+                    playerId: self._localPlayer.playerID)
             } else {
                 // GameCenter is disabled on the device
                 self._gameCenterSessionActive = false

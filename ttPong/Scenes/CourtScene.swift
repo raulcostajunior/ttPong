@@ -10,7 +10,7 @@ import SpriteKit
 import GameplayKit
 
 
-class CourtScene: SKScene, SKPhysicsContactDelegate {
+class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
     
     // TODO: (v 1.6) Add state for new world record with the corresponding congratulation effects.
     enum CourtState {
@@ -120,6 +120,8 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         initMsgDisplayingNodes(size)
         initPhysics(size)
         initSoundFx()
+
+        GameManager.shared.setGameCenterConnDelegate(self)
 
         gotoWaitToStartMatchState()
     }
@@ -298,6 +300,23 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
             SKAction.playSoundFileNamed("GameOver.wav",
                                         waitForCompletion: false)
     }
+
+    // MARK: - GameCenterConnDelegate
+
+    func GameCenterPlayerConnected(playerId: String) {
+        print("@CourtScene.GameCenterPlayerConnected! state = \(state)")
+        if state == .WaitToStartMatch || state == .WaitToStartNewRally {
+            _msgHighScore.isHidden = false
+        } else {
+            _msgHighScore.isHidden = true
+        }
+        _highScoreDisp.isHidden = false
+    }
+
+    func GameCenterPlayerDisconnected(playerId: String) {
+        _msgHighScore.isHidden = true
+        _highScoreDisp.isHidden = true
+    }
     
     // MARK: - SKPhysicsContactDelegate
 
@@ -383,8 +402,7 @@ class CourtScene: SKScene, SKPhysicsContactDelegate {
         playSoundFx(_gameStartEffect)
         
         GameManager.shared.startNewGame()
-        GameManager.shared.updateHighScoresFromGameCenter()
-        
+
         // Visibility of elements on screen for the WaitToStartMach state
         _disc.isHidden = true
         _discsDisp.isHidden = false

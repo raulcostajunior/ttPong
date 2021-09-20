@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C418115E266CE67600555FBF /* ThemeOptionSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = C418115D266CE67600555FBF /* ThemeOptionSprite.swift */; };
 		CB2C0961249F66C5005DD7C9 /* Phosphate.ttc in Resources */ = {isa = PBXBuildFile; fileRef = CB2C0960249F66C5005DD7C9 /* Phosphate.ttc */; };
+		CB2F2C1626F87E7000FE76C6 /* GameCenterConnDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB2F2C1526F87E7000FE76C6 /* GameCenterConnDelegate.swift */; };
 		CB33F8072529FDDD00522045 /* DiscGone.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F8062529FDDD00522045 /* DiscGone.wav */; };
 		CB33F80C252A004E00522045 /* NewRecord.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F80B252A004E00522045 /* NewRecord.wav */; };
 		CB33F811252A0F7D00522045 /* GameOver.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F810252A0F7D00522045 /* GameOver.wav */; };
@@ -64,6 +65,7 @@
 		CB01B7C62573F96300B5293B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		CB01B7C72573F96300B5293B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CB2C0960249F66C5005DD7C9 /* Phosphate.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = Phosphate.ttc; sourceTree = "<group>"; };
+		CB2F2C1526F87E7000FE76C6 /* GameCenterConnDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterConnDelegate.swift; sourceTree = "<group>"; };
 		CB33F8062529FDDD00522045 /* DiscGone.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = DiscGone.wav; sourceTree = "<group>"; };
 		CB33F80B252A004E00522045 /* NewRecord.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = NewRecord.wav; sourceTree = "<group>"; };
 		CB33F810252A0F7D00522045 /* GameOver.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = GameOver.wav; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 				CBBF951A244CA5EB00789DE2 /* Sprites */,
 				CBBF94E7244AE65100789DE2 /* Assets.xcassets */,
 				CBBF94DA244AE65000789DE2 /* AppDelegate.swift */,
+				CB2F2C1526F87E7000FE76C6 /* GameCenterConnDelegate.swift */,
 				CBBF94E2244AE65000789DE2 /* GameViewController.swift */,
 				CBDFE8E924797F74003EE801 /* GameManager.swift */,
 				CBD45982252CDC6E000AC0E0 /* ScoreBoard.swift */,
@@ -402,6 +405,7 @@
 				CBBF94DB244AE65000789DE2 /* AppDelegate.swift in Sources */,
 				CBD45983252CDC6E000AC0E0 /* ScoreBoard.swift in Sources */,
 				CBBF951E244CA6F700789DE2 /* DiscSprite.swift in Sources */,
+				CB2F2C1626F87E7000FE76C6 /* GameCenterConnDelegate.swift in Sources */,
 				CBC2FDBA2530BA99003E3A86 /* LeaderBoardSprite.swift in Sources */,
 				CBBF951C244CA63200789DE2 /* PadSprite.swift in Sources */,
 				CBB8F97524B3830A00761E6B /* AboutGameSprite.swift in Sources */,
