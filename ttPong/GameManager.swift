@@ -215,7 +215,6 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 }
                 self._previousPlayerID = self._localPlayer.playerID
                 self.updateHighScoresFromGameCenter()
-                print("Will call gamecenter conn delegate connected")
                 self._gameCenterConnDelegate?.GameCenterPlayerConnected(
                     playerId: self._localPlayer.playerID)
             } else {

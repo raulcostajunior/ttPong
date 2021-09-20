@@ -304,18 +304,30 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
     // MARK: - GameCenterConnDelegate
 
     func GameCenterPlayerConnected(playerId: String) {
-        print("@CourtScene.GameCenterPlayerConnected! state = \(state)")
-        if state == .WaitToStartMatch || state == .WaitToStartNewRally {
-            _msgHighScore.isHidden = false
-        } else {
-            _msgHighScore.isHidden = true
-        }
-        _highScoreDisp.isHidden = false
+        // Waits for the high-score to be retrieved after the connection
+        // is established.
+        Timer.scheduledTimer(
+            withTimeInterval: 3.0, repeats: false,
+            block: { timer in
+                DispatchQueue.main.async {
+                    if self.state == .WaitToStartMatch ||
+                       self.state == .WaitToStartNewRally {
+                        self._msgHighScore.isHidden = false
+                    } else {
+                        self._msgHighScore.isHidden = true
+                    }
+                    self._highScoreDisp.isHidden = false
+                    self.adjustScorePosition()
+                    self.updateHighScoreText()
+                    self.updateGlobalHighText()
+                }
+            })
     }
 
     func GameCenterPlayerDisconnected(playerId: String) {
         _msgHighScore.isHidden = true
         _highScoreDisp.isHidden = true
+        adjustScorePosition()
     }
     
     // MARK: - SKPhysicsContactDelegate
@@ -601,27 +613,26 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         _msgDisp2.run(fadeInMsg)
         
         var discTxt: String!
-        let availDiscs = GameManager.shared.availableDiscs
-        if availDiscs >= 2 {
-            discTxt =
-                String.localizedStringWithFormat(
-                    NSLocalizedString("You have %d discs left !", comment: ""),
-                    availDiscs
-                )
-        } else if availDiscs == 1 {
-            discTxt =
-                NSLocalizedString("Make the most of your last disc !", comment: "")
-        }
-        // There's at least one rally left ...
-        _msgDisp1.text = discTxt
-        _msgDisp2.text = NSLocalizedString("Good luck !!", comment:"")
-        
-        if availDiscs > 1 {
-            // There's at least one disc left; let user start
-            // a new rally
+        var availDiscs = GameManager.shared.availableDiscs
+        if availDiscs > 1  {
+            // There is still at least one disc left
             GameManager.shared.pickUpDisc()
+            availDiscs = availDiscs - 1
             _discsDisp.text = discsText()
-            
+            if availDiscs >= 2 {
+                discTxt =
+                    String.localizedStringWithFormat(
+                        NSLocalizedString("You have %d discs left !", comment: ""),
+                        availDiscs
+                    )
+            } else if availDiscs == 1 {
+                discTxt =
+                    NSLocalizedString("Make the most of your last disc !", comment: "")
+            }
+            // There's at least one rally left ...
+            _msgDisp1.text = discTxt
+            _msgDisp2.text = NSLocalizedString("Good luck !!", comment:"")
+        
             // Set visibility of screen elements for LostDisc state.
             showToolNodes()
             _disc.isHidden = true
@@ -898,8 +909,10 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
     }
     
     private func highScoreText() -> String {
-        let fmtHighScore = String(format:"%04d",
-                                  GameManager.shared.scoreBoard.playerHighScore)
+        let scoreValue =
+            GameManager.shared.scoreBoard.playerHighScore < 0
+            ? 0 : GameManager.shared.scoreBoard.playerHighScore
+        let fmtHighScore = String(format:"%04d", scoreValue)
         return String.localizedStringWithFormat(
             NSLocalizedString("HIGH - %@", comment: ""),
             fmtHighScore
