@@ -1,12 +1,10 @@
 /* GameManager.swift */
-"About ttPong" = "Über ttPong";
-"Author: Raul Costa Junior, 2020.\n\n" = "Autor: Raul Costa Junior, 2020 - 2021.\n\n";
+"About ttPong" = "ttPONG %@";
+"Author: Raul Costa Junior, 2020.\n\n" = "Raul Costa Junior, 2020 - 2021.";
 "Score Board Disabled" = "Punktetafel deaktiviert";
 "OK" = "OK";
-"Please consider writing a review." = "Bitte schreiben Sie eine Rezension.";
 "To enable the Score Board" = "\nUm die Punktetafel zu aktivieren, melden Sie sich bitte im GameCenter unter Einstellungen > GameCenter an.";
 "Write a review" = "Eine Rezension schreiben";
-"Version @\n" = "Version @\n";
 
 /* CourtScene.swift */
 "Game aborted" = "Spiel abgebrochen";

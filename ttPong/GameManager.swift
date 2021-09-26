@@ -130,18 +130,17 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         let appVersion =
             Bundle.main.infoDictionary?["CFBundleShortVersionString"] as?
                String
-        var messageBody =
+        let titleStr =
             appVersion != nil ?
             String.localizedStringWithFormat(
-                NSLocalizedString("Version %@\n", comment: ""), appVersion!
-            ) : ""
-        messageBody +=
-            NSLocalizedString("Author: Raul Costa Junior, 2020.\n\n", comment: "")
-            +
-            NSLocalizedString("Please consider writing a review.", comment: "")
+                NSLocalizedString("About ttPong", comment: ""), appVersion!) :
+            NSLocalizedString("About ttPong", comment: "")
+        let messageBody = NSLocalizedString(
+            "Author: Raul Costa Junior, 2020.\n\n", comment: "")
+
         let alert =
             UIAlertController(
-                title: NSLocalizedString("About ttPong", comment: ""),
+                title: titleStr,
                 message: messageBody,
                 preferredStyle: .actionSheet)
         alert.addAction(
@@ -179,22 +178,24 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
 
     private let _connectivity = Connectivity()
     private var _gameCenterSessionActive = false
+    private var _gameCenterDisabled = false
     private var _localPlayer: GKLocalPlayer!
     private var _previousPlayerID: String?
 
     // Is there a live session with GameCenter for the
     // local player?
     var gameCenterSessionActive: Bool {
-        // TODO: Add verification if a connection to the Internet is
-        //       present. If it is, returns the current value of the
-        //       field. If it is not, returns false. In case a connection
-        //       is not present but the current value of the field is true,
-        //       change it to false and communicate the fact to the
-        //       GameCenterConnDelegate.
-        //
-        // TODO: Hook a "handler" to an "InternetConnectionIsPresent" event
-        //       that will call initGameCenterIntegration.
-        _gameCenterSessionActive
+        if !_gameCenterDisabled && !_gameCenterSessionActive {
+            // There's no GameCenter session but the player hasn't denied
+            // his/her intend to use GameCenter - if there's connectivity,
+            // prompt the player to login to GameCenter again.
+            _connectivity.checkConnectivity { conn in
+                if conn.isConnectedViaCellular || conn.isConnectedViaWiFi {
+                    self.initGameCenterIntegration()
+                }
+            }
+        }
+        return _gameCenterSessionActive
     }
 
     private var _gameCenterConnDelegate: GameCenterConnDelegate?
@@ -217,25 +218,33 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 return
             }
             if (self._localPlayer.isAuthenticated) {
-                // TODO: verify that an Internet connection
-                //       is present. Only switch the state
-                //       of GameCenter connection to true
-                //       is a connection is present.
-                //user has succesfully logged in
-                self._gameCenterSessionActive = true
-                if let previousPlayerID = self._previousPlayerID,
-                    previousPlayerID != self._previousPlayerID {
-                    // GameCenter player changed
-                    self._gameCenterConnDelegate?.GameCenterPlayerDisconnected(
-                        playerId: self._previousPlayerID ?? "")
-                    self.startNewGame()
+                self._connectivity.checkConnectivity { conn in
+                    if conn.isConnectedViaCellular || conn.isConnectedViaWiFi {
+                        // There's both a logged GameCenter user and Internet
+                        // connectivity.
+                        self._gameCenterSessionActive = true
+                        if let previousPlayerID = self._previousPlayerID,
+                            previousPlayerID != self._previousPlayerID {
+                            // GameCenter player changed
+                            self._gameCenterConnDelegate?.GameCenterPlayerDisconnected(
+                                playerId: self._previousPlayerID ?? "")
+                            self.startNewGame()
+                        }
+                        self.updateHighScoresFromGameCenter()
+                        self._gameCenterConnDelegate?.GameCenterPlayerConnected(
+                            playerId: self._localPlayer.playerID)
+                    }
+                    self._previousPlayerID = self._localPlayer.playerID
+                    self._gameCenterDisabled = false
+                    // If there's no Internet connectivity, leave the next
+                    // check for when gameCenterSessionActive is queried again;
+                    // we avoid going into polling mode as that would increase
+                    // battery usage.
                 }
-                self._previousPlayerID = self._localPlayer.playerID
-                self.updateHighScoresFromGameCenter()
-                self._gameCenterConnDelegate?.GameCenterPlayerConnected(
-                    playerId: self._localPlayer.playerID)
             } else {
-                // GameCenter is disabled on the device
+                // User has not logged in GameCenter - register that in
+                // _gameCenterDisabled so we don't keep bothering him/her.
+                self._gameCenterDisabled = true
                 self._gameCenterSessionActive = false
                 self._previousPlayerID = nil
             }

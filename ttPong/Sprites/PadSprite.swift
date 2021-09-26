@@ -62,7 +62,7 @@ class PadSprite: SKSpriteNode {
     static let CollisionCateg: UInt32 = 0x1 << 1
     
     init(for sceneSize:CGSize) {
-        let height = Int(round(sceneSize.height/3.6))
+        let height = Int(round(sceneSize.height/3.2))
             
         super.init(texture: nil, color: UIColor.clear,
                    size: CGSize(width: PadSprite.WIDTH, height: height))

@@ -38,7 +38,7 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
     private var _rightPad: PadSprite!
     private var _soundOption: SoundOptionSprite!
     private var _leaderBoard: LeaderBoardSprite!
-    private var _themeOption: ThemeOptionSprite!
+//    private var _themeOption: ThemeOptionSprite!
     private var _gameInfo: AboutGameSprite!
     
     // The x coordinate of the scoreboard when
@@ -141,8 +141,7 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
     fileprivate func initToolsNodes(_ size: CGSize) {
         // The tools are centered at the bottom of the screen.
         _leaderBoard = LeaderBoardSprite()
-        let leaderHPos =
-            (size.width - _leaderBoard.size.width - CourtScene.ICON_H_SPACING)/2
+        let leaderHPos = size.width/2
         let leaderVPos = CourtScene.TOP_BOTTOM_INSET+_leaderBoard.size.height/2
         _leaderBoard.position = CGPoint(x: leaderHPos, y: leaderVPos)
         self.addChild(_leaderBoard)
@@ -155,16 +154,16 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         _soundOption.position = CGPoint(x: sndOptHPos, y: sndOptVPos)
         self.addChild(_soundOption)
         
-        _themeOption = ThemeOptionSprite()
-        let themeOptHPos = leaderHPos + _leaderBoard.size.width/2 +
-            CourtScene.ICON_H_SPACING
-        let themeOptVPos = CourtScene.TOP_BOTTOM_INSET +
-            _leaderBoard.size.height/2
-        _themeOption.position = CGPoint(x: themeOptHPos, y: themeOptVPos)
-        self.addChild(_themeOption)
+//        _themeOption = ThemeOptionSprite()
+//        let themeOptHPos = leaderHPos + _leaderBoard.size.width/2 +
+//            CourtScene.ICON_H_SPACING
+//        let themeOptVPos = CourtScene.TOP_BOTTOM_INSET +
+//            _leaderBoard.size.height/2
+//        _themeOption.position = CGPoint(x: themeOptHPos, y: themeOptVPos)
+//        self.addChild(_themeOption)
                
         _gameInfo = AboutGameSprite()
-        let infoHPos = themeOptHPos + _leaderBoard.size.width/2 +
+        let infoHPos = leaderHPos + _leaderBoard.size.width/2 +
             CourtScene.ICON_H_SPACING
         let infoVPos = sndOptVPos
         _gameInfo.position = CGPoint(x: infoHPos, y: infoVPos)
@@ -307,7 +306,7 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         // Waits for the high-score to be retrieved after the connection
         // is established.
         Timer.scheduledTimer(
-            withTimeInterval: 3.0, repeats: false,
+            withTimeInterval: 4.0, repeats: false,
             block: { timer in
                 DispatchQueue.main.async {
                     if self.state == .WaitToStartMatch ||
@@ -390,7 +389,7 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
                             GameManager.shared.scoreBoard.increaseScore(by: 1)
                             self.updateScoreText()
                             self.updateHighScoreText()
-                            if self._hitsInRally % 3 == 0 &&
+                            if self._hitsInRally % 4 == 0 &&
                                 self._curDxSpeed < self._maxDxSpeed {
                                 // Periodically, on the number of hits in
                                 // the rally, increase the minimal speed
@@ -549,10 +548,13 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         
         _msgTitle.text =
             NSLocalizedString("Game Paused", comment: "")
+        _msgTitle.isHidden = false
         _msgDisp1.text =
             NSLocalizedString("To resume, touch and hold both pads.", comment: "")
+        _msgDisp1.isHidden = false
         _msgDisp2.text =
             NSLocalizedString("To abort, touch anywhere with 3 fingers.", comment: "")
+        _msgDisp2.isHidden = false
     }
     
     fileprivate func gotoFinishedOrAbortedState(
@@ -746,7 +748,7 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
                 // pause - needs to be a small interval to avoid compromising
                 // the reaction interval available for the player when the
                 // disc speed is resumed.
-                Thread.sleep(forTimeInterval: 0.01)
+                Thread.sleep(forTimeInterval: 0.03)
             }
         case .MatchFinished, .MatchAborted,
              .MatchFinishedNewRecord, .MatchAbortedNewRecord:
@@ -975,14 +977,14 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
     private func hideToolNodes() {
         _soundOption.isHidden = true
         _leaderBoard.isHidden = true
-        _themeOption.isHidden = true
+//        _themeOption.isHidden = true
         _gameInfo.isHidden = true
     }
     
     private func showToolNodes() {
         _soundOption.isHidden = false
         _leaderBoard.isHidden = false
-        _themeOption.isHidden = false
+//        _themeOption.isHidden = false
         _gameInfo.isHidden = false
     }
     
