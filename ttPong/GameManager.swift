@@ -7,6 +7,7 @@
 //
 
 // import CloudKit
+import Connectivity
 import Foundation
 import GameKit
 import SpriteKit
@@ -176,13 +177,25 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     //       of connectivity and flush those records whenever the connectivity
     //       is restored in the lifetime of the hosting process.
 
+    private let _connectivity = Connectivity()
     private var _gameCenterSessionActive = false
     private var _localPlayer: GKLocalPlayer!
     private var _previousPlayerID: String?
 
     // Is there a live session with GameCenter for the
     // local player?
-    var gameCenterSessionActive: Bool { _gameCenterSessionActive }
+    var gameCenterSessionActive: Bool {
+        // TODO: Add verification if a connection to the Internet is
+        //       present. If it is, returns the current value of the
+        //       field. If it is not, returns false. In case a connection
+        //       is not present but the current value of the field is true,
+        //       change it to false and communicate the fact to the
+        //       GameCenterConnDelegate.
+        //
+        // TODO: Hook a "handler" to an "InternetConnectionIsPresent" event
+        //       that will call initGameCenterIntegration.
+        _gameCenterSessionActive
+    }
 
     private var _gameCenterConnDelegate: GameCenterConnDelegate?
 
@@ -204,6 +217,10 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                 return
             }
             if (self._localPlayer.isAuthenticated) {
+                // TODO: verify that an Internet connection
+                //       is present. Only switch the state
+                //       of GameCenter connection to true
+                //       is a connection is present.
                 //user has succesfully logged in
                 self._gameCenterSessionActive = true
                 if let previousPlayerID = self._previousPlayerID,
