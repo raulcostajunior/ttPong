@@ -32,6 +32,9 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
     // The arctan of 45 degrees - will be used to derive the maximum y velocity
     // component for a maximum disc trajectory slope of 45 degrees.
     static let ARCTAN_45_DEG: CGFloat = 1.0 / sqrt(45.0)
+    
+    static let SLEEP_INTERVAL_PAUSED = 0.03
+    static let SLEEP_INTERVAL_WAITING = 0.07
 
     private var _disc: DiscSprite!
     private var _leftPad: PadSprite!
@@ -713,7 +716,7 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
             } else {
                 // Sleep for a while to decrease battery consumption during
                 // wait.
-                Thread.sleep(forTimeInterval: 0.15)
+                Thread.sleep(forTimeInterval: CourtScene.SLEEP_INTERVAL_WAITING)
             }
         case .LaunchingDisk:
             // LaunchingDisk is a transient state - displays timed message
@@ -730,7 +733,7 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
             } else {
                 // Sleep for a while to decrease battery consumption during
                 // wait.
-                Thread.sleep(forTimeInterval: 0.15)
+                Thread.sleep(forTimeInterval: CourtScene.SLEEP_INTERVAL_WAITING)
             }
             
         case .GameOngoing:
@@ -748,7 +751,7 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
                 // pause - needs to be a small interval to avoid compromising
                 // the reaction interval available for the player when the
                 // disc speed is resumed.
-                Thread.sleep(forTimeInterval: 0.03)
+                Thread.sleep(forTimeInterval: CourtScene.SLEEP_INTERVAL_PAUSED)
             }
         case .MatchFinished, .MatchAborted,
              .MatchFinishedNewRecord, .MatchAbortedNewRecord:

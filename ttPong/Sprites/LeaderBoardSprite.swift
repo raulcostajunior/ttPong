@@ -26,6 +26,18 @@ class LeaderBoardSprite: SKSpriteNode {
     }
      
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        // Perform a pulsating effect on the button - the rendering of the
+        // score board takes a while to take over the screen and the user needs
+        // some feedback that the tool button has been activated.
+        let fadeOut = SKAction.fadeOut(withDuration: 0.6)
+        let fadeIn = SKAction.fadeIn(withDuration: 0.8)
+        self.run(fadeOut, completion: {
+            self.run(fadeIn, completion: {
+                self.run(fadeOut, completion: {
+                    self.run(fadeIn)
+                })
+            })
+        })
         GameManager.shared.displayRecords()
         super.touchesEnded(touches, with: event)
     }
