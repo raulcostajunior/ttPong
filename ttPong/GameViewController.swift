@@ -14,8 +14,8 @@ class GameViewController: UIViewController {
     
     var adjustedSafeArea = false
 
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
+    override func viewDidLoad() {
+        super.viewDidLoad()
         if #available(iOS 11.0, *), let view = self.view, !adjustedSafeArea {
             view.frame = self.view.safeAreaLayoutGuide.layoutFrame
             adjustedSafeArea = true
@@ -28,7 +28,7 @@ class GameViewController: UIViewController {
 //        view.showsDrawCount = true
         GameManager.shared.presentGame(on:view)
     }
-
+ 
     override var shouldAutorotate: Bool {
         return true
     }

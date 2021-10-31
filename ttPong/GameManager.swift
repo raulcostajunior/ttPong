@@ -24,6 +24,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
         _scoreBoard = ScoreBoard()
     }
     
+   
     // MARK: - Options and Score Management
 
     private static let TOTAL_DISCS = 4
