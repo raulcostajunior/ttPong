@@ -251,6 +251,19 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             }
         }
     }
+    
+    func resetGameCenterIntegration() {
+        if self._gameCenterSessionActive {
+            self._gameCenterSessionActive = false
+            self._previousPlayerID = self._localPlayer.playerID
+            self._gameCenterDisabled = false
+            self._gameCenterConnDelegate?.GameCenterPlayerDisconnected(playerId: self._localPlayer.playerID)
+        } else {
+            // If there was no session active we just need to clear the
+            // GameCenterDisabled status.
+            self._gameCenterDisabled = false
+        }
+    }
 
     func updateHighScoresFromGameCenter() {
         guard _gameCenterSessionActive else { return }

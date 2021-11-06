@@ -421,11 +421,15 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         _disc.isHidden = true
         _discsDisp.isHidden = false
         _scoreDisp.isHidden = false
-        _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
+        _highScoreDisp.isHidden =
+            GameManager.shared.scoreBoard.playerHighScore < 0 ||
+            !GameManager.shared.gameCenterSessionActive
         _msgTitle.isHidden = false
         _msgDisp1.isHidden = false
         _msgDisp2.isHidden = false
-        _msgHighScore.isHidden = GameManager.shared.scoreBoard.globalHighScore < 0
+        _msgHighScore.isHidden =
+            GameManager.shared.scoreBoard.globalHighScore < 0 ||
+            !GameManager.shared.gameCenterSessionActive
         resetPadsPositions()
         _leftPad.movable = false
         _rightPad.movable = false
@@ -452,10 +456,14 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         _disc.isHidden = true
         _discsDisp.isHidden = false
         _scoreDisp.isHidden = false
-        _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
+        _highScoreDisp.isHidden =
+            GameManager.shared.scoreBoard.playerHighScore < 0 ||
+            !GameManager.shared.gameCenterSessionActive
         _msgDisp1.isHidden = false
         _msgDisp2.isHidden = false
-        _msgHighScore.isHidden = GameManager.shared.scoreBoard.globalHighScore < 0
+        _msgHighScore.isHidden =
+            GameManager.shared.scoreBoard.globalHighScore < 0 ||
+            !GameManager.shared.gameCenterSessionActive
         _msgTitle.isHidden = true
         resetPadsPositions()
         _leftPad.movable = false
@@ -484,7 +492,9 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         _disc.isHidden = true
         _discsDisp.isHidden = false
         _scoreDisp.isHidden = false
-        _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
+        _highScoreDisp.isHidden =
+            GameManager.shared.scoreBoard.playerHighScore < 0 ||
+            !GameManager.shared.gameCenterSessionActive
         _msgDisp1.isHidden = false
         _msgDisp2.isHidden = false
         _msgHighScore.isHidden = true
@@ -517,7 +527,8 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         _discsDisp.isHidden = false
         _scoreDisp.isHidden = false
         _highScoreDisp.isHidden =
-            GameManager.shared.scoreBoard.playerHighScore < 0
+            GameManager.shared.scoreBoard.playerHighScore < 0 ||
+            !GameManager.shared.gameCenterSessionActive
         _msgDisp1.isHidden = true
         _msgDisp2.isHidden = true
         _msgTitle.isHidden = true
@@ -567,7 +578,8 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         _disc.isHidden = true
         _discsDisp.isHidden = false
         _scoreDisp.isHidden = false
-        _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
+        _highScoreDisp.isHidden =
+            GameManager.shared.scoreBoard.playerHighScore < 0 || !GameManager.shared.gameCenterSessionActive
         _msgTitle.isHidden = false
         _msgDisp1.isHidden = false
         _msgDisp2.isHidden = false
@@ -643,7 +655,8 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
             _disc.isHidden = true
             _discsDisp.isHidden = false
             _scoreDisp.isHidden = false
-            _highScoreDisp.isHidden = GameManager.shared.scoreBoard.playerHighScore < 0
+            _highScoreDisp.isHidden =
+                GameManager.shared.scoreBoard.playerHighScore < 0 || !GameManager.shared.gameCenterSessionActive
             _msgDisp1.isHidden = false
             _msgDisp2.isHidden = false
             _msgHighScore.isHidden = true
