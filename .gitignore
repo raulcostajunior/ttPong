@@ -94,3 +94,9 @@ iOSInjectionProject/
 *.kra~
 
 *.DS_Store
+
+# Files with extended file attributes when the FS is not AFS (Apple File System)
+# nor HFS+.
+
+._*
+ 
