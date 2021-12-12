@@ -74,7 +74,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             return;
         }
 
-        _currentScene = CourtScene(size:view.bounds.size)
+        _currentScene = CourtScene(within: view.frame)
         _currentScene?.scaleMode = .aspectFill
         view.presentScene(_currentScene)
         

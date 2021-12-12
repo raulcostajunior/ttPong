@@ -95,10 +95,12 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         super.init(coder: aDecoder)
     }
     
-    override init(size: CGSize) {
+    init(within frame: CGRect) {
+        let size = CGSize(width: frame.width, height: frame.height)
         super.init(size: size)
+
         backgroundColor = SKColor(red: 0.0, green: 0.0, blue:0.0, alpha: 1.0)
-        
+
         _disc = DiscSprite(for: size)
         _disc.name = "Disc"
         _disc.position = CGPoint(x: size.width/2.0, y: 100.0)
@@ -106,14 +108,18 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
 
         _leftPad = PadSprite(for: size)
         _leftPad.name = "LeftPad"
-        let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET
+        let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET +
+                    frame.origin.x
+
         let vPos = size.height/2.0
         _leftPad.position = CGPoint(x: lHPos, y: vPos)
         self.addChild(_leftPad)
 
         _rightPad = PadSprite(for: size)
         _rightPad.name = "RightPad"
-        let rHPos = self.size.width - CourtScene.PAD_INSET - _rightPad.size.width/2.0
+        let rHPos = self.size.width - CourtScene.PAD_INSET -
+                    _rightPad.size.width/2.0 - frame.origin.x
+
         _rightPad.position = CGPoint(x: rHPos, y: vPos)
         self.addChild(_rightPad)
         

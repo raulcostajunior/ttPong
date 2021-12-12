@@ -12,21 +12,29 @@ import GameKit
 
 class GameViewController: UIViewController {
     
-    var adjustedSafeArea = false
+    var gamePresented = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        if #available(iOS 11.0, *), let view = self.view, !adjustedSafeArea {
-            view.frame = self.view.safeAreaLayoutGuide.layoutFrame
-            adjustedSafeArea = true
-        }
         guard let view = self.view as! SKView? else { return }
         view.ignoresSiblingOrder = true
 //        view.showsFPS = true
 //        view.showsNodeCount = true
 //        view.showsPhysics = true
 //        view.showsDrawCount = true
-        GameManager.shared.presentGame(on:view)
+    }
+
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        guard let view = self.view as! SKView?, !gamePresented else { return }
+        // SafeArea adjustments cannot be done at viewDidLoad (too early;
+        // all the insets are zero, even for models that have a notch and no
+        // home button).
+        if #available(iOS 11.0, *) {
+            view.frame = self.view.safeAreaLayoutGuide.layoutFrame
+        }
+        GameManager.shared.presentGame(on: view)
+        gamePresented = true
     }
  
     override var shouldAutorotate: Bool {
