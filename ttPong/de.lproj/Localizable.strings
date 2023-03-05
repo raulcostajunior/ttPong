@@ -1,0 +1,37 @@
+/* GameManager.swift */
+"About ttPong" = "ttPONG %@";
+"Author: Raul Costa Junior, 2020.\n\n" = "Raul Costa Junior, 2020 - 2021.";
+"Score Board Disabled" = "Punktetafel deaktiviert";
+"OK" = "OK";
+"To enable the Score Board" = "\nUm die Punktetafel zu aktivieren, melden Sie sich bitte im GameCenter unter Einstellungen > GameCenter an.";
+"Write a review" = "Eine Rezension schreiben";
+
+/* CourtScene.swift */
+"Game aborted" = "Spiel abgebrochen";
+"Hope to have you back soon !" = "Kommen Sie bald wieder !";
+"Let's Play !" = "Lass uns spielen !";
+"To start a new match," = "Halten Sie zu Beginn";
+"touch and hold both pads." = "beide Pads.";
+"A New Record !!" = "Ihr Neuer Rekord !!";
+"Game aborted, but congrats !" = "Spiel abgebrochen, aber Glückwunsch !";
+"Well done !!!" = "Gut gemacht !!!";
+"Game Over !" = "Spiel beendet !";
+"Go ahead and play again !!" = "Lasst uns noch einmal spielen !!";
+"Game Paused" = "Spiel pausiert";
+"To resume, touch and hold both pads." = "Um fortzufahren, halten Sie beide Pads.";
+"To abort, touch anywhere with 3 fingers." = "Zum Abbrechen berühren Sie den Bildschirm mit 3 Fingern.";
+"Get ready to play !" = "Machen Sie sich bereit !";
+"Releasing any pad pauses the game." = "Freigeben eines beliebigen Blocks, um das Spiel zu pausieren.";
+"You have %d discs left !" = "Weitere %d Platten !";
+"Make the most of your last disc !" ="Machen Sie das Beste aus Ihrer letzten Platte !";
+"Good luck !!" = "Viel Glück !!";
+"Hold both pads to launch a new disc." = "Halten Sie beide Pads zum Starten einer neuen Platte.";
+"SCORE - %@" = "PUNKTE - %@";
+"HIGH - %@" = "REKORD - %@";
+"GLOBAL HIGH RANK" = "WELT REKORD - %@    IHR RANK - %@";
+"GLOBAL HIGH" = "WELT REKORD - %@";
+"LAST DISC" = "LETZTE PLATTE";
+"DISCS - %d" = "PLATTEN - %d";
+"SCORE - 99999" = "PUNKTE - 99999";
+
+

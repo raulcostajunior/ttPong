@@ -1,0 +1,37 @@
+/* GameManager.swift */
+"About ttPong" = "ttPONG %@";
+"Author: Raul Costa Junior, 2020.\n\n" = "Raul Costa Junior, 2020 - 2021.";
+"Score Board Disabled" = "Score Board Disabled";
+"OK" = "OK";
+"To enable the Score Board" = "\nTo enable the Score Board, please sign in to GameCenter in Settings > GameCenter.";
+"Write a review" = "Write a review";
+
+/* CourtScene.swift */
+"Game aborted" = "Game aborted";
+"Hope to have you back soon !" = "Hope to have you back soon !";
+"Let's Play !" = "Let's Play !";
+"To start a new match," = "To start a new match,";
+"touch and hold both pads." = "touch and hold both pads.";
+"A New Record !!" = "Your New Record !!";
+"Game aborted, but congrats !" = "Game aborted, but congrats !";
+"Well done !!!" = "Well done !!!";
+"Game Over !" = "Game Over !";
+"Go ahead and play again !!" = "Go ahead and play again !!";
+"Game Paused" = "Game Paused";
+"To resume, touch and hold both pads." = "To resume, touch and hold both pads.";
+"To abort, touch anywhere with 3 fingers." = "To abort, touch anywhere with 3 fingers.";
+"Get ready to play !" = "Get ready to play !";
+"Releasing any pad pauses the game." = "Releasing any pad pauses the game.";
+"You have %d discs left !" = "You have %d discs left !";
+"Make the most of your last disc !" ="Make the most of your last disc !";
+"Good luck !!" = "Good luck !!";
+"Hold both pads to launch a new disc." = "Hold both pads to launch a new disc.";
+"SCORE - %@" = "SCORE - %@";
+"HIGH - %@" = "HIGH - %@";
+"GLOBAL HIGH RANK" = "GLOBAL HIGH - %@    YOUR RANK - %@";
+"GLOBAL HIGH" = "GLOBAL HIGH - %@";
+"LAST DISC" = "LAST DISC";
+"DISCS - %d" = "DISCS - %d";
+"SCORE - 99999" = "SCORE - 99999";
+
+

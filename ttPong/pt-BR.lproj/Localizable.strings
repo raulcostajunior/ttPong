@@ -1,0 +1,35 @@
+/* GameManager.swift */
+"About ttPong" = "ttPONG %@";
+"Author: Raul Costa Junior, 2020.\n\n" = "Raul Costa Junior, 2020 - 2021.";
+"Score Board Disabled" = "Placar Desabilitado";
+"OK" = "OK";
+"To enable the Score Board" = "\nPara habilitar o Placar, logue-se no Gamecenter em Ajustes > GameCenter.";
+"Write a review" = "Avaliar o ttPong";
+
+/* CourtScene.swift */
+"Game aborted" = "Jogo Abortado";
+"Hope to have you back soon !" = "Volte em breve !";
+"Let's Play !" = "Vamos Jogar !";
+"To start a new match," = "Para iniciar,";
+"touch and hold both pads." = "segure os dois anteparos.";
+"A New Record !!" = "Seu Novo Recorde !!";
+"Game aborted, but congrats !" = "Jogo abortado, mas Parabéns !";
+"Well done !!!" = "Parabéns !!!";
+"Game Over !" = "Fim de Jogo !";
+"Go ahead and play again !!" = "Vamos jogar de novo !!";
+"Game Paused" = "Jogo Pausado";
+"To resume, touch and hold both pads." = "Para continuar, segure os dois anteparos.";
+"To abort, touch anywhere with 3 fingers." = "Para abortar, toque a tela com 3 dedos.";
+"Get ready to play !" = "Prepare-se !";
+"Releasing any pad pauses the game." = "Para pausar, solte pelo menos um anteparo.";
+"You have %d discs left !" = "Mais %d discos !";
+"Make the most of your last disc !" ="Aproveite seu último disco !";
+"Good luck !!" = "Boa Sorte !!";
+"Hold both pads to launch a new disc." = "Segure ambos os anteparos para lançar o disco.";
+"SCORE - %@" = "PLACAR - %@";
+"HIGH - %@" = "RECORDE - %@";
+"GLOBAL HIGH RANK" = "RECORDE GLOBAL - %@    SUA POSIÇÃO - %@";
+"GLOBAL HIGH" = "RECORDE GLOBAL - %@";
+"LAST DISC" = "ÚLTIMO DISCO";
+"DISCS - %d" = "DISCOS - %d";
+"SCORE - 99999" = "RECORDE - 99999";
