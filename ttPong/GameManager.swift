@@ -233,9 +233,9 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
                         }
                         self.updateHighScoresFromGameCenter()
                         self._gameCenterConnDelegate?.GameCenterPlayerConnected(
-                            playerId: self._localPlayer.playerID)
+                            playerId: self._localPlayer.teamPlayerID)
                     }
-                    self._previousPlayerID = self._localPlayer.playerID
+                    self._previousPlayerID = self._localPlayer.teamPlayerID
                     self._gameCenterDisabled = false
                     // If there's no Internet connectivity, leave the next
                     // check for when gameCenterSessionActive is queried again;
@@ -255,9 +255,9 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     func resetGameCenterIntegration() {
         if self._gameCenterSessionActive {
             self._gameCenterSessionActive = false
-            self._previousPlayerID = self._localPlayer.playerID
+            self._previousPlayerID = self._localPlayer.teamPlayerID
             self._gameCenterDisabled = false
-            self._gameCenterConnDelegate?.GameCenterPlayerDisconnected(playerId: self._localPlayer.playerID)
+            self._gameCenterConnDelegate?.GameCenterPlayerDisconnected(playerId: self._localPlayer.teamPlayerID)
         } else {
             // If there was no session active we just need to clear the
             // GameCenterDisabled status.
@@ -308,7 +308,7 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
             completionHandler: { [weak self] (boardScores, error) -> Void in
                if let scores = boardScores, error == nil {
                    for score in scores {
-                       if score.player.playerID == self?._localPlayer.playerID {
+                       if score.player.teamPlayerID == self?._localPlayer.teamPlayerID {
                            playerHighScore = score.value
                            playerRank = Int64(score.rank)
                            break;

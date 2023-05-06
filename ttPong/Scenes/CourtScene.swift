@@ -136,15 +136,12 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
     }
     
     fileprivate func initDiscAppearanceEffect() {
-        let discAppearancePath =
-            Bundle.main.path(forResource: "DiscAppearance",
-                             ofType: "sks")
-        _discAppearance =
-            NSKeyedUnarchiver.unarchiveObject(withFile: discAppearancePath!)
-            as? SKEmitterNode
-        _discAppearance.isHidden = true
-        _discAppearance.alpha = 0.0
-        self.addChild(_discAppearance)
+        if let discAppearancePath = Bundle.main.url(forResource: "DiscAppearance", withExtension: "sks") {
+            _discAppearance = try? NSKeyedUnarchiver.unarchivedObject(ofClass: SKEmitterNode.self, from: Data(contentsOf: discAppearancePath))
+            _discAppearance.isHidden = true
+            _discAppearance.alpha = 0.0
+            self.addChild(_discAppearance)
+        }
     }
     
     fileprivate func initToolsNodes(_ size: CGSize) {
