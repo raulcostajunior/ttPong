@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C418115E266CE67600555FBF /* ThemeOptionSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = C418115D266CE67600555FBF /* ThemeOptionSprite.swift */; };
+		C4676B752AADCF75009EF488 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB714D48252F2A1300D8476F /* GameKit.framework */; };
 		CB2C0961249F66C5005DD7C9 /* Phosphate.ttc in Resources */ = {isa = PBXBuildFile; fileRef = CB2C0960249F66C5005DD7C9 /* Phosphate.ttc */; };
 		CB2F2C1626F87E7000FE76C6 /* GameCenterConnDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB2F2C1526F87E7000FE76C6 /* GameCenterConnDelegate.swift */; };
 		CB33F8072529FDDD00522045 /* DiscGone.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F8062529FDDD00522045 /* DiscGone.wav */; };
@@ -16,7 +17,6 @@
 		CB33F816252A22D700522045 /* GameStart.wav in Resources */ = {isa = PBXBuildFile; fileRef = CB33F815252A22D700522045 /* GameStart.wav */; };
 		CB4E5D95256A6F0B004CC416 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CB4E5D97256A6F0B004CC416 /* Localizable.strings */; };
 		CB6FE80C26B6895800477F17 /* Connectivity in Frameworks */ = {isa = PBXBuildFile; productRef = CB6FE80B26B6895800477F17 /* Connectivity */; };
-		CB714D49252F2A1300D8476F /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB714D48252F2A1300D8476F /* GameKit.framework */; };
 		CBA536BD2517B93900E6EFDE /* DiscHit.caf in Resources */ = {isa = PBXBuildFile; fileRef = CBA536BC2517B93900E6EFDE /* DiscHit.caf */; };
 		CBA536C52517BA1800E6EFDE /* DiscRelease.caf in Resources */ = {isa = PBXBuildFile; fileRef = CBA536C42517BA1800E6EFDE /* DiscRelease.caf */; };
 		CBB1B73024BC49A30033FA32 /* DiscAppearance.sks in Resources */ = {isa = PBXBuildFile; fileRef = CBB1B72E24BC49A30033FA32 /* DiscAppearance.sks */; };
@@ -109,8 +109,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CB714D49252F2A1300D8476F /* GameKit.framework in Frameworks */,
 				CB6FE80C26B6895800477F17 /* Connectivity in Frameworks */,
+				C4676B752AADCF75009EF488 /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -605,7 +605,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7G8JJ3WHW6;
 				INFOPLIST_FILE = ttPong/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -626,7 +626,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7G8JJ3WHW6;
 				INFOPLIST_FILE = ttPong/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
