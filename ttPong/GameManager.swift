@@ -96,8 +96,10 @@ class GameManager: NSObject, GKGameCenterControllerDelegate {
     }
 
     func displayRecords() {
-        let rootVc =
-            UIApplication.shared.windows.first!.rootViewController!
+        let scenes = UIApplication.shared.connectedScenes
+        let windowScene = scenes.first as? UIWindowScene
+        let window = windowScene?.windows.first
+        let rootVc = window!.rootViewController!
         if self.gameCenterSessionActive {
             var vc: GKGameCenterViewController!
             if #available(iOS 14.0, *) {
