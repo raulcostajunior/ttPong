@@ -95,8 +95,9 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         super.init(coder: aDecoder)
     }
     
-    init(within frame: CGRect) {
-        let size = CGSize(width: frame.width, height: frame.height)
+    init(within view: SKView) {
+        let insets = view.safeAreaInsets
+        let size = CGSize(width: view.frame.width, height: view.frame.height)
         super.init(size: size)
 
         backgroundColor = SKColor(red: 0.0, green: 0.0, blue:0.0, alpha: 1.0)
@@ -108,8 +109,7 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
 
         _leftPad = PadSprite(for: size)
         _leftPad.name = "LeftPad"
-        let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET +
-                    frame.origin.x
+        let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET + insets.left
 
         let vPos = size.height/2.0
         _leftPad.position = CGPoint(x: lHPos, y: vPos)
@@ -117,21 +117,21 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
 
         _rightPad = PadSprite(for: size)
         _rightPad.name = "RightPad"
-        let rHPos = self.size.width - CourtScene.PAD_INSET -
-                    _rightPad.size.width/2.0 - frame.origin.x
+        let rHPos = view.frame.width - CourtScene.PAD_INSET -
+        _rightPad.size.width/2.0 - insets.right
 
         _rightPad.position = CGPoint(x: rHPos, y: vPos)
         self.addChild(_rightPad)
         
         initDiscAppearanceEffect()
-        initToolsNodes(size)
+        initToolsNodes(view)
         initGameStatusNodes(size)
         initMsgDisplayingNodes(size)
         initPhysics(size)
         initSoundFx()
 
         GameManager.shared.setGameCenterConnDelegate(self)
-
+        
         gotoWaitToStartMatchState()
     }
     
@@ -144,18 +144,18 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         }
     }
     
-    fileprivate func initToolsNodes(_ size: CGSize) {
+    fileprivate func initToolsNodes(_ view: SKView) {
         // The tools are centered at the bottom of the screen.
         _leaderBoard = LeaderBoardSprite()
-        let leaderHPos = size.width/2
-        let leaderVPos = CourtScene.TOP_BOTTOM_INSET+_leaderBoard.size.height/2
+        let leaderHPos = view.frame.width/2
+        let leaderVPos = CourtScene.TOP_BOTTOM_INSET + view.safeAreaInsets.bottom + _leaderBoard.size.height/2
         _leaderBoard.position = CGPoint(x: leaderHPos, y: leaderVPos)
         self.addChild(_leaderBoard)
         
         _soundOption = SoundOptionSprite()
         let sndOptHPos =
             leaderHPos - _leaderBoard.size.width/2 - CourtScene.ICON_H_SPACING
-        let sndOptVPos = CourtScene.TOP_BOTTOM_INSET +
+        let sndOptVPos = CourtScene.TOP_BOTTOM_INSET + view.safeAreaInsets.bottom +
             _soundOption.size.height/2
         _soundOption.position = CGPoint(x: sndOptHPos, y: sndOptVPos)
         self.addChild(_soundOption)
@@ -282,6 +282,7 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
         _rightLimit = _rightPad.position.x + _disc.size.width/2
         _leftLimitIn = _leftPad.position.x + _leftPad.size.width/2
         _rightLimitIn = _rightPad.position.x - _rightPad.size.width/2
+       
     }
     
     fileprivate func initSoundFx() {
@@ -342,7 +343,7 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
 
     func didBegin(_ contact:SKPhysicsContact) {
         guard state == .GameOngoing && _disc.position.x > _leftLimitIn &&
-            _disc.position.x < _rightLimitIn
+                _disc.position.x  < _rightLimitIn
             else {
             // We're only interested in collisions while game is ongoing
             // and the disc in court
@@ -840,8 +841,8 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
     override func didEvaluateActions() {
         if state == .GameOngoing {
             // Detects and processes disc loss
-            if _disc.position.x - _disc.size.width/2 < _leftLimit ||
-               _disc.position.x + _disc.size.width/2 > _rightLimit {
+            if _disc.position.x - _disc.size.width/2 < _leftLimit! ||
+               _disc.position.x + _disc.size.width/2 > _rightLimit! {
                 // Disc is completely to the left or to the right of the scene.
                 // Player lost rally.
                 gotoLostDiscState()
@@ -852,10 +853,10 @@ class CourtScene: SKScene, GameCenterConnDelegate, SKPhysicsContactDelegate {
     // MARK: - Private helper methods
     
     private func resetPadsPositions() {
-        let lHPos = _leftPad.size.width/2.0 + CourtScene.PAD_INSET
+        let lHPos = _leftPad.position.x
         let vPos = size.height/2.0
         _leftPad.position = CGPoint(x: lHPos, y: vPos)
-        let rHPos = self.size.width - CourtScene.PAD_INSET - _rightPad.size.width/2.0
+        let rHPos = _rightPad.position.x
         _rightPad.position = CGPoint(x: rHPos, y: vPos)
     }
     

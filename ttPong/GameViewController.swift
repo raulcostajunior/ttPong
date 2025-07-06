@@ -30,9 +30,12 @@ class GameViewController: UIViewController {
         // SafeArea adjustments cannot be done at viewDidLoad (too early;
         // all the insets are zero, even for models that have a notch and no
         // home button).
-        if #available(iOS 11.0, *) {
-            view.frame = self.view.safeAreaLayoutGuide.layoutFrame
-        }
+//        if #available(iOS 11.0, *) {
+////            let widthReduction = view.frame.width - view.safeAreaLayoutGuide.layoutFrame.width
+////            
+////            view.frame = CGRect(origin: .zero, size:view.safeAreaLayoutGuide.layoutFrame.size)
+//            view.frame = self.view.safeAreaLayoutGuide.layoutFrame
+//        }
         GameManager.shared.presentGame(on: view)
         gamePresented = true
     }
